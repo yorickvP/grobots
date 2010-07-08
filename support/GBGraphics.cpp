@@ -5,6 +5,7 @@
 #include "GBGraphics.h"
 #include "GBStringUtilities.h"
 #include <math.h>
+#include <SDL_gfxPrimitives.h>
 
 // GBRect //
 
@@ -25,7 +26,17 @@ void GBRect::Shrink(short step) {
 	bottom -= step;
 }
 
-#if MAC && ! HEADLESS
+#ifdef WITH_SDL
+void GBRect::ToRect(SDL_Rect & r) const {
+	r.x = left;
+	r.y = top;
+	r.w = right-left;
+	r.h = bottom-top;
+}
+GBRect::GBRect(SDL_Rect & r)
+	: left(r.x), top(r.y), right(r.x + r.w), bottom(r.y + r.h) {}
+
+#elif MAC && ! HEADLESS
 void GBRect::ToRect(Rect & r) const {
 	r.left = left;
 	r.top = top;
@@ -45,24 +56,76 @@ void GBRect::ToRect(RECT & r) const {
 #endif
 
 // GBGraphics //
-
-#if HEADLESS
+#ifdef WITH_SDL
+GBGraphics::GBGraphics(SDL_Surface * surf) : surf(surf) {};
+GBGraphics::~GBGraphics() {}
+void GBGraphics::setSurface(SDL_Surface* surf) {this->surf = surf;}
+void GBGraphics::DrawLine(short x1, short y1, short x2, short y2,
+		const GBColor & color, short thickness) {
+	if (surf == nil) return;
+	lineRGBA(surf, x1, y1, x2, y2, color.Red() * 255, color.Green() * 255, color.Blue() * 255, 255);
+}
+void GBGraphics::DrawSolidRect(const GBRect & where, const GBColor & color) {
+	if (surf == nil) return;
+	boxRGBA(surf, where.left, where.top, where.right, where.bottom, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+}
+void GBGraphics::DrawOpenRect(const GBRect & where, const GBColor & color, short thickness) {
+	if (surf == nil) return;
+	rectangleRGBA(surf, where.left, where.top, where.right, where.bottom, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+}
+void GBGraphics::DrawSolidOval(const GBRect & r, const GBColor & color) {
+	if (surf == nil) return;
+	SDL_Rect r1;
+	r.ToRect(r1);
+	filledEllipseRGBA(surf, r1.x + (r1.w/2), r1.y + (r1.h/2), r1.w/2, r1.h/2, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+}
+void GBGraphics::DrawOpenOval(const GBRect & r, const GBColor & color, short thickness) {
+	if (surf == nil) return;
+	SDL_Rect r1;
+	r.ToRect(r1);
+	ellipseRGBA(surf, r1.x + (r1.w/2), r1.y + (r1.h/2), r1.w/2, r1.h/2, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+}
+void GBGraphics::DrawStringLeft(const string & str, short x, short y,
+		short size, const GBColor & color, bool useBold) {
+	if (surf == nil) return;
+	stringRGBA(surf, x, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+}
+void GBGraphics::DrawStringCentered(const string & str, short x, short y,
+		short size, const GBColor & color, bool useBold) {
+	if (surf == nil) return;
+	stringRGBA(surf, x - (str.length() * 4), y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+}
+void GBGraphics::DrawStringRight(const string & str, short x, short y,
+		short size, const GBColor & color, bool useBold) {
+	if (surf == nil) return;
+	stringRGBA(surf, x - str.length() * 8, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+}
+void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect) {
+	SDL_Rect r1, r2;
+	srcRect.ToRect(r1);
+	destRect.ToRect(r2);
+	SDL_BlitSurface(src.surf, &r1, surf, &r2);
+}
+#elif HEADLESS
 GBGraphics::GBGraphics() {}
 GBGraphics::~GBGraphics() {}
-
 void GBGraphics::DrawLine(short, short, short, short, const GBColor &, short) {}
-
 void GBGraphics::DrawSolidRect(const GBRect &, const GBColor &) {}
 void GBGraphics::DrawOpenRect(const GBRect &, const GBColor &, short) {}
+
 void GBGraphics::DrawSolidOval(const GBRect &, const GBColor &) {}
 void GBGraphics::DrawOpenOval(const GBRect &, const GBColor &, short) {}
-void GBGraphics::DrawArc(const GBRect &, short, short, const GBColor &, short) {}
 
 void GBGraphics::DrawStringLeft(const string &, short, short, short, const GBColor &, bool) {}
 void GBGraphics::DrawStringRight(const string &, short, short, short, const GBColor &, bool) {}
 void GBGraphics::DrawStringCentered(const string &, short, short, short, const GBColor &, bool) {}
 
 void GBGraphics::Blit(const GBBitmap &, const GBRect &, const GBRect &) {}
+#endif
+#if HEADLESS || defined(WITH_SDL)
+
+void GBGraphics::DrawArc(const GBRect &, short, short, const GBColor &, short) {}
+
 #elif MAC
 void GBGraphics::UseColor(const GBColor & c) {
 	RGBColor color;
@@ -298,10 +361,25 @@ GBGraphics & GBBitmap::Graphics() {
 
 const GBGraphics & GBBitmap::Graphics() const {
 	return graphics;}
+	
+#ifdef WITH_SDL
+SDL_Surface* CreateCompatibleRGBSurface(Uint32 flags, short width, short height, SDL_Surface* source) {
+	const SDL_PixelFormat& fmt = *(source->format);
+	return SDL_CreateRGBSurface(flags, width, height, fmt.BitsPerPixel, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask);
+}
+GBBitmap::GBBitmap(short width, short height, GBGraphics &g)
+	: bounds(0, 0, width, height),
+	surf(g.surf ? CreateCompatibleRGBSurface(SDL_SWSURFACE, width, height, g.surf) : nil), graphics(surf)
+{}
 
-#if HEADLESS
-GBBitmap::GBBitmap(short width, short height, GBGraphics &)
-	: bounds(0, 0, width, height), graphics()
+GBBitmap::~GBBitmap() { if (surf) SDL_FreeSurface(surf); }
+
+void GBBitmap::StartDrawing() {}
+void GBBitmap::StopDrawing() {}
+
+#elif HEADLESS
+GBBitmap::GBBitmap(short width, short height, GBGraphics &g)
+	: bounds(0, 0, width, height), graphics(g)
 {}
 
 GBBitmap::~GBBitmap() {}

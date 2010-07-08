@@ -7,6 +7,7 @@
 #define GBErrors_h
 
 #include <string>
+#include <cstdlib>
 
 using std::string;
 

@@ -6,7 +6,7 @@
 #include "GBStringUtilities.h"
 #include <stdlib.h>
 
-#if HEADLESS
+#if HEADLESS || defined(WITH_SDL)
 	#include <iostream>
 	using std::cerr;
 	using std::endl;
@@ -87,7 +87,7 @@ string GBAbort::ToString() const {
 	return "abort";
 }
 
-#if HEADLESS
+#if HEADLESS || defined(WITH_SDL)
 void FatalError(const string & message) {
 	cerr << "Fatal error: " << message << endl;
 	exit(EXIT_FAILURE);
@@ -95,6 +95,11 @@ void FatalError(const string & message) {
 
 void NonfatalError(const string & message) {
 	cerr << message << endl;
+}
+
+bool Confirm(const string & message, const string & operation) {
+	//TODO this should actually ask
+	return true;
 }
 #elif MAC
 const short kFatalErrorAlertID = 600;

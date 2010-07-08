@@ -8,6 +8,9 @@
 
 #include "GBPlatform.h"
 
+#ifdef WITH_SDL
+  #include <SDL/SDL.h>
+  #include <SDL_gfxPrimitives.h>
 #if HEADLESS
 	//nothing
 #elif MAC
@@ -32,7 +35,10 @@ public:
 	short CenterX() const;
 	short CenterY() const;
 	void Shrink(short step);
-#if MAC && ! HEADLESS
+#ifdef WITH_SDL
+	void ToRect(SDL_Rect & r) const;
+	GBRect(SDL_Rect & r);
+#elif MAC && ! HEADLESS
 	void ToRect(Rect & r) const;
 	GBRect(Rect & r);
 #elif WINDOWS
@@ -43,7 +49,13 @@ public:
 class GBBitmap;
 
 class GBGraphics {
-#if HEADLESS
+#ifdef WITH_SDL
+	SDL_Surface* surf;
+public:
+	GBGraphics(SDL_Surface * surf);
+	void setSurface(SDL_Surface* surf);
+	friend class GBBitmap;
+#elif HEADLESS
 public:
 	GBGraphics();
 #elif MAC
@@ -91,9 +103,10 @@ public:
 
 class GBBitmap {
 private:
-	GBRect bounds;
-	GBGraphics graphics;
-#if HEADLESS
+#ifdef WITH_SDL
+	SDL_Surface* surf;
+	friend class GBGraphics;
+#elif HEADLESS
 #elif MAC
 	GWorldPtr world;
 	CGrafPtr savePort;
@@ -106,6 +119,9 @@ public:
 #else
 	#warning "Need GBBitmap."
 #endif
+private:
+	GBRect bounds;
+	GBGraphics graphics;
 public:
 	GBBitmap(short width, short height, GBGraphics & parent);
 	~GBBitmap();

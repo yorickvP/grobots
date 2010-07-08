@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <time.h>
 
-#if WINDOWS && _MSC_VER < 1300
+#if WINDOWS && _MSC_VER < 1300 && !defined __MINGW32__
 //this seems to be missing in MSVC6
 ostream & operator << (ostream & s, const string & str) {
 	return s << str.c_str();
