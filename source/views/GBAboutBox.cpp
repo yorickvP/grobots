@@ -1,5 +1,5 @@
 // GBAboutBox.cpp
-// Grobots (c) 2002-2006 Devon and Warren Schudy
+// Grobots (c) 2002-2012 Devon and Warren Schudy
 // Distributed under the GNU General Public License.
 
 #include "GBAboutBox.h"
@@ -29,18 +29,21 @@ void GBAboutBox::Draw() {
 	DrawStringLeft("Tilendor", 35, 128, 10, GBColor::white);
 	DrawStringLeft("Daniel von Fange", 35, 138, 10, GBColor::white);
 	DrawStringLeft("Borg", 35, 148, 10, GBColor::white);
-	DrawStringCentered("http://grobots.sourceforge.net/", Width() / 2, 175, 10, GBColor(0, 0.7f, 1));
-	DrawStringLeft("Grobots comes with ABSOLUTELY NO WARRANTY.", 10, 198, 10, GBColor::white);
-    DrawStringLeft("This is free software, and you are welcome to", 10, 210, 10, GBColor::white);
-	DrawStringLeft("redistribute it under the GNU General Public License.", 10, 222, 10, GBColor::white);
+	DrawStringLeft("Eugen Zagorodniy", 35, 158, 10, GBColor::white);
+	DrawStringLeft("Rick Manning", 35, 168, 10, GBColor::white);
+	DrawStringLeft("Mike Anderson", 35, 178, 10, GBColor::white);
+	DrawStringCentered("http://grobots.sourceforge.net/", Width() / 2, 205, 10, GBColor(0, 0.7f, 1));
+	DrawStringLeft("Grobots comes with ABSOLUTELY NO WARRANTY.", 10, 228, 10, GBColor::white);
+    DrawStringLeft("This is free software, and you are welcome to", 10, 240, 10, GBColor::white);
+	DrawStringLeft("redistribute it under the GNU General Public License.", 10, 252, 10, GBColor::white);
 }
 
 short GBAboutBox::PreferredWidth() const {
-	return 260;
+	return 290;
 }
 
 short GBAboutBox::PreferredHeight() const {
-	return 235;
+	return 265;
 }
 
 const string GBAboutBox::Name() const {
