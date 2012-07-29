@@ -25,6 +25,10 @@ The authors' email addresses are:
 dschudy@yahoo.com
 wschudy@alum.wpi.edu
 
+----- Building under XCode -----
+
+In XCode 2.x or later, open mac/Grobots.xcodeproj and everything should work.
+
 ----- Building under MPW -----
 
 The Mac version of Grobots can be built under MPW, using STLport
@@ -47,10 +51,9 @@ Then run MPW, make Grobots the current directory, and run
 
 ----- Building under MSVC -----
 
-The Windows versions (regular and headless) can be built under
-Microsoft Visual C++ 6. Open win/Grobots.dsw and everything should work.
+The Windows versions (regular and headless) can be built under Microsoft Visual Studio 2010.  Open win/WinGrobots.sln and everything should work.
 
-The compiler may die of an internal error when building with full optimizations on.
+For older versions (back to MSVC 6), open win/Grobots.dsw. The compiler may die of an internal error when building with full optimizations on.
 
 
 Building Grobots on Windows using Visual Studio 2005
