@@ -70,6 +70,10 @@ GBNumber GBNumber::operator*(const double factor) const {
 	return MakeRaw(factor * data);
 }
 
+GBNumber GBNumber::operator*(const short factor) const {
+	return MakeRaw(factor * data);
+}
+
 GBNumber GBNumber::operator/(const GBNumber &divisor) const {
 	if ( ! divisor.data ) throw GBDivideByZeroError();
 	return MakeRaw(((GBLongLong)data << kNumFractionBits) / (GBLongLong)divisor.data);
@@ -86,6 +90,11 @@ GBNumber GBNumber::operator/(const long divisor) const {
 }
 
 GBNumber GBNumber::operator/(const double divisor) const {
+	if ( ! divisor ) throw GBDivideByZeroError();
+	return MakeRaw(data / divisor); // is this right?
+}
+
+GBNumber GBNumber::operator/(const short divisor) const {
 	if ( ! divisor ) throw GBDivideByZeroError();
 	return MakeRaw(data / divisor); // is this right?
 }

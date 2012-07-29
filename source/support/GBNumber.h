@@ -38,11 +38,15 @@ public:
 	GBNumber operator/=(const long divisor);
 	GBNumber operator*=(const double factor);
 	GBNumber operator/=(const double divisor);
+	GBNumber operator*=(const short factor);
+	GBNumber operator/=(const short divisor);
 // arithmetic
 	GBNumber operator+(int) const;
 	GBNumber operator-(int) const;
 	GBNumber operator+(double) const;
 	GBNumber operator-(double) const;
+	GBNumber operator+(short) const;
+	GBNumber operator-(short) const;
 	GBNumber operator*(const GBNumber &) const;
 	GBNumber operator/(const GBNumber &) const;
 	GBNumber operator*(const int factor) const;
@@ -51,6 +55,8 @@ public:
 	GBNumber operator/(const long divisor) const;
 	GBNumber operator*(const double factor) const;
 	GBNumber operator/(const double divisor) const;
+	GBNumber operator*(const short factor) const;
+	GBNumber operator/(const short divisor) const;
 // comparisons
 	bool operator==(const GBNumber &) const;
 	bool operator!=(const GBNumber &) const;
@@ -218,6 +224,14 @@ inline GBNumber GBNumber::operator+(double addend) const {
 }
 
 inline GBNumber GBNumber::operator-(double subtrahend) const {
+	return *this - GBNumber(subtrahend);
+}
+
+inline GBNumber GBNumber::operator+(short addend) const {
+	return *this + GBNumber(addend);
+}
+
+inline GBNumber GBNumber::operator-(short subtrahend) const {
 	return *this - GBNumber(subtrahend);
 }
 
