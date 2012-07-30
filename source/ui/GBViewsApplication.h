@@ -66,6 +66,7 @@ public:
 #endif
 	void SetStepPeriod(int period);
 //UI setup
+	static GBRect GetScreenSize();
 	GBWindow * MakeWindow(GBView * view, int x, int y, bool visible = true);
 //menus
 	void CheckOne(int item, bool checked);

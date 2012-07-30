@@ -191,11 +191,11 @@ short GBMiniMapView::MaximumHeight() const {
 }
 
 short GBMiniMapView::PreferredWidth() const {
-	return floor(world.Size().x) * 2;
+	return floor(world.Size().x) * 3;
 }
 
 short GBMiniMapView::PreferredHeight() const {
-	return floor(world.Size().y) * 2;
+	return floor(world.Size().y) * 3;
 }
 
 void GBMiniMapView::SetSize(short width, short height) {

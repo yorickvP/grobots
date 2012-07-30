@@ -24,6 +24,7 @@ class GBApplication;
 class GBPortal : public GBView, public GBModel, public GBDeletionListener {
 	GBWorld & world;
 	GBPosition viewpoint;
+	short defaultwidth, defaultheight;
 	short scale; //pixels per unit
 	bool following;
 	GBPosition followPosition;
@@ -80,6 +81,7 @@ public:
 	bool Resizable() const;
 	short PreferredWidth() const;
 	short PreferredHeight() const;
+	void SetDefaultSize(short width, short height);
 	void SetSize(short width, short height);
 // edges
 	GBCoordinate ViewLeft() const;

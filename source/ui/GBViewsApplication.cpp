@@ -335,6 +335,21 @@ GBViewsApplication::~GBViewsApplication() {
 #endif
 }
 
+GBRect GBViewsApplication::GetScreenSize() {
+#if CARBON
+	Rect bounds;
+	if ( !GetAvailableWindowPositioningBounds(GetMainDevice(), &bounds) )
+		return GBRect(bounds);
+#elif MAC
+	return GBRect(qd.screenBits.bounds);
+#elif WIN
+	RECT desktop;
+	if (!GetWindowRect(GetDesktopWindow(), &desktop))
+		return GBRect(desktop);
+#endif
+	return GBRect(2, 44, 1024, 768);
+}
+
 GBWindow * GBViewsApplication::MakeWindow(GBView * view, int x, int y, bool visible) {
 #if WINDOWS
 	GBWindow * w = new GBWindow(view, x, y, visible, hInstance, this);

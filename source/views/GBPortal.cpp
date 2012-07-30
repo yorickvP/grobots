@@ -172,6 +172,7 @@ void GBPortal::RestrictScrolling() {
 GBPortal::GBPortal(GBWorld & newWorld)
 	: world(newWorld),
 	viewpoint(newWorld.Size() / 2), scale(kScale),
+	defaultwidth(400), defaultheight(400),
 	following(false), followPosition(newWorld.Size() / 2), moving(nil),
 	autofollow(false), lastFollow(0),
 	tool(ptScroll),
@@ -363,11 +364,16 @@ bool GBPortal::Resizable() const {
 }
 
 short GBPortal::PreferredWidth() const {
-	return 311;
+	return defaultwidth;
 }
 
 short GBPortal::PreferredHeight() const {
-	return 311;
+	return defaultheight;
+}
+
+void GBPortal::SetDefaultSize(short width, short height) {
+	defaultwidth = width;
+	defaultheight = height;
 }
 
 void GBPortal::SetSize(short width, short height) {

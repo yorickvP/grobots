@@ -410,24 +410,34 @@ GBApplication::GBApplication()
 	debuggerWindow(nil), sideDebuggerWindow(nil)
 {
 	SetupSound();
+	GBView * roster = new GBRosterView(world);
 	portal = new GBPortal(world);
-	mainWindow = MakeWindow(new GBDoubleBufferedView(portal), 291, 43);
-	debugger = new GBDebuggerView(world);
-	debuggerWindow = MakeWindow(debugger, 616, 43, false);
-	sideDebuggerWindow = MakeWindow(new GBSideDebuggerView(world), 200, 400, false);
 	minimap = new GBMiniMapView(world, *portal);
-	minimapWindow = MakeWindow(new GBDoubleBufferedView(minimap), 7,
-		#if MAC && ! CARBON
-			qd.screenBits.bounds.bottom - 230,
-		#else
-			400,
-		#endif
-		true);
-	rosterWindow = MakeWindow(new GBRosterView(world), 7, 43);
-	aboutWindow = MakeWindow(new GBAboutBox(), 200, 150, false);
 	scores = new GBScoresView(world);
-	scoresWindow = MakeWindow(scores, 291, 384, false);
-	typeWindow = MakeWindow(new GBRobotTypeView(world), 616, 270, false);
+	debugger = new GBDebuggerView(world);
+//lay out windows...
+	GBRect screen = GetScreenSize();
+	short edge = 5, titlebar = 22, rightedge = edge; //TODO get these from window manager
+#if MAC
+	edge = 0;
+	rightedge = screen.Width() > 800 ? 100 : edge;
+#endif
+	short gap = edge * 2 + 1;
+	short left = screen.left + edge;
+	short mainleft = left + roster->PreferredWidth() + gap;
+	short right = screen.right - debugger->PreferredWidth() - rightedge;
+	short top = screen.top + titlebar + edge;
+	short scorestop = screen.bottom - scores->PreferredHeight() - edge;
+	portal->SetDefaultSize(max(right - mainleft - gap, 311), max(scorestop - top - titlebar, 311));
+//...and create them
+	mainWindow = MakeWindow(new GBDoubleBufferedView(portal), mainleft, top);
+	debuggerWindow = MakeWindow(debugger, right, top, false);
+	sideDebuggerWindow = MakeWindow(new GBSideDebuggerView(world), 200, 400, false);
+	minimapWindow = MakeWindow(new GBDoubleBufferedView(minimap), left, screen.bottom - minimap->PreferredHeight() - edge);
+	rosterWindow = MakeWindow(roster, left, top);
+	aboutWindow = MakeWindow(new GBAboutBox(), 200, 150, false);
+	scoresWindow = MakeWindow(scores, left + minimap->PreferredWidth() + gap, scorestop, false);
+	typeWindow = MakeWindow(new GBRobotTypeView(world), right, 270, false);
 	tournamentWindow = MakeWindow(new GBTournamentView(world), 100, 100, false);
 	SetupMenus();
 	SetStepPeriod(kNormalSpeedLimit);
