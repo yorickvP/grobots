@@ -80,6 +80,13 @@ void GBView::DrawStringPair(const string & str1, const string & str2,
 	DrawStringRight(str2, right, y, size, color, useBold);
 }
 
+//Convenience: fit pairs inside a box
+void GBView::DrawStringPair(const string & str1, const string & str2,
+		const GBRect & box, short y, short size, const GBColor & color, bool useBold) const {
+	DrawStringLeft(str1, box.left + 3, box.top + y, size, color, useBold);
+	DrawStringRight(str2, box.right - 3, box.top + y, size, color, useBold);
+}
+
 void GBView::DrawLongLeft(long n, short x, short y,
 		short size, const GBColor & color, bool useBold) const {
 	DrawStringLeft(ToString(n), x, y, size, color, useBold);
@@ -94,6 +101,13 @@ void GBView::DrawStringLongPair(const string & str, long n,
 		short left, short right, short y, short size, const GBColor & color, bool useBold) const {
 	DrawStringLeft(str, left, y, size, color, useBold);
 	DrawLongRight(n, right, y, size, color, useBold);
+}
+
+//Convenience: fit pairs inside a box
+void GBView::DrawStringLongPair(const string & str, long n,
+		const GBRect & box, short y, short size, const GBColor & color, bool useBold) const {
+	DrawStringLeft(str, box.left + 3, box.top + y, size, color, useBold);
+	DrawLongRight(n, box.right - 3, box.top + y, size, color, false);
 }
 
 void GBView::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect) const {

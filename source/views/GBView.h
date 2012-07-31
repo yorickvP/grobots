@@ -49,6 +49,8 @@ protected:
 		short size, const GBColor & color = GBColor::black, bool bold = false) const;
 	void DrawStringPair(const string & str1, const string & str2,
 		short left, short right, short y, short size, const GBColor & color = GBColor::black, bool bold = false) const;
+	void DrawStringPair(const string & str1, const string & str2,
+		const GBRect & box, short y, short size, const GBColor & color = GBColor::black, bool bold = false) const;
 // longs
 	void DrawLongLeft(long n, short x, short y,
 		short size, const GBColor & color = GBColor::black, bool bold = false) const;
@@ -56,6 +58,8 @@ protected:
 		short size, const GBColor & color = GBColor::black, bool bold = false) const;
 	void DrawStringLongPair(const string & str1, long n,
 		short left, short right, short y, short size, const GBColor & color = GBColor::black, bool bold = false) const;
+	void DrawStringLongPair(const string & str1, long n,
+		const GBRect & box, short y, short size, const GBColor & color = GBColor::black, bool bold = false) const;
 // blitter
 	void Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect) const;
 	void BlitAll(const GBBitmap & src, const GBRect & srcRect) const;
