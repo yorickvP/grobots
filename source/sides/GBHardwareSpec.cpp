@@ -399,7 +399,7 @@ GBHardwareSpec::GBHardwareSpec()
 	syphon(), enemySyphon(),
 // calculated
 	coolingCost(0),
-	hardwareCost(), mass()
+	growthCost(0), combatCost(0), hardwareCost(0), mass(0)
 {}
 
 GBHardwareSpec::~GBHardwareSpec() {}
@@ -426,6 +426,8 @@ GBHardwareSpec & GBHardwareSpec::operator=(const GBHardwareSpec & arg) {
 	syphon = arg.syphon;
 	enemySyphon = arg.enemySyphon;
 	coolingCost = arg.coolingCost;
+	growthCost = arg.growthCost;
+	combatCost = arg.combatCost;
 	hardwareCost = arg.hardwareCost;
 	mass = arg.mass;
 	return *this;
@@ -494,12 +496,16 @@ void GBHardwareSpec::SetBomb(const GBDamage amt) {
 	bomb = max(amt, 0);}
 
 void GBHardwareSpec::Recalculate() {
+	growthCost = EnergyHardwareCost() + SolarCellsCost()
+		+ EaterCost() + constructor.Cost() + syphon.Cost();
+	combatCost = ArmorCost() + RepairCost() + ShieldCost() +
+		blaster.Cost() + grenades.Cost() + enemySyphon.Cost() + BombCost();
 	hardwareCost = ChassisCost()
 		+ ProcessorCost()
 		+ EngineCost()
 		+ sensor1.Cost() + sensor2.Cost() + sensor3.Cost()
 		+ forceField.Cost()
-		+ GrowthCost() + CombatCost();
+		+ growthCost + combatCost;
 	mass = ChassisMass()
 		+ ProcessorMass()
 		+ EngineMass()
@@ -530,16 +536,11 @@ GBEnergy GBHardwareSpec::BaseCost() const {
 GBMass GBHardwareSpec::Mass() const {
 	return mass;}
 	
-// not cached, since these aren't called much
 GBEnergy GBHardwareSpec::GrowthCost() const {
-	return EnergyHardwareCost() + SolarCellsCost()
-		+ EaterCost() + constructor.Cost() + syphon.Cost();
-}
+	return growthCost;}
 
 GBEnergy GBHardwareSpec::CombatCost() const {
-	return ArmorCost() + RepairCost() + ShieldCost() +
-		blaster.Cost() + grenades.Cost() + enemySyphon.Cost() + BombCost();
-}
+	return combatCost;}
 
 GBEnergy GBHardwareSpec::ChassisCost() const {
 	return kBaseCost;}

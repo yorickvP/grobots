@@ -151,7 +151,7 @@ public: // complex hardware
 	// collision sensor?
 private: // calculated
 	GBEnergy coolingCost;
-	GBEnergy hardwareCost;
+	GBEnergy growthCost, combatCost, hardwareCost;
 	GBMass mass;
 public:
 	GBHardwareSpec();
