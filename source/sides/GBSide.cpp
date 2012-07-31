@@ -6,6 +6,7 @@
 #include "GBRobotType.h"
 #include "GBErrors.h"
 #include "GBRandomState.h"
+#include "GBStringUtilities.h"
 
 
 const float kSideCopyColorDistance = 0.3f;
@@ -309,3 +310,11 @@ bool GBSide::Better(const GBSide *a, const GBSide *b) {
 	return a->TournamentScores().BiomassFraction() > b->TournamentScores().BiomassFraction();
 }
 
+//Return the basename of the file this side was loaded from.
+std::string GBSide::Filename() const {
+#if USE_MAC_IO
+	return FromPascalString(filename.name);
+#else
+	return filename.c_str(); //basename?
+#endif
+}

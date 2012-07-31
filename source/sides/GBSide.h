@@ -108,6 +108,8 @@ public:
 	int MessagesWaiting(const int channel, const GBMessageNumber next) const;
 
 	static bool Better(const GBSide *a, const GBSide *b);
+	
+	std::string GBSide::Filename() const;
 };
 
 
