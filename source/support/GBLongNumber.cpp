@@ -45,8 +45,8 @@ GBLongNumber & GBLongNumber::operator +=(const GBLongNumber & addend) {
 	return *this;
 }
 
-long GBLongNumber::operator /(const GBLongNumber & divisor) const {
-	return *this / divisor.Round();
+double GBLongNumber::operator /(const GBLongNumber & divisor) const {
+	return (double)Round() / divisor.Round();
 }
 
 long GBLongNumber::operator /(long divisor) const {

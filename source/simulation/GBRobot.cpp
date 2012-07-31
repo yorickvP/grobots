@@ -114,8 +114,16 @@ GBNumber GBRobot::ShieldFraction() const {
 }
 
 void GBRobot::TakeDamage(const GBDamage amount, GBSide * origin) {
-	hardware.TakeDamage(amount * type->MassiveDamageMultiplier(mass) * ShieldFraction());
+	GBDamage actual = amount * type->MassiveDamageMultiplier(mass) * ShieldFraction();
+	hardware.TakeDamage(actual);
 	lastHit = origin;
+	if ( origin == Owner() )
+		Owner()->Scores().ReportFriendlyFire(actual);
+	else {
+		Owner()->Scores().ReportDamageTaken(actual);
+		if ( origin )
+			origin->Scores().ReportDamageDone(actual);
+	}
 }
 
 GBEnergy GBRobot::TakeEnergy(const GBEnergy amount) {
@@ -209,7 +217,7 @@ void GBRobot::Act(GBWorld * world) {
 
 void GBRobot::CollectStatistics(GBWorld * world) const {
 	GBEnergy bm = Biomass();
-	Owner()->ReportRobot(bm, type->Hardware().constructor.Cost(), Position());
+	Owner()->ReportRobot(bm, type, Position());
 	type->ReportRobot(bm);
 	world->ReportRobot(bm);
 }

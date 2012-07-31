@@ -84,7 +84,7 @@ public:
 	void Reset(); // clear status info
 	void ResetSampledStatistics();
 // scoring
-	void ReportRobot(GBEnergy biomass, GBEnergy construc, const GBPosition & where);
+	void ReportRobot(GBEnergy biomass, const GBRobotType *type, const GBPosition & where);
 	void ReportDead(const GBEnergy en);
 	void ReportKilled(const GBEnergy en);
 	void ReportSuicide(const GBEnergy en);

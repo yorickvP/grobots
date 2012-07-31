@@ -122,9 +122,10 @@ GBScores::GBScores()
 	: rounds(0), sides(0), survived(0), sterile(0), earlyDeaths(0), elimination(0),
 	population(0), populationEver(0),
 	biomass(0), earlyBiomass(0),
-	constructor(0),
+	constructor(0), economyHardware(0), combatHardware(0), totalHardware(0),
 	territory(0),
 	dead(0), killed(0), suicide(0),
+	damageDone(0), damageTaken(0), friendlyFire(0),
 	income(), expenditure(), seeded(0),
 	biomassFraction(0.0), earlyBiomassFraction(0.0),
 	killedFraction(0.0),
@@ -141,11 +142,13 @@ void GBScores::Reset() {
 	population = populationEver = 0;
 	biomass = earlyBiomass = 0;
 	constructor = 0;
+	economyHardware = combatHardware = totalHardware = 0;
 	territory = 0;
 	seeded = 0;
 	income.Reset();
 	expenditure.Reset();
 	dead = killed = suicide = 0;
+	damageDone = damageTaken = friendlyFire = 0;
 	biomassFraction = earlyBiomassFraction = 0.0;
 	killedFraction = 0.0;
 	biomassFractionSquared = 0.0;
@@ -167,6 +170,9 @@ GBScores & GBScores::operator +=(const GBScores & other) {
 	biomass += other.biomass;
 	earlyBiomass += other.earlyBiomass;
 	constructor += other.constructor;
+	economyHardware += other.economyHardware;
+	combatHardware += other.combatHardware;
+	totalHardware += other.totalHardware;
 	territory += other.territory;
 	seeded += other.seeded;
 	income += other.income;
@@ -174,14 +180,19 @@ GBScores & GBScores::operator +=(const GBScores & other) {
 	dead += other.dead;
 	killed += other.killed;
 	suicide += other.suicide;
+	damageDone += other.damageDone;
+	damageTaken += other.damageTaken;
+	friendlyFire += other.friendlyFire;
 	biomassFraction += other.biomassFraction;
 	earlyBiomassFraction += other.earlyBiomassFraction;
 	killedFraction += other.killedFraction;
 	biomassFractionSquared += other.biomassFractionSquared;
 //add biomass
 	if (biomassHistory.size() < other.biomassHistory.size())
-		biomassHistory.resize(other.biomassHistory.size(), 0);
-	for ( int i = 0; i < other.biomassHistory.size(); ++i )
+		biomassHistory.resize(other.biomassHistory.size(), biomassHistory.back());
+	for ( int i = other.biomassHistory.size(); i < biomassHistory.size(); ++ i )
+		biomassHistory[i] += other.biomassHistory.back();
+	for ( int i = 0; i < other.biomassHistory.size(); ++ i )
 		biomassHistory[i] += other.biomassHistory[i];
 	return *this;
 }
@@ -257,6 +268,10 @@ long GBScores::Constructor() const { return constructor / rounds; }
 
 long GBScores::Territory() const { return territory; }
 
+GBRatio GBScores::EconFraction() const { return economyHardware / totalHardware; }
+GBRatio GBScores::CombatFraction() const { return combatHardware / totalHardware; }
+
+
 long GBScores::Seeded() const { return seeded / rounds; }
 
 GBIncomeStatistics & GBScores::Income() { return income;}
@@ -316,7 +331,8 @@ GBSideScores::~GBSideScores() {}
 void GBSideScores::ResetSampledStatistics() {
 	population = 0;
 	biomass = 0;
-	constructor = 0;
+	constructor = economyHardware = combatHardware = totalHardware = 0;
+	
 	territory = 0;
 }
 
@@ -326,15 +342,23 @@ void GBSideScores::Reset() {
 	sterileTime = 0;
 }
 
-void GBSideScores::ReportRobot(const GBEnergy botBiomass, const GBEnergy construc) {
+void GBSideScores::ReportRobot(const GBEnergy &botBiomass, const GBEnergy &construc,
+							   const GBEnergy &econ, const GBEnergy &combat, const GBEnergy hw) {
 	population += 1;
 	biomass += botBiomass;
 	constructor += construc;
+	economyHardware += econ;
+	combatHardware += combat;
+	totalHardware += hw;
 }
 
 void GBSideScores::ReportDead(const GBEnergy en) { dead += en; }
 void GBSideScores::ReportKilled(const GBEnergy en) { killed += en; }
 void GBSideScores::ReportSuicide(const GBEnergy en) { suicide += en; }
+
+void GBSideScores::ReportDamageDone(const GBDamage d) { damageDone += d; }
+void GBSideScores::ReportDamageTaken(const GBDamage d) { damageTaken += d; }
+void GBSideScores::ReportFriendlyFire(const GBDamage d) { friendlyFire += d; }
 
 void GBSideScores::ReportSeeded(const GBEnergy en) {
 	seeded += en;
@@ -379,7 +403,7 @@ void GBSideScores::ReportFrame(const GBFrames frame) {
 		earlyBiomass = biomass;
 		if ( sterile ) earlyDeaths = 1;
 	}
-	if ( frame % 100 == 0 )
+	if ( frame % 100 == 0 && frame )
 		biomassHistory.push_back(biomass.Round());
 }
 

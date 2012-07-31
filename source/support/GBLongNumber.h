@@ -23,7 +23,7 @@ public:
 	GBLongNumber & operator+=(const GBNumber addend);
 	GBLongNumber & operator+=(const GBLongNumber & addend);
 // misc
-	long operator/(const GBLongNumber & divisor) const;
+	double operator/(const GBLongNumber & divisor) const;
 	long operator/(long divisor) const;
 	bool Nonzero() const;
 	bool Zero() const;

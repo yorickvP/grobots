@@ -93,12 +93,14 @@ protected:
 	GBLongNumber biomass, earlyBiomass;
 	std::vector<long> biomassHistory; //may eventually be a vector of GBScores
 	GBLongNumber constructor;
+	GBLongNumber economyHardware, combatHardware, totalHardware;
 	long territory;
 // accumulated
 	GBLongNumber seeded;
 	GBIncomeStatistics income;
 	GBExpenditureStatistics expenditure;
 	GBLongNumber dead, killed, suicide;
+	GBLongNumber damageDone, damageTaken, friendlyFire;
 // fractions
 	float biomassFraction, earlyBiomassFraction;
 	float killedFraction;
@@ -135,6 +137,8 @@ public:
 	const std::vector<long> BiomassHistory() const;
 	long Constructor() const;
 	long Territory() const;
+	GBRatio EconFraction() const;
+	GBRatio CombatFraction() const;
 // cumulative
 	long Seeded() const;
 	const GBIncomeStatistics & Income() const;
@@ -164,10 +168,14 @@ public:
 	void ReportSeeded(const GBEnergy en);
 	void ReportFrame(const GBFrames frame);
 	void ResetSampledStatistics();
-	void ReportRobot(const GBEnergy en, const GBPower construc);
+	void ReportRobot(const GBEnergy &botBiomass, const GBEnergy &construc,
+					 const GBEnergy &econ, const GBEnergy &combat, const GBEnergy hw);
 	void ReportDead(const GBEnergy en);
 	void ReportKilled(const GBEnergy en);
 	void ReportSuicide(const GBEnergy en);
+	void ReportDamageDone(const GBDamage d);
+	void ReportDamageTaken(const GBDamage d);
+	void ReportFriendlyFire(const GBDamage d);
 	void ReportTerritory();
 // accessors
 	GBFrames ExtinctTime() const;

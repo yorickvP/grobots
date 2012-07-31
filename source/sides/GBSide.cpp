@@ -199,8 +199,9 @@ void GBSide::ResetSampledStatistics() {
 	Changed();
 }
 
-void GBSide::ReportRobot(GBEnergy biomass, GBEnergy construc, const GBPosition & where) {
-	scores.ReportRobot(biomass, construc);
+void GBSide::ReportRobot(GBEnergy biomass, const GBRobotType *type, const GBPosition & where) {
+	const GBHardwareSpec &hw = type->Hardware();
+	scores.ReportRobot(biomass, hw.constructor.Cost(), hw.GrowthCost(), hw.CombatCost(), hw.BaseCost());
 	groupPosition += where;
 	Changed();
 }
