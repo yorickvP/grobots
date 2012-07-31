@@ -26,6 +26,7 @@ class GBDebuggerView : public GBView, public GBDeletionListener {
 	void DrawPrintBox(const GBRect & box, const GBStackBrain * brain);
 	void DrawHardwareBox(const GBRect & box);
 	void DrawProfileBox(const GBRect & box);
+	void DrawObjectsBox(const GBRect & box);
 	void UpdateTarget();
 public:
 	explicit GBDebuggerView(GBWorld & wld);

@@ -13,10 +13,10 @@ const short kStatusBoxHeight = 30;
 const short kPCBoxHeight = 95;
 const short kStackBoxHeight = 65;
 const short kPrintBoxHeight = 15;
-const short kHardwareBoxWidth = 150;
-const short kHardwareBoxHeight = 300;
-const short kProfileBoxWidth = 110;
-const short kProfileBoxHeight = GBWORLD_PROFILING ? 87 : 25;
+const short kHardwareBoxWidth = 150, kHardwareBoxHeight = 300;
+const short kProfileBoxWidth = 150;
+const short kProfileBoxHeight = GBWORLD_PROFILING ? 97 : 25;
+const short kObjectsBoxWidth = 120, kObjectsBoxHeight = 67;
 
 void GBDebuggerView::DrawStatusBox(const GBRect & box) {
 	DrawBox(box);
@@ -39,7 +39,7 @@ void GBDebuggerView::DrawPCBox(const GBRect & box, const GBStackBrain * brain) {
 	DrawBox(box);
 	GBStackAddress pc = brain->PC();
 	DrawStringPair("PC:", brain->AddressLastLabel(pc) + " (line " + ToString(brain->PCLine()) + ')',
-		box.left + 3, box.right - 3, box.top + 11, 10, GBColor::black, true);
+		box, 11, 10, GBColor::black, true);
 	for ( long i = -4; i <= 3; i ++ )
 		if ( brain->ValidAddress(pc + i) )
 			DrawStringPair(brain->AddressName(pc + i) + ':', brain->DisassembleAddress(pc + i),
@@ -98,73 +98,88 @@ void GBDebuggerView::DrawPrintBox(const GBRect & box, const GBStackBrain * brain
 	const std::string & print = brain->LastPrint();
 	if ( print != "none" )
 		DrawBox(box);
-	DrawStringPair("Last print:", print, box.left + 3, box.right - 3, box.top + 11, 10);
+	DrawStringPair("Last print:", print, box, 11, 10);
 }
 
 void GBDebuggerView::DrawHardwareBox(const GBRect & box) {
 	const GBHardwareState & hw = target->hardware;
-	const short right = box.right - 3;
-	const short left = box.left + 3;
 	DrawBox(box);
-	DrawStringPair("Mass:", ToString(target->Mass(), 1), left, right, box.top + 11, 10);
-	DrawStringPair("Position:", ToString(target->Position(), 1), left, right, box.top + 21, 10);
-	DrawStringPair("Velocity:", ToString(target->Velocity(), 2), left, right, box.top + 31, 10);
-	DrawStringPair("Speed:", ToString(target->Speed(), 2), left, right, box.top + 41, 10);
+	DrawStringPair("Mass:", ToString(target->Mass(), 1), box, 11, 10);
+	DrawStringPair("Position:", ToString(target->Position(), 1), box, 21, 10);
+	DrawStringPair("Velocity:", ToString(target->Velocity(), 2), box, 31, 10);
+	DrawStringPair("Speed:", ToString(target->Speed(), 2), box, 41, 10);
 	if (hw.EnginePower())
-		DrawStringPair("Engine vel:", ToString(hw.EngineVelocity(), 2), left, right, box.top + 51, 10);
-	DrawStringPair("Energy:", ToString(hw.Energy(), 1), left, right, box.top + 65, 10, GBColor::darkGreen);
-	DrawStringPair("Eaten:", ToString(hw.Eaten(), 1), left, right, box.top + 75, 10, GBColor::darkGreen);
+		DrawStringPair("Engine vel:", ToString(hw.EngineVelocity(), 2), box, 51, 10);
+	DrawStringPair("Energy:", ToString(hw.Energy(), 1), box, 65, 10, GBColor::darkGreen);
+	DrawStringPair("Eaten:", ToString(hw.Eaten(), 1), box, 75, 10, GBColor::darkGreen);
 	DrawStringPair("Armor:", ToString(hw.Armor()) + '/' + ToString(hw.MaxArmor()),
-		left, right, box.top + 85, 10);
+		box, 85, 10);
 	if (hw.ActualShield())
 		DrawStringPair("Shield:", ToString(hw.ActualShield()) + " ("
-			+ ToPercentString(target->ShieldFraction()) + ')', left, right, box.top + 95,
+			+ ToPercentString(target->ShieldFraction()) + ')', box, 95,
 			10, GBColor::blue);
 	if ( hw.constructor.Type() ) {
-		DrawStringLeft("Constructor", left, box.top + 121, 10, GBColor::black, true);
-		DrawStringPair("type:", hw.constructor.Type()->Name(), left, right, box.top + 131,
+		DrawStringLeft("Constructor", box.left + 3, box.top + 121, 10, GBColor::black, true);
+		DrawStringPair("type:", hw.constructor.Type()->Name(), box, 131,
 			10, hw.constructor.Type()->Color().ContrastingTextColor());
 		DrawStringPair("progress:", ToString(hw.constructor.Progress(), 0)
 				+ '/' + ToString(hw.constructor.Type()->Cost(), 0),
-			left, right, box.top + 141, 10);
+			box, 141, 10);
 	}
 	//sensor times? result details?
 	if (hw.sensor1.Radius())
-		DrawStringLongPair("robot-found:", hw.sensor1.NumResults(), left, right, box.top + 161, 10);
+		DrawStringLongPair("robot-found:", hw.sensor1.NumResults(), box, 161, 10);
 	if (hw.sensor2.Radius())
-		DrawStringLongPair("food-found:", hw.sensor2.NumResults(), left, right, box.top + 171, 10);
+		DrawStringLongPair("food-found:", hw.sensor2.NumResults(), box, 171, 10);
 	if (hw.sensor3.Radius())
-		DrawStringLongPair("shot-found:", hw.sensor3.NumResults(), left, right, box.top + 181, 10);
-	DrawStringLeft("Weapons:", left, box.top + 191, 10, GBColor::black, true);
+		DrawStringLongPair("shot-found:", hw.sensor3.NumResults(), box, 181, 10);
+	DrawStringLeft("Weapons:", box.left + 3, box.top + 191, 10, GBColor::black, true);
 	if (hw.blaster.Damage())
-		DrawStringLongPair("blaster-cooldown:", hw.blaster.Cooldown(), left, right, box.top + 201, 10);
+		DrawStringLongPair("blaster-cooldown:", hw.blaster.Cooldown(), box, 201, 10);
 	if (hw.grenades.Damage())
-		DrawStringLongPair("grenades-cooldown:", hw.grenades.Cooldown(), left, right, box.top + 211, 10);
+		DrawStringLongPair("grenades-cooldown:", hw.grenades.Cooldown(), box, 211, 10);
 	if (hw.forceField.MaxPower())
-		DrawStringPair("force-field-angle:", ToString(hw.forceField.Angle(), 2), left, right, box.top + 221, 10);
+		DrawStringPair("force-field-angle:", ToString(hw.forceField.Angle(), 2), box, 221, 10);
 	if (hw.syphon.MaxRate())
 		DrawStringPair("syphoned:", ToString(hw.syphon.Syphoned(), 2) + '/'
-			+ ToString(hw.syphon.Rate(), 2), left, right, box.top + 241, 10);
+			+ ToString(hw.syphon.Rate(), 2), box, 241, 10);
 	if (hw.enemySyphon.MaxRate())
 		DrawStringPair("enemy-syphoned:", ToString(hw.enemySyphon.Syphoned(), 2) + '/'
-			+ ToString(hw.enemySyphon.Rate(), 2), left, right, box.top + 251, 10);
+			+ ToString(hw.enemySyphon.Rate(), 2), box, 251, 10);
 	if (target->flag)
-		DrawStringPair("flag:", ToString(target->flag, 2), left, right, box.top + 271, 10);
+		DrawStringPair("flag:", ToString(target->flag, 2), box, 271, 10);
 }
 
 void GBDebuggerView::DrawProfileBox(const GBRect & box) {
 #if GBWORLD_PROFILING
 	DrawBox(box);
-	DrawStringLongPair("Total time:", world.TotalTime(), box.left + 5, box.right - 5, box.top + 13, 10);
-	DrawStringLongPair("Simulation:", world.SimulationTime(), box.left + 5, box.right - 5, box.top + 23, 10);
-	DrawStringLongPair("Move:", world.MoveTime(), box.left + 5, box.right - 5, box.top + 33, 10);
-	DrawStringLongPair("Act:", world.ActTime(), box.left + 5, box.right - 5, box.top + 43, 10);
-	DrawStringLongPair("Collide:", world.CollideTime(), box.left + 5, box.right - 5, box.top + 53, 10);
-	DrawStringLongPair("Think:", world.ThinkTime(), box.left + 5, box.right - 5, box.top + 63, 10);
-	DrawStringLongPair("Resort:", world.ResortTime(), box.left + 5, box.right - 5, box.top + 73, 10);
-	DrawStringLongPair("Statistics:", world.StatisticsTime(), box.left + 5, box.right - 5, box.top + 83, 10);
+	DrawStringLeft("Profile:", box.left + 3, box.top + 13, 10, GBColor::black, true);
+	DrawStringPair("Simulation:", ToString(world.SimulationTime()) + " ms", box, 23, 10);
+	DrawStringPair("Move:", ToPercentString(world.MoveTime(), 0), box.left + 15, box.right - 5, box.top + 33, 10);
+	DrawStringPair("Act:", ToPercentString(world.ActTime(), 0), box.left + 15, box.right - 5, box.top + 43, 10);
+	DrawStringPair("Collide:", ToPercentString(world.CollideTime(), 0), box.left + 15, box.right - 5, box.top + 53, 10);
+	DrawStringPair("Think:", ToPercentString(world.ThinkTime(), 0), box.left + 15, box.right - 5, box.top + 63, 10);
+	DrawStringPair("Resort:", ToPercentString(world.ResortTime(), 0), box.left + 15, box.right - 5, box.top + 73, 10);
+	DrawStringPair("Statistics:", ToPercentString(world.StatisticsTime(), 0), box.left + 15, box.right - 5, box.top + 83, 10);
+	DrawStringPair("Total time:", ToString(world.TotalTime()) + " ms", box, 93, 10);
 	world.ResetTimes();
 #endif
+}
+
+void GBDebuggerView::DrawObjectsBox(const GBRect & box) {
+	DrawBox(box);
+	long bots = world.CountObjects(ocRobot);
+	long foods = world.CountObjects(ocFood);
+	long shots = world.CountObjects(ocShot) + world.CountObjects(ocArea);
+	long sensors = world.CountObjects(ocSensorShot);
+	long decorations = world.CountObjects(ocDecoration);
+	DrawStringLongPair("Objects:", bots + foods + shots + sensors + decorations,
+					   box, 13, 10, GBColor::black, true);
+	DrawStringLongPair("Robots:", bots, box, 23, 10);
+	DrawStringLongPair("Foods:", foods, box, 33, 10);
+	DrawStringLongPair("Shots:", shots, box, 43, 10);
+	DrawStringLongPair("Sensors:", sensors, box, 53, 10);
+	DrawStringLongPair("Decorations:", decorations, box, 63, 10);
 }
 
 void GBDebuggerView::UpdateTarget() {
@@ -216,7 +231,7 @@ void GBDebuggerView::ReportDeletion(const GBDeletionReporter * deletee) {
 }
 
 GBMilliseconds GBDebuggerView::RedrawInterval() const {
-	return target ? 300 : 1000;
+	return target ? 300 : 2000;
 }
 
 bool GBDebuggerView::InstantChanges() const {
@@ -230,20 +245,20 @@ bool GBDebuggerView::DelayedChanges() const {
 void GBDebuggerView::Draw() {
 	UpdateTarget();
 	DrawBackground();
-	GBRect box;
+	GBRect header(kEdgeSpace, kEdgeSpace, Width() - kEdgeSpace, kEdgeSpace + kStatusBoxHeight);
 	if ( ! target ) {
 		DrawStringLeft("No robot selected", 4, 20, 12);
-		box.top = kEdgeSpace;
+		GBRect box(kEdgeSpace, header.bottom + kEdgeSpace,
+				   kEdgeSpace + kObjectsBoxWidth, header.bottom + kEdgeSpace + kObjectsBoxHeight);
+		DrawObjectsBox(box);
+		box.left = box.right + kEdgeSpace;
+		box.right = box.left + kProfileBoxWidth;
 		box.bottom = box.top + kProfileBoxHeight;
-		box.right = Width() - kEdgeSpace;
-		box.left = box.right - kProfileBoxWidth;
 		DrawProfileBox(box);
 	} else {
 	// draw robot name
-		box.left = box.top = kEdgeSpace;
-		box.right = Width() - kEdgeSpace;
-		box.bottom = box.top + kStatusBoxHeight;
-		DrawStatusBox(box);
+		DrawStatusBox(header);
+		GBRect box = header;
 	// get brain
 		const GBStackBrain * sbrain = dynamic_cast<GBStackBrain *>(target->Brain());
 		if ( sbrain ) {
@@ -272,8 +287,8 @@ void GBDebuggerView::Draw() {
 			DrawPrintBox(box, sbrain);
 		}
 	// draw hardware
-		box.top = kStatusBoxHeight + kEdgeSpace * 2;
-		box.right = Width() - kEdgeSpace;
+		box.top = header.bottom + kEdgeSpace;
+		box.right = header.right;
 		box.left = box.right - kHardwareBoxWidth;
 		box.bottom = box.top + kHardwareBoxHeight;
 		DrawHardwareBox(box);
@@ -294,7 +309,7 @@ short GBDebuggerView::PreferredHeight() const {
 		return kStatusBoxHeight + (brainheight < kHardwareBoxHeight ?
 			kHardwareBoxHeight : brainheight) + 3 * kEdgeSpace;
 	} else
-		return kProfileBoxHeight + kEdgeSpace * 2;
+		return kStatusBoxHeight + kProfileBoxHeight + kEdgeSpace * 3;
 }
 
 const string GBDebuggerView::Name() const {return "Debugger";}

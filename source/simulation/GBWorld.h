@@ -116,12 +116,12 @@ public:
 #if GBWORLD_PROFILING
 	long TotalTime() const;
 	long SimulationTime() const;
-	long ThinkTime() const;
-	long MoveTime() const;
-	long ActTime() const;
-	long CollideTime() const;
-	long ResortTime() const;
-	long StatisticsTime() const;
+	GBRatio ThinkTime() const;
+	GBRatio MoveTime() const;
+	GBRatio ActTime() const;
+	GBRatio CollideTime() const;
+	GBRatio ResortTime() const;
+	GBRatio StatisticsTime() const;
 	void ResetTimes();
 #endif
 };

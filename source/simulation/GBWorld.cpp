@@ -626,28 +626,30 @@ long GBWorld::SimulationTime() const {
 	return U64SetU(U64Div(U64Add(simulationTime, 500), 1000));
 }
 
-long GBWorld::ThinkTime() const {
-	return U64SetU(U64Div(U64Add(thinkTime, 500), 1000));
+#define U64RatioSafe(num, denom) (U32SetU(denom) ? (GBRatio)U32SetU(num) / (GBRatio)U32SetU(denom) : 0.0f)
+
+GBRatio GBWorld::ThinkTime() const { 
+	return U64RatioSafe(thinkTime, simulationTime);
 }
 
-long GBWorld::MoveTime() const {
-	return U64SetU(U64Div(U64Add(moveTime, 500), 1000));
+GBRatio GBWorld::MoveTime() const {
+	return U64RatioSafe(moveTime, simulationTime);
 }
 
-long GBWorld::ActTime() const {
-	return U64SetU(U64Div(U64Add(actTime, 500), 1000));
+GBRatio GBWorld::ActTime() const {
+	return U64RatioSafe(actTime, simulationTime);
 }
 
-long GBWorld::CollideTime() const {
-	return U64SetU(U64Div(U64Add(collideTime, 500), 1000));
+GBRatio GBWorld::CollideTime() const {
+	return U64RatioSafe(collideTime, simulationTime);
 }
 
-long GBWorld::ResortTime() const {
-	return U64SetU(U64Div(U64Add(resortTime, 500), 1000));
+GBRatio GBWorld::ResortTime() const {
+	return U64RatioSafe(resortTime, simulationTime);
 }
 
-long GBWorld::StatisticsTime() const {
-	return U64SetU(U64Div(U64Add(statisticsTime, 500), 1000));
+GBRatio GBWorld::StatisticsTime() const {
+	return U64RatioSafe(statisticsTime, simulationTime);
 }
 
 void GBWorld::ResetTimes() {
