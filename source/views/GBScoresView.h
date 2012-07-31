@@ -14,19 +14,15 @@ class GBScoresView : public GBView {
 	GBWorld & world;
 	GBChangeCount lastDrawnWorld;
 	const GBSide * lastSideDrawn;
-	bool graphAllLastDrawn;
 	
-	void DrawIncome(const GBIncomeStatistics & income, short left, short right, short top);
-	void DrawExpenditures(const GBExpenditureStatistics & spent, short left, short right, short top);
-	void DrawDeaths(const GBScores & scores, short left, short right, short top);
+	void DrawIncome(const GBScores & scores, const GBRect & box);
+	void DrawExpenditures(const GBScores & scores, const GBRect & box);
+	void DrawDeaths(const GBScores & scores, const GBRect & box);
 	void DrawGraph(const GBRect & box, long vscale, int hscale,
-		const std::vector<long> & hist, const GBColor & color);
-	void DrawGraphs(const GBRect & box);
-	void DrawRoundScores(const GBScores & scores, const GBRect & box);
-	void DrawTournamentScores(const GBScores & tscores, const GBRect & box);
+		const std::vector<long> & hist, const GBColor & color, short weight);
+	void DrawGraph(const GBRect & box, bool allRounds);
+	void DrawScores(const GBScores & scores, bool allRounds);
 public:
-	bool graphAllRounds;
-	
 	explicit GBScoresView(GBWorld & rost);
 
 	void Draw();

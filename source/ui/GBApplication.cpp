@@ -55,7 +55,6 @@ enum {
 		miMinimapTrails,
 		miReportErrors = 13113, miReportPrints,
 		miRefollow = 13116, miFollowRandom, miRandomNear, miAutofollow,
-		miGraphAllRounds = 13121,
 	kSimulationMenu = 132,
 		miRun = 13201, miSingleFrame, miStep, miPause,
 		miSlowerSpeed = 13206, miSlowSpeed, miNormalSpeed, miFastSpeed, miFasterSpeed, miUnlimitedSpeed,
@@ -490,7 +489,6 @@ void GBApplication::AdjustMenus() {
 	CheckOne(miReportErrors, world.reportErrors);
 	CheckOne(miReportPrints, world.reportPrints);
 	CheckOne(miAutofollow, portal->autofollow);
-	CheckOne(miGraphAllRounds, scores->graphAllRounds);
 //Simulation menu
 	EnableOne(miRun, ! world.running);
 	EnableOne(miSingleFrame, ! world.running);
@@ -585,7 +583,6 @@ void GBApplication::HandleMenuSelection(int item) {
 			case miFollowRandom: portal->FollowRandom(); break;
 			case miRandomNear: portal->FollowRandomNear(); break;
 			case miAutofollow: portal->autofollow = ! portal->autofollow; break;
-			case miGraphAllRounds: scores->graphAllRounds = ! scores->graphAllRounds; break;
 		//Simulation menu:
 			case miRun:
 				world.running = true;
