@@ -16,6 +16,15 @@ class FSSpec;
 
 class GBWindow;
 
+enum GBMenuKeyModifier { modDefault = 0, modNone, modShift, };
+
+struct GBMenuItem {
+	int id;
+	const char * name;
+	char key;
+	GBMenuKeyModifier modifier;
+};
+
 class GBViewsApplication {
 protected:
 	bool alive;
@@ -29,6 +38,7 @@ protected:
 #if WINDOWS
 	HINSTANCE hInstance;
 	int showCmd;
+	HACCEL hAccelTable;
 #endif
 private:
 #if MAC
@@ -54,9 +64,6 @@ public:
 	void Run();
 // useful
 #if MAC
-#if ! CARBON
-	static void OpenAppleMenuItem(int item);
-#endif
 	static bool DoNumberDialog(ConstStr255Param prompt, long & value,
 		long min = -1000000000, long max = 1000000000);
 	static void SetCursor(GBCursor curs);
@@ -69,6 +76,7 @@ public:
 	static GBRect GetScreenSize();
 	GBWindow * MakeWindow(GBView * view, int x, int y, bool visible = true);
 //menus
+	void AddMenu(const GBMenuItem * items);
 	void CheckOne(int item, bool checked);
 	void EnableOne(int item, bool checked);
 protected: // to override

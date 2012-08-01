@@ -12,17 +12,13 @@
 #include <Dialogs.h>
 #include <Menus.h>
 #include <ToolUtils.h>
-#if ! CARBON
-	#include <Devices.h>
-#endif
 #include <Sound.h>
-#if CARBON
-	#include <Navigation.h>
-#endif
+#include <Navigation.h>
 #endif
 #include "GBWindow.h"
 #include "GBErrors.h"
 #include "GBViewsApplication.h"
+#include "GBStringUtilities.h"
 
 const short kNumberDialogID = 128;
 
@@ -157,11 +153,7 @@ void GBViewsApplication::HandleMouseDown(EventRecord * evt) {
 		case inDrag:
 			if ( ! evt->modifiers & cmdKey )
 				SelectWindow(window);
-		#if CARBON
 			DragWindow(window, evt->where, nil);
-		#else
-			DragWindow(window, evt->where, &(qd.screenBits.bounds));
-		#endif
 			break;
 		case inGoAway:
 			if ( TrackGoAway(window, evt->where) )
@@ -186,6 +178,7 @@ void GBViewsApplication::HandleMouseDown(EventRecord * evt) {
 	}
 }
 void GBViewsApplication::HandleKeyDown(EventRecord * evt) {
+	//TODO if ( IsMenuKeyEvent(NULL, evt, kNilOptions, NULL, NULL) ) {
 	if ( evt->modifiers & cmdKey ) {
 		if ( evt->what == keyDown ) {
 			AdjustMenus();
@@ -311,15 +304,7 @@ GBViewsApplication::GBViewsApplication() :
 	mainWindow(nil)
 {
 #if MAC
-#if CARBON
 	NavLoad();
-#else
-	InitGraf(&qd.thePort);
-	FlushEvents(everyEvent, 0);
-	InitWindows();
-	InitMenus();
-	InitDialogs(0L);
-#endif
 #elif WINDOWS
 	wclass.hInstance = inst;
 	wclass.hIcon = LoadIcon(inst, MAKEINTRESOURCE(103));
@@ -340,8 +325,6 @@ GBRect GBViewsApplication::GetScreenSize() {
 	Rect bounds;
 	if ( !GetAvailableWindowPositioningBounds(GetMainDevice(), &bounds) )
 		return GBRect(bounds);
-#elif MAC
-	return GBRect(qd.screenBits.bounds);
 #elif WIN
 	RECT desktop;
 	if (!GetWindowRect(GetDesktopWindow(), &desktop))
@@ -381,12 +364,13 @@ void GBViewsApplication::Run() {
 	} while ( alive );
 #elif WINDOWS
 	MSG msg;
-	while (alive && GetMessage(&msg, 0, 0, 0) > 0) {
-		DispatchMessage(&msg);
-		if (msg.message == WM_TIMER)
-			Process();
-		Redraw();
-	}
+ 	while (alive && GetMessage(&msg, 0, 0, 0) > 0)
+ 		if (!TranslateAccelerator(MainWindow()->win, hAccelTable, &msg)) {
+ 			DispatchMessage(&msg);
+ 			if (msg.message == WM_TIMER)
+ 				Process();
+ 			Redraw();
+ 		}	
 #endif
 }
 
@@ -409,26 +393,41 @@ void GBViewsApplication::CheckOne(int item, bool checked) {
 
 void GBViewsApplication::EnableOne(int item, bool enabled) {
 #if MAC
-	MenuHandle thisMenu = GetMenuHandle(item / 100);
-#if ! CARBON
-	#define EnableMenuItem(m,i) EnableItem(m,i)
-	#define DisableMenuItem(m,i) DisableItem(m,i)
-#endif
-	if (enabled) EnableMenuItem(thisMenu, item % 100);
-	else  DisableMenuItem(thisMenu, item % 100);
+	if (enabled) EnableMenuCommand(NULL, item);
+	else DisableMenuCommand(NULL, item);
 #elif WINDOWS
 	EnableMenuItem(GetMenu(mainWindow->win), item, enabled ? MF_ENABLED : MF_GRAYED);
 #endif
 }
 
-#if MAC && ! CARBON
-void GBViewsApplication::OpenAppleMenuItem(int item) {
-	Str255 name;
-	MenuHandle mHandle = GetMenuHandle(item / 100);
-	GetMenuItemText(mHandle, item % 100, name);
-	OpenDeskAcc(name);
-}
+//First item is the id and title of the whole menu. 0 terminates. 
+void GBViewsApplication::AddMenu(const GBMenuItem * items) {
+#if CARBON
+	Str255 str;
+	ToPascalString(items[0].name, str);
+	MenuRef menu = NewMenu(items[0].id, str);
+	for ( int ix = 1; items[ix].id; ++ix ) {
+		if ( items[ix].name ) {
+			ToPascalString(items[ix].name, str);
+			InsertMenuItemText(menu, str, ix);
+		} else {
+			ToPascalString("-", str);
+			InsertMenuItemText(menu, str, ix);
+		}
+		if ( items[ix].id )
+			SetMenuItemCommandID(menu, ix, items[ix].id);
+		if ( items[ix].key )
+			SetMenuItemCommandKey(menu, ix, false, items[ix].key);
+		if ( items[ix].modifier == modNone )
+			SetMenuItemModifiers(menu, ix, kMenuNoCommandModifier);
+		else if ( items[ix].modifier == modShift )
+			SetMenuItemModifiers(menu, ix, kMenuNoCommandModifier | kMenuShiftModifier);
+	}
+	InsertMenu(menu, 0);
+#else
+	//TODO
 #endif
+}
 
 #if MAC
 bool GBViewsApplication::DoNumberDialog(ConstStr255Param prompt, long & value, long min, long max) {

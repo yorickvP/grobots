@@ -25,18 +25,12 @@
 #include <NumberFormatting.h>
 #include <Dialogs.h>
 #include <Controls.h>
-#if CARBON
-	#include <Navigation.h>
-#else
-	#include <StandardFile.h>
-#endif
+#include <Navigation.h>
 #endif
 
 
 //Menu item IDs: these are 100*menuid + itemposition
 enum {
-	kAppleMenu = 128,
-		miAbout = 12801,
 	kFileMenu = 129,
 		miLoadSide = 12901, miDuplicateSide,
 		miReloadSide = 12903,
@@ -44,25 +38,26 @@ enum {
 		miClose = 12908,
 		miQuit = 12910,
 	kWindowMenu = 130,
-		miRosterView = 13001, miMainView, miMinimapView,
+		miAbout = 13001,
+		miRosterView, miMainView, miMinimapView,
 		miScoresView, miTypesView,
 		miDebuggerView,
 		miTournamentView, miSideDebuggerView,
 	kViewMenu = 131,
 		miSound = 13101,
-		miShowSensors = 13103, miShowDecorations, miShowMeters,
-		miMinimapRobots = 13107, miMinimapFood, miMinimapSensors, miMinimapDecorations,
+		miZoomIn = 13103, miZoomOut, miZoomStandard,
+		miShowSensors = 13107, miShowDecorations, miShowMeters,
 		miMinimapTrails,
-		miReportErrors = 13113, miReportPrints,
-		miRefollow = 13116, miFollowRandom, miRandomNear, miAutofollow,
+		miReportErrors = 13112, miReportPrints,
+		miRefollow = 13114, miFollowRandom, miRandomNear, miAutofollow,
+		miNextPageMemory = 13119, miPreviousPageMemory, miFirstPageMemory,
 	kSimulationMenu = 132,
-		miRun = 13201, miSingleFrame, miStep, miPause,
-		miSlowerSpeed = 13206, miSlowSpeed, miNormalSpeed, miFastSpeed, miFasterSpeed, miUnlimitedSpeed,
-		miNewRound = 13213, miRestart,
-		miSeed = 13215, miReseed,
-		miRules = 13218,
-		miTournament = 13219, miSaveScores, miResetScores,
-		miStartStopBrain = 13223,
+		miRun = 13201, miSingleFrame, miStep, miPause, miStartStopBrain,
+		miSlowerSpeed = 13207, miSlowSpeed, miNormalSpeed, miFastSpeed, miFasterSpeed, miUnlimitedSpeed,
+		miNewRound = 13214, miRestart,
+		miSeed, miReseed,
+		miRules = 13219,
+		miTournament = 13220, miSaveScores, miResetScores,
 	kToolsMenu = 133,
 		miScroll = 13301,
 		miAddManna = 13303, miAddRobot, miAddSeed,
@@ -82,23 +77,113 @@ const int kMaxFasterSteps = 3;
 const GBMilliseconds kMaxEventInterval = 50;
 
 void GBApplication::SetupMenus() {
+	GBMenuItem fileMenu[] = {
+		{ kFileMenu, "File" },
+		{ miLoadSide, "Open SideÉ", 'O' },
+		{ miDuplicateSide, "Duplicate Side" },
+		{ miLoadSide, "Reload Side", 'L' },
+		{ -1 },
+		{ miRemoveSide, "Remove Side", 'K' },
+		{ miRemoveAllSides, "Remove All Sides" },
+		{ -1 },
+	#if MAC
+		{ miClose, "Close Window", 'W' },
+	#else
+		{ miQuit, "Exit", 'Q' },
+	#endif
+		0
+	};
+	GBMenuItem windowMenu[] = {
+		{ kWindowMenu, "Window" },
+		{ miAbout, "About GrobotsÉ" },
+		{ miRosterView, "Roster" },
+	#if MAC
+		{ miMainView, "World", 'V' },
+	#endif
+		{ miMinimapView, "Minimap", 'M' },
+		{ miScoresView, "Statistics", 'S' },
+		{ miTypesView, "Types", 'Y' },
+		{ miDebuggerView, "Debugger", 'D' },
+		{ miTournamentView, "Tournament", 'E' },
+		{ miSideDebuggerView, "Shared Memory", },
+		0
+	};
+	GBMenuItem simulationMenu[] = {
+		{ kSimulationMenu, "Simulation" },
+		{ miRun, "Run", 'R' },
+		{ miSingleFrame, "Single Frame", 'F' },
+		{ miStep, "Step Brain", 'B' },
+		{ miPause, "Pause", 'P' },
+		{ miStartStopBrain, "Start/Stop Brain" },
+		{ -1 },
+		{ miSlowerSpeed, "Slowest (2 fps)", '0' },
+		{ miSlowSpeed, "Slow (10 fps)", '1' },
+		{ miNormalSpeed, "Normal (30 fps)", '3' },
+		{ miFastSpeed, "Fast (60 fps)", '6' },
+		{ miFasterSpeed, "Faster", '9' },
+		{ miUnlimitedSpeed, "Unlimited", 'U' },
+		{ -1 },
+		{ miNewRound, "New Round", 'N' },
+		{ miRestart, "Restart", '\\' },
+		{ miSeed, "Add Seeds", '=' },
+		{ miReseed, "Reseed Dead Sides" },
+		{ -1 },
+		{ miRules, "RulesÉ" },
+		{ miTournament, "TournamentÉ", 'T' },
+		{ miSaveScores, "Save Tournament Scores" },
+		{ miResetScores, "Reset Tournament Scores" },
+		0
+	};
+	GBMenuItem viewMenu[] = {
+		{ kViewMenu, "View" },
+	#if MAC
+		{ miSound, "Sound" },
+		{ -1 },
+	#endif
+		{ miZoomIn, "Zoom In", '=', modNone },
+		{ miZoomOut, "Zoom Out", '-', modNone },
+		{ miZoomStandard, "Zoom Standard", '0', modNone },
+		{ -1 },
+		{ miShowSensors, "Show Sensors" },
+		{ miShowDecorations, "Show Decorations" },
+		{ miShowMeters, "Show Meters" },
+		{ miMinimapTrails, "Minimap Trails", 'T', modNone },
+		{ -1 },
+		{ miReportErrors, "Show Robot Errors" },
+		{ miReportPrints, "Show Prints" },
+		{ -1 },
+		{ miRefollow, "Refollow", '`', modNone },
+		{ miFollowRandom, "Follow Random", '\r', modNone },
+		{ miRandomNear, "Random Near", '\t', modNone },
+		{ miAutofollow, "Autofollow", 'A' },
+		{ -1 },
+		{ miNextPageMemory, "Next Page", kPageUpCharCode, modNone },
+		{ miPreviousPageMemory, "Previous Page", kPageDownCharCode, modNone },
+		{ miFirstPageMemory, "First Page", kHomeCharCode, modNone },
+		0
+	};
+	GBMenuItem toolsMenu[] = {
+		{ kToolsMenu, "Tools" },
+		{ miScroll, "Scroll/Follow", ' ', modNone },
+		{ -1 },
+		{ miAddManna, "Add Manna", 'M', modNone },
+		{ miAddRobot, "Add Robot", 'R', modNone },
+		{ miAddSeed, "Add Seed", 'S', modNone },
+		{ -1 },
+		{ miMove, "Move", 'V', modNone },
+		{ miPull, "Pull", 'P', modNone },
+		{ miSmite, "Smite", 'X', modNone },
+		{ miBlasts, "Blasts", 'B', modNone },
+		{ miErase, "Erase", 'W', modNone },
+		{ miEraseBig, "Erase Area", 'A', modNone },
+		0
+	};
 #if MAC
-	MenuHandle currentMenu;
-	currentMenu = GetMenu(kAppleMenu);
-#if ! CARBON
-	AppendResMenu(currentMenu, 'DRVR');
-#endif
-	InsertMenu(currentMenu, 0);
-	currentMenu = GetMenu(kFileMenu);
-	InsertMenu(currentMenu, 0);
-	currentMenu = GetMenu(kWindowMenu);
-	InsertMenu(currentMenu, 0);
-	currentMenu = GetMenu(kSimulationMenu);
-	InsertMenu(currentMenu, 0);
-	currentMenu = GetMenu(kViewMenu);
-	InsertMenu(currentMenu, 0);
-	currentMenu = GetMenu(kToolsMenu);
-	InsertMenu(currentMenu, 0);
+	AddMenu(fileMenu);
+	AddMenu(windowMenu);
+	AddMenu(simulationMenu);
+	AddMenu(viewMenu);
+	AddMenu(toolsMenu);
 	// help items...?
 	DrawMenuBar();
 #elif WINDOWS
@@ -106,6 +191,7 @@ void GBApplication::SetupMenus() {
 	if (!mbar)
 		FatalError("Couldn't load menu bar.");
 	SetMenu(mainWindow->win, mbar);
+	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(102));
 #endif
 }
 
@@ -137,13 +223,6 @@ void GBApplication::DoLoadSide() {
 				(Ptr)&spec, sizeof(FSSpec), &dummySize) )
 			OpenFile(spec);
 	}
-#elif MAC
-	SFTypeList types;
-	types[0] = 'TEXT';
-	StandardFileReply reply;
-	StandardGetFile(nil, 1, types, &reply);
-	if ( ! reply.sfGood ) return;
-	OpenFile(reply.sfFile);
 #elif WINDOWS
 	OPENFILENAME ofn;
 	char buff[2048] = "";
@@ -245,20 +324,12 @@ void GBApplication::DoRulesDialog() {
 	ToPascalString(ToString(world.seedTypePenalty),text);
 	SetDialogItemText(item, text);
 	GetDialogItem(dlog, kTimeLimitCheckbox, &itemType, &item, &bounds);
-#if CARBON
 	SetControl32BitValue((ControlHandle)item, timeLimitCheck);
-#else
-	SetControlValue((ControlHandle)item, stopOnEliminationCheck);
-#endif
 	GetDialogItem(dlog, kTimeLimitBox, &itemType, &item, &bounds);
 	NumToString(world.timeLimit > 0 ? world.timeLimit : 18000, text);
 	SetDialogItemText(item, text);
 	GetDialogItem(dlog, kStopOnEliminationCheckbox, &itemType, &item, &bounds);
-#if CARBON
 	SetControl32BitValue((ControlHandle)item, stopOnEliminationCheck);
-#else
-	SetControlValue((ControlHandle)item, stopOnEliminationCheck);
-#endif
 // do dialog
 	SelectDialogItemText(dlog, kWorldWidthBox, 0, -1);
 	do {
@@ -414,6 +485,7 @@ GBApplication::GBApplication()
 	minimap = new GBMiniMapView(world, *portal);
 	scores = new GBScoresView(world);
 	debugger = new GBDebuggerView(world);
+	sideDebugger = new GBSideDebuggerView(world);
 //lay out windows...
 	GBRect screen = GetScreenSize();
 	short edge = 5, titlebar = 22, rightedge = edge; //TODO get these from window manager
@@ -431,7 +503,7 @@ GBApplication::GBApplication()
 //...and create them
 	mainWindow = MakeWindow(new GBDoubleBufferedView(portal), mainleft, top);
 	debuggerWindow = MakeWindow(debugger, right, top, false);
-	sideDebuggerWindow = MakeWindow(new GBSideDebuggerView(world), 200, 400, false);
+	sideDebuggerWindow = MakeWindow(sideDebugger, 200, 400, false);
 	minimapWindow = MakeWindow(new GBDoubleBufferedView(minimap), left, screen.bottom - minimap->PreferredHeight() - edge);
 	rosterWindow = MakeWindow(roster, left, top);
 	aboutWindow = MakeWindow(new GBAboutBox(), 200, 150, false);
@@ -455,11 +527,6 @@ GBApplication::~GBApplication() {
 }
 
 void GBApplication::AdjustMenus() {
-//About item
-#if MAC
-	GBWindow * wind = GBWindow::GetFromWindow(FrontWindow());
-	CheckOne(miAbout, wind == aboutWindow);
-#endif
 //file
 	EnableOne(miDuplicateSide, world.SelectedSide() != 0);
 	EnableOne(miReloadSide, world.SelectedSide() != 0);
@@ -467,6 +534,8 @@ void GBApplication::AdjustMenus() {
 	EnableOne(miRemoveAllSides, world.Sides() != 0);
 // check windows in Window menu
 #if MAC
+	GBWindow * wind = GBWindow::GetFromWindow(FrontWindow());
+	CheckOne(miAbout, wind == aboutWindow);
 	CheckOne(miMainView, wind == mainWindow);
 	CheckOne(miRosterView, wind == rosterWindow);
 	CheckOne(miMinimapView, wind == minimapWindow);
@@ -481,14 +550,13 @@ void GBApplication::AdjustMenus() {
 	CheckOne(miShowSensors, portal->showSensors);
 	CheckOne(miShowDecorations, portal->showDecorations);
 	CheckOne(miShowMeters, portal->showDetails);
-	CheckOne(miMinimapRobots, minimap->showRobots);
-	CheckOne(miMinimapFood, minimap->showFood);
-	CheckOne(miMinimapSensors, minimap->showSensors);
-	CheckOne(miMinimapDecorations, minimap->showDecorations);
 	CheckOne(miMinimapTrails, minimap->showTrails);
 	CheckOne(miReportErrors, world.reportErrors);
 	CheckOne(miReportPrints, world.reportPrints);
 	CheckOne(miAutofollow, portal->autofollow);
+	EnableOne(miNextPageMemory, sideDebugger->pane < 9);
+	EnableOne(miPreviousPageMemory, sideDebugger->pane > 0);
+	EnableOne(miFirstPageMemory, sideDebugger->pane != 0);
 //Simulation menu
 	EnableOne(miRun, ! world.running);
 	EnableOne(miSingleFrame, ! world.running);
@@ -569,13 +637,12 @@ void GBApplication::HandleMenuSelection(int item) {
 			case miSideDebuggerView: sideDebuggerWindow->Show(); break;
 		//View menu
 			case miSound: SetSoundActive(! SoundActive()); break;
+			case miZoomIn: portal->Zoom(1); break;
+			case miZoomOut: portal->Zoom(-1); break;
+			case miZoomStandard: portal->ResetZoom(); break;
 			case miShowSensors: portal->showSensors = ! portal->showSensors; break;
 			case miShowDecorations: portal->showDecorations = ! portal->showDecorations; break;
 			case miShowMeters: portal->showDetails = ! portal->showDetails; break;
-			case miMinimapRobots: minimap->showRobots = ! minimap->showRobots; break;
-			case miMinimapFood: minimap->showFood = ! minimap->showFood; break;
-			case miMinimapSensors: minimap->showSensors = ! minimap->showSensors; break;
-			case miMinimapDecorations: minimap->showDecorations = ! minimap->showDecorations; break;
 			case miMinimapTrails: minimap->showTrails = ! minimap->showTrails; break;
 			case miReportErrors: world.reportErrors = ! world.reportErrors; break;
 			case miReportPrints: world.reportPrints = ! world.reportPrints; break;
@@ -583,6 +650,9 @@ void GBApplication::HandleMenuSelection(int item) {
 			case miFollowRandom: portal->FollowRandom(); break;
 			case miRandomNear: portal->FollowRandomNear(); break;
 			case miAutofollow: portal->autofollow = ! portal->autofollow; break;
+ 			case miNextPageMemory: -- sideDebugger->pane; break;
+ 			case miPreviousPageMemory: ++ sideDebugger->pane; break;
+ 			case miFirstPageMemory: sideDebugger->pane = 0; break;
 		//Simulation menu:
 			case miRun:
 				world.running = true;
@@ -640,10 +710,6 @@ void GBApplication::HandleMenuSelection(int item) {
 			case miEraseBig: portal->tool = ptEraseBig; break;
 		//other
 			default:
-#if MAC && ! CARBON
-				if (item / 100 == kAppleMenu)
-					OpenAppleMenuItem(item);
-#endif
 				break;
 		}
 	} catch ( GBAbort & ) {}

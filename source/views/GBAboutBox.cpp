@@ -18,9 +18,7 @@ void GBAboutBox::Draw() {
 	DrawStringCentered("by Devon and Warren Schudy", Width() / 2, 75, 12, GBColor::white);
 	DrawStringCentered("built " __DATE__
 		#if CARBON
-			" for Carbon"
-		#elif MAC
-			" for Mac OS Classic"
+			" for Mac (Carbon)"
 		#elif WINDOWS
 			" for Win32"
 		#endif

@@ -14,10 +14,6 @@
 #include <ToolUtils.h>
 #endif
 
-#if ! CARBON
-	#define GetWindowPort(w) w
-#endif
-
 const short kMacWindowKind = 190;
 #elif WINDOWS
 const char * kWindowClassName = "Grobots window";
@@ -38,7 +34,6 @@ GBWindow::GBWindow(GBView * contents, short left, short top, bool vis)
 	Str255 s;
 	ToPascalString(view->Name(), s);
 	view->SetBounds(GBRect(0, 0, view->PreferredWidth(), view->PreferredHeight()));
-#if CARBON
 	if ( CreateNewWindow(kDocumentWindowClass,
 			view->Resizable() ? kWindowStandardDocumentAttributes
 				: (kWindowCloseBoxAttribute | kWindowCollapseBoxAttribute),
@@ -46,12 +41,6 @@ GBWindow::GBWindow(GBView * contents, short left, short top, bool vis)
 		throw GBOutOfMemoryError();
 	SetWTitle(window, s);
 	SetWRefCon(window, (long)this);
-#else
-	window = NewCWindow(nil, &bounds, s, vis,
-		view->Resizable() ? zoomDocProc : noGrowDocProc,
-		(WindowPtr)(-1), true, (long)this);
-	if ( ! window ) throw GBOutOfMemoryError();
-#endif
 	SetWindowKind(window, kMacWindowKind);
 	view->SetGraphics(&graphics);
 	if ( vis )
@@ -151,6 +140,8 @@ void GBWindow::DrawChanges(bool running) {
 	}
 }
 
+//TODO resize to nearest allowed size, not to preferred size.
+// Also move NeedsResize in here.
 void GBWindow::ResizeSelf() {
 #if MAC
 	SetSize(view->PreferredWidth(), view->PreferredHeight());
@@ -263,15 +254,9 @@ GBWindow * GBWindow::GetFromWindow(WindowPtr wind) {
 void GBWindow::Resize(Point where) {
 	Rect sizeRect;
 	SetRect(&sizeRect, view->MinimumWidth(), view->MinimumHeight(), view->MaximumWidth(), view->MaximumHeight());
-#if CARBON
 	Rect newsize;
 	if ( ResizeWindow(window, where, &sizeRect, &newsize) )
 		SetSize(newsize.right - newsize.left, newsize.bottom - newsize.top);
-#else
-	long result = GrowWindow(window, where, &sizeRect);
-	if ( result )
-		SetSize(LoWord(result), HiWord(result));
-#endif
 }
 
 void GBWindow::ZoomIn() {

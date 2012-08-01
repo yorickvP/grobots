@@ -15,7 +15,9 @@ class GBSideDebuggerView : public GBView {
 	const GBWorld & world;
 	GBChangeCount worldChanges;
 	const GBSide * lastSideDrawn;
+public:
 	short pane;
+private:
 	short lastDrawnPane;
 	
 	void DrawSharedMemory(GBRect & box);
