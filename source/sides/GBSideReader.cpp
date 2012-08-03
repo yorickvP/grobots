@@ -374,7 +374,7 @@ void GBSideReader::ProcessTag(GBElementType element) {
 				if ( ! ExtractToken(name, line, pos) )
 					throw GBMissingElementArgumentError();
 				string val;
-				GBNumber num;
+				GBNumber num = 0.0f;
 				if ( ExtractToken(val, line, pos) ) {
 					if ( ! ParseNumber(val, num) )
 						throw GBElementArgumentError();
