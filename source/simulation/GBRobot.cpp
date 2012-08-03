@@ -15,7 +15,7 @@
 #include "GBBrainSpec.h"
 #include "GBStringUtilities.h"
 #include <algorithm>
-
+#include "GBMilliseconds.h"
 
 const GBRatio kRobotRadiusFactor = 0.1;
 const GBMass kRobotRadiusPadding = 3;   // robots look this much heavier than they are
@@ -27,7 +27,8 @@ const GBRatio kQuadraticDragFactor = 0.15;
 const GBNumber kShieldEffectiveness = 1;
 const GBPower kStandardShieldPerMass = 1.0; //shield per mass for blue-white shield graphic
 const float kMinMinimapBotContrast = 0.35f;
-const float kMinMeterContrast = 0.25f;
+const float kMinMeterContrast = 0.3f;
+const GBFrames kRecentDamageTime = 10;
 
 
 void GBRobot::Recalculate() {
@@ -40,7 +41,7 @@ GBRobot::GBRobot(GBRobotType * rtype, const GBPosition & where)
 	type(rtype),
 	brain(rtype->MakeBrain()),
 	id(rtype->Side()->GetNewRobotNumber()), parent(0),
-	lastHit(nil),
+	lastHit(nil), recentDamage(0),
 	friendlyCollisions(0), enemyCollisions(0), foodCollisions(0), shotCollisions(0), wallCollisions(0),
 	hardware(&rtype->Hardware()),
 	dead(false),
@@ -56,7 +57,7 @@ GBRobot::GBRobot(GBRobotType * rtype, const GBPosition & where, const GBVelocity
 	type(rtype),
 	brain(rtype->MakeBrain()),
 	id(rtype->Side()->GetNewRobotNumber()), parent(parentID),
-	lastHit(nil),
+	lastHit(nil), recentDamage(0),
 	friendlyCollisions(0), enemyCollisions(0), foodCollisions(0), shotCollisions(0), wallCollisions(0),
 	hardware(&rtype->Hardware()),
 	dead(false),
@@ -117,6 +118,7 @@ void GBRobot::TakeDamage(const GBDamage amount, GBSide * origin) {
 	GBDamage actual = amount * type->MassiveDamageMultiplier(mass) * ShieldFraction();
 	hardware.TakeDamage(actual);
 	lastHit = origin;
+	recentDamage = kRecentDamageTime;
 	if ( origin == Owner() )
 		Owner()->Scores().ReportFriendlyFire(actual);
 	else {
@@ -212,6 +214,8 @@ void GBRobot::Act(GBWorld * world) {
 			lastHit->ReportKilled(Biomass());
 		Owner()->ReportDead(Biomass());
 	}
+	if ( recentDamage )
+		-- recentDamage;
 	Recalculate();
 }
 
@@ -263,39 +267,55 @@ const GBColor GBRobot::Color() const {
 		.Mix(0.9f, type->Color());
 }
 
+//Draw a meter with whichever color gives better contrast. If pulse, make the meter flash.
+static void DrawMeter(GBGraphics & g, const GBNumber & fraction, const GBRect & where,
+					  short zeroAngle, short oneAngle, short width,
+					  const GBColor & color1, const GBColor & color2, const GBColor & bgcolor, bool pulse) {
+	const GBColor & color = bgcolor.ChooseContrasting(color1, color2, kMinMeterContrast);
+	short angle = ceil(fraction * (oneAngle - zeroAngle));
+	float phase = Milliseconds() * 6.28 / 500;
+	g.DrawArc(where, zeroAngle + (angle < 0 ? angle : 0), abs(angle),
+			  color * (pulse ? 0.85 + 0.15f * sin(phase) : 1.0f), width);
+}
+
 void GBRobot::Draw(GBGraphics & g, const GBRect & where, bool detailed) const {
 	if(where.Width() <= 5) {
 		DrawMini(g,where);
 		return;
 	}
+	short meterWidth = max(1, (where.Width() + 10) / 10);
+//halo: damage, crashes, prints
+	GBRect halo(where);
+	halo.Shrink(-2);
+	if ( detailed ) {
+		if ( brain && brain->Status() != bsOK )
+			g.DrawSolidOval(halo, brain->Status() == bsStopped ? GBColor::yellow : GBColor::red);
+		//TODO show velocity as a shadow or tail
+	}
 // shield
 	if ( hardware.ActualShield() > 0 )
-		g.DrawOpenRect(where, GBColor(0.3f, 0.5f, 1)
-			* (hardware.ActualShield() / (mass * kStandardShieldPerMass)).ToDouble());
-// body
-	g.DrawSolidOval(where, Owner()->Color());
+		g.DrawOpenOval(halo, GBColor(0.3f, 0.5f, 1)
+			* (hardware.ActualShield() / (mass * kStandardShieldPerMass)));
+//background and rim
+	g.DrawSolidOval(where, GBColor::darkRed.Mix(0.8f * recentDamage / kRecentDamageTime, Owner()->Color()));
+	g.DrawOpenOval(where, type->Color());
 // meters
 	if ( detailed ) {
-		short meterWidth = std::max(1, (where.Width() + 10) / 10);
-		short arcsize;
-		GBRect meterRect = where;
-		meterRect.Shrink((meterWidth + 1) / 2); //TODO is this portable?
 	// energy meter
-		if ( hardware.MaxEnergy() ) {
-			arcsize = round(hardware.Energy() / hardware.MaxEnergy() * 180);
-			g.DrawArc(meterRect, 180 - arcsize, arcsize,
-				Owner()->Color().ChooseContrasting(GBColor::green, GBColor(0, 0.5f, 1), kMinMeterContrast), meterWidth);
-		}
-	// armor meter
-		arcsize = round(max(hardware.Armor(), 0) / hardware.MaxArmor() * 180);
-		g.DrawArc(meterRect, 180, arcsize,
-			Owner()->Color().ChooseContrasting(GBColor::lightGray, GBColor::darkGray, kMinMeterContrast), meterWidth);
+		if ( hardware.MaxEnergy() )
+			DrawMeter(g, hardware.Energy() / hardware.MaxEnergy(), where, 180, 0, meterWidth,
+					  GBColor::green, GBColor(0, 0.5f, 1), Owner()->Color(),
+					  hardware.Eaten() || hardware.syphon.Syphoned() || hardware.enemySyphon.Syphoned());
+	// damage meter
+		if ( hardware.Armor() < hardware.MaxArmor() )
+			DrawMeter(g, 1.0f - hardware.Armor() / hardware.MaxArmor(), where, 360, 180, meterWidth,
+					  GBColor::red, GBColor::lightGray, Owner()->Color(), hardware.RepairRate());
 	// gestation meter
-		meterRect.Shrink(meterWidth);
 		if ( hardware.constructor.Progress() ) {
-			arcsize = round(hardware.constructor.Fraction() * 360);
-			g.DrawArc(meterRect, 360 - arcsize, arcsize,
-				Owner()->Color().ChooseContrasting(GBColor(1, 1, 0), GBColor(0, 0.5f, 0), kMinMeterContrast), meterWidth);
+			GBRect meterRect = where;
+			meterRect.Shrink(meterWidth);
+			DrawMeter(g, hardware.constructor.Fraction(), meterRect, 0, 360, 1,
+					  GBColor::yellow, GBColor::darkGreen, Owner()->Color(), hardware.constructor.Rate());
 		}
 	}
 // decoration
@@ -308,53 +328,62 @@ void GBRobot::Draw(GBGraphics & g, const GBRect & where, bool detailed) const {
 	short dy = where.Height() / 4;
 	//cross, hline, and vline draw in bigDec instead of dec
 	GBRect bigDec(where.CenterX() - dx, where.CenterY() - dy, where.CenterX() + dx, where.CenterY() + dy);
+	//flash decoration when reloading or sensing
+	const GBColor & basecolor = type->Decoration() == rdNone ? Owner()->Color() : type->DecorationColor();
+	GBColor color = basecolor;
+	if ( hardware.grenades.Cooldown() )
+		color = GBColor::yellow.Mix((float)hardware.grenades.Cooldown() / hardware.grenades.ReloadTime(), basecolor);
+	else if ( hardware.blaster.Cooldown() )
+		color = GBColor::magenta.Mix((float)hardware.blaster.Cooldown() / hardware.blaster.ReloadTime(), basecolor);
 	switch ( type->Decoration() ) {
+		case rdNone: default:
+			if ( ! hardware.blaster.Cooldown() && ! hardware.grenades.Cooldown() )
+				break; //if we're flashing, fall through and draw a dot
 		case rdDot:
 			g.DrawSolidOval(GBRect(where.CenterX() - thickness, where.CenterY() - thickness,
-				where.CenterX() + thickness, where.CenterY() + thickness), type->DecorationColor());
+				where.CenterX() + thickness, where.CenterY() + thickness), color);
 			break;
-		case rdCircle: g.DrawOpenOval(dec, type->DecorationColor(), thickness); break;
-		case rdSquare: g.DrawOpenRect(dec, type->DecorationColor(), thickness); break;
+		case rdCircle: g.DrawOpenOval(dec, color, thickness); break;
+		case rdSquare: g.DrawOpenRect(dec, color, thickness); break;
 		case rdTriangle:
 			g.DrawLine(dec.left, dec.bottom, dec.CenterX(), dec.top,
-				type->DecorationColor(), thickness);
+				color, thickness);
 			g.DrawLine(dec.CenterX(), dec.top, dec.right, dec.bottom,
-				type->DecorationColor(), thickness);
+				color, thickness);
 			g.DrawLine(dec.left, dec.bottom, dec.right, dec.bottom,
-				type->DecorationColor(), thickness);
+				color, thickness);
 			break;
 		case rdCross:
 			g.DrawLine(where.CenterX(), bigDec.top, where.CenterX(), bigDec.bottom,
-				type->DecorationColor(), thickness);
+				color, thickness);
 			g.DrawLine(bigDec.left, where.CenterY(), bigDec.right, where.CenterY(),
-				type->DecorationColor(), thickness);
+				color, thickness);
 			break;
 		case rdX:
 			g.DrawLine(dec.left, dec.top, dec.right, dec.bottom,
-				type->DecorationColor(), thickness);
+				color, thickness);
 			g.DrawLine(dec.left, dec.bottom, dec.right, dec.top,
-				type->DecorationColor(), thickness);
+				color, thickness);
 			break;
 		case rdHLine:
 			g.DrawLine(bigDec.left, where.CenterY(), bigDec.right, where.CenterY(),
-				type->DecorationColor(), thickness);
+				color, thickness);
 			break;
 		case rdVLine:
 			g.DrawLine(where.CenterX(), bigDec.top, where.CenterX(), bigDec.bottom,
-				type->DecorationColor(), thickness);
+				color, thickness);
 			break;
 		case rdSlash:
 			g.DrawLine(dec.left, dec.bottom, dec.right, dec.top,
-				type->DecorationColor(), thickness);
+				color, thickness);
 			break;
 		case rdBackslash:
 			g.DrawLine(dec.left, dec.top, dec.right, dec.bottom,
-				type->DecorationColor(), thickness);
+				color, thickness);
 			break;
-		case rdNone: default: break;
 	}
-//rim (last in case something is slightly in the wrong place)
-	g.DrawOpenOval(where, type->Color());
+//overlay
+	//radio rings?
 }
 
 void GBRobot::DrawMini(GBGraphics & g, const GBRect & where) const {

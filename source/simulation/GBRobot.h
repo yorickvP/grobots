@@ -20,6 +20,7 @@ class GBRobot : public GBObject {
 	GBBrain * brain;
 	long id, parent;
 	GBSide * lastHit; // who hit us last
+	GBFrames recentDamage;
 	int friendlyCollisions, enemyCollisions, shotCollisions, foodCollisions, wallCollisions;
 public:
 // hardware state
