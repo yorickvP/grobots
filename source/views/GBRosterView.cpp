@@ -10,6 +10,7 @@
 const short kFramecounterHeight = 15;
 const short kSideBoxHeight = 17;
 const short kPopulationWidth = 30;
+const short kWarningHeight = 36;
 
 
 GBRosterView::GBRosterView(GBWorld & wrld)
@@ -60,6 +61,10 @@ short GBRosterView::ItemHeight() const {
 	return kSideBoxHeight;
 }
 
+short GBRosterView::FooterHeight() const {
+	return Items() ? 0 : kWarningHeight;
+}
+
 void GBRosterView::DrawHeader(const GBRect & box) {
 	DrawBox(box);
 	DrawStringLeft(string("Frame ") + ToString(world.CurrentFrame()),
@@ -101,6 +106,15 @@ void GBRosterView::DrawItem(long index, const GBRect & box) {
 				box.right - 4, box.top + 12, 10, GBColor::darkGray);
 		}
 	}
+}
+
+void GBRosterView::DrawFooter(const GBRect & box) {
+	DrawStringLeft("No sides are loaded, so Grobots won't do much.",
+					   box.left, box.top + 10, 10, GBColor::black);
+	DrawStringLeft("If you don't have any sides, download some from",
+					   box.left, box.top + 22, 10, GBColor::black);
+	DrawStringLeft("http://grobots.sf.net/sides/",
+				   box.left, box.top + 34, 10, GBColor::blue);
 }
 
 void GBRosterView::ItemClicked(long index) {

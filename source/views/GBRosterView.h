@@ -35,8 +35,10 @@ public:
 	long Items() const;
 	short HeaderHeight() const;
 	short ItemHeight() const;
+	short FooterHeight() const;
 	void DrawHeader(const GBRect & box);
 	void DrawItem(long index, const GBRect & box);
+	void DrawFooter(const GBRect & box);
 	void ItemClicked(long index);
 };
 
