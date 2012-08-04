@@ -51,7 +51,9 @@ public:
 };
 
 class GBNotIntegerError : public GBBrainError {
+	GBNumber value;
 public:
+	explicit GBNotIntegerError(const GBNumber & val) : value(val) {}
 	string ToString() const;
 };
 

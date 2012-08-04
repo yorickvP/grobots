@@ -623,7 +623,7 @@ GBSymbolIndex GBStackBrainSpec::NumLabels() const {
 
 GBStackInstruction GBStackBrainSpec::ReadInstruction(const GBStackAddress index) const {
 	if ( index < 0 )
-		throw GBBadAddressError();
+		throw GBBadAddressError(index);
 	if ( index >= code.size() )
 		throw GBOffEndError();
 	return code[index];
@@ -756,7 +756,7 @@ string GBCStackError::ToString() const {
 }
 
 string GBBadAddressError::ToString() const {
-	return "invalid address";
+	return "invalid address: " + ::ToString(address);
 }
 
 

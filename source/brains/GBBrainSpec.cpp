@@ -4,6 +4,7 @@
 
 #include "GBBrainSpec.h"
 #include "GBTypes.h"
+#include "GBStringUtilities.h"
 
 
 GBBrainSpec::GBBrainSpec() {}
@@ -31,7 +32,7 @@ string GBBadSymbolIndexError::ToString() const {
 }
 
 string GBNotIntegerError::ToString() const {
-	return "value was not an integer as required";
+	return ::ToString(value) + " is not an integer";
 }
 
 string GBReadOnlyError::ToString() const {

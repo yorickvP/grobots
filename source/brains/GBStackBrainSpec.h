@@ -164,7 +164,9 @@ public:
 };
 
 class GBBadAddressError : public GBBrainError {
+	GBNumber address;
 public:
+	explicit GBBadAddressError(GBNumberParam addr) : address(addr) {}
 	string ToString() const;
 };
 

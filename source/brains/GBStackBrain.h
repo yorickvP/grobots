@@ -106,6 +106,7 @@ public:
 
 class GBOffEndError : public GBBadAddressError {
 public:
+	GBOffEndError() : GBBadAddressError(0) {}
 	string ToString() const;
 };
 

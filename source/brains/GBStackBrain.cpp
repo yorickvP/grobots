@@ -212,14 +212,14 @@ GBStackAddress GBStackBrain::ToAddress(const GBStackDatum value) {
 			// note: addr immediately after the last instruction is allowed
 			return addr;
 	}
-	throw GBBadAddressError();
+	throw GBBadAddressError(value);
 	return -1;
 }
 
 long GBStackBrain::ToInteger(const GBStackDatum value) {
 	if ( IsInteger(value) )
 		return floor(value);
-	throw GBNotIntegerError();
+	throw GBNotIntegerError(value);
 	return 0;
 }
 
