@@ -82,7 +82,7 @@ void GBSideDebuggerView::DrawSharedMemory(GBRect & box) {
 				short curNum = minNumThisPane + i*numsWide + j;
 				GBNumber read = GetSM(curNum, &worked, side);
 
-				GBColor color = GBColor(0,0,1).Mix(float(((read - smallest) / range).ToDouble()), GBColor(1,0,0));
+				GBColor color = GBColor(0,0,1).Mix(ToDouble((read - smallest) / range), GBColor(1,0,0));
 				if (worked)
 					DrawStringRight(ToString(read, 2, false), curX, curY, short(10), color);
 			}

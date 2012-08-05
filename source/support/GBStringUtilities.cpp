@@ -27,6 +27,10 @@ string ToString(long n) {
 	return s;
 }
 
+string ToString(int n) {
+	return ToString((long)n);
+}
+
 string ToString(GBNumber n, int digitsAfterDP, bool trailingZeroes) {
 	long scale = 1;
 	for ( int i = digitsAfterDP; i > 0; i -- ) scale *= 10;
@@ -54,9 +58,11 @@ string ToPercentString(float f, int digitsAfterDP, bool trailingZeroes) {
 	return ToString(f * 100.0, digitsAfterDP, trailingZeroes) + '%';
 }
 
+#if USE_GBNUMBER
 string ToPercentString(GBNumber n, int digitsAfterDP, bool trailingZeroes) {
 	return ToString(n * 100, digitsAfterDP, trailingZeroes) + '%';
 }
+#endif
 
 string ToPercentString(long num, long denom, int digitsAfterDP, bool trailingZeroes) {
 	return ToString((float)num / denom * 100, digitsAfterDP, trailingZeroes) + '%';

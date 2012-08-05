@@ -160,7 +160,7 @@ void GBScoresView::DrawScores(const GBScores & scores, bool allRounds) {
 		DrawStringPair("Efficiency:", ToPercentString(scores.Efficiency(), 0),
 					   col, 70, 9, GBColor::black);
 	long doubletime = scores.Doubletime(world.CurrentFrame());
-	if ( ! allRounds && doubletime && abs(doubletime) < 1000000 )
+	if ( ! allRounds && doubletime && abs((int)doubletime) < 1000000 )
 		DrawStringLongPair("Doubletime:", doubletime, col, 80, 9, GBColor::black);
 //other
 	DrawStringPair("Economy:", ToPercentString(scores.EconFraction(), 0), col, 90, 9, GBColor::black);

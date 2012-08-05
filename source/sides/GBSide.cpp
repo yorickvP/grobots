@@ -191,7 +191,7 @@ void GBSide::Reset() {
 
 void GBSide::ResetSampledStatistics() {
 	if (scores.Population())
-		center = (center + groupPosition / scores.Population()) / 2;
+		center = (center + groupPosition / (int)scores.Population()) / 2;
 	groupPosition.Set(0, 0);
 	scores.ResetSampledStatistics();
 	for ( GBRobotType * cur = types; cur != nil; cur= cur -> next ) {

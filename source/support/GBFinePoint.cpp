@@ -30,9 +30,9 @@ GBFinePoint GBFinePoint::operator/(const int divisor) const {
 }
 
 bool GBFinePoint::InRange(const GBFinePoint & other, const GBNumber range) const {
-	double r = range.ToDouble();
-	double dx = (x - other.x).ToDouble();
-	double dy = (y - other.y).ToDouble();
+	double r = ToDouble(range);
+	double dx = ToDouble(x - other.x);
+	double dy = ToDouble(y - other.y);
 	return (dx * dx + dy * dy) <= r * r;
 }
 
@@ -62,7 +62,7 @@ GBNumber GBFinePoint::NormSquare() const {
 }
 
 GBNumber GBFinePoint::Norm() const {
-	double xd = x.ToDouble(), yd = y.ToDouble();
+	double xd = ToDouble(x), yd = ToDouble(y);
 	return sqrt(xd * xd + yd * yd);
 }
 
@@ -76,7 +76,7 @@ void GBFinePoint::SetNorm(GBNumber norm) {
 }
 
 GBAngle GBFinePoint::Angle() const {
-	return atan2(y.ToDouble(), x.ToDouble());
+	return atan2(y, x);
 }
 
 void GBFinePoint::SetAngle(GBAngle angle) {

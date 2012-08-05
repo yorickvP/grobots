@@ -21,10 +21,13 @@ using std::string;
 #endif
 
 string ToString(long n);
+string ToString(int n);
 string ToString(GBNumber n, int digitsAfterDP = 3, bool trailingZeroes = false);
 string ToString(const GBFinePoint & v, int digitsAfterDP = 3, bool trailingZeroes = false);
 string ToPercentString(float f, int digitsAfterDP = 1, bool trailingZeroes = false);
+#if USE_GBNUMBER
 string ToPercentString(GBNumber n, int digitsAfterDP = 1, bool trailingZeroes = false);
+#endif
 string ToPercentString(long num, long denom, int digitsAfterDP = 1, bool trailingZeroes = false);
 
 bool NamesEquivalent(const string & a, const string & b);
