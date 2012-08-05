@@ -14,6 +14,7 @@ class GBShot : public GBObject {
 protected:
 	GBSide * owner;
 	GBDamage power;
+	void DrawTail(GBGraphics &, const GBProjection &, GBSpeed movement, const GBColor &) const;
 public:
 	GBShot(const GBPosition & where, const GBDistance r,
 		GBSide * const who, const GBDamage howMuch);
@@ -51,7 +52,7 @@ public:
 	long Type() const;
 // drawing code
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 };
 
 class GBGrenade : public GBTimedShot {
@@ -65,7 +66,7 @@ public:
 	long Type() const;
 // drawing code
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 };
 
 class GBExplosion : public GBTimedShot {
@@ -76,7 +77,7 @@ public:
 	void Act(GBWorld * world);
 // drawing code
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 //
 	static GBDistance PowerRadius(GBDamage pow);
 };
@@ -95,7 +96,7 @@ public:
 	GBNumber Interest() const;
 // drawing code
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 	void DrawMini(GBGraphics & g, const GBRect & where) const;
 //
 	static GBDistance PowerRadius(GBPower pow);
@@ -115,7 +116,7 @@ public:
 	GBNumber Interest() const;
 // drawing code
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 };
 
 #endif

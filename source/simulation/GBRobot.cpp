@@ -278,7 +278,7 @@ static void DrawMeter(GBGraphics & g, const GBNumber & fraction, const GBRect & 
 			  color * (pulse ? 0.85 + 0.15f * sin(phase) : 1.0f), width);
 }
 
-void GBRobot::Draw(GBGraphics & g, const GBRect & where, bool detailed) const {
+void GBRobot::Draw(GBGraphics & g, const GBProjection & proj, const GBRect & where, bool detailed) const {
 	if(where.Width() <= 5) {
 		DrawMini(g,where);
 		return;
@@ -308,7 +308,7 @@ void GBRobot::Draw(GBGraphics & g, const GBRect & where, bool detailed) const {
 					  hardware.Eaten() || hardware.syphon.Syphoned() || hardware.enemySyphon.Syphoned());
 	// damage meter
 		if ( hardware.Armor() < hardware.MaxArmor() )
-			DrawMeter(g, 1.0f - hardware.Armor() / hardware.MaxArmor(), where, 360, 180, meterWidth,
+			DrawMeter(g, GBNumber(1) - hardware.Armor() / hardware.MaxArmor(), where, 360, 180, meterWidth,
 					  GBColor::red, GBColor::lightGray, Owner()->Color(), hardware.RepairRate());
 	// gestation meter
 		if ( hardware.constructor.Progress() ) {

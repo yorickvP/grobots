@@ -93,8 +93,8 @@ void GBPortal::InitBackground() {
 void GBPortal::DrawObjects() {
 	long minTileX = max(floor(ViewLeft() / kForegroundTileSize - 0.5), 0L);
 	long minTileY = max(floor(ViewBottom() / kForegroundTileSize - 0.5), 0L);
-	long maxTileX = min(ceil(ViewRight() / kForegroundTileSize + 0.5), world.ForegroundTilesX() - 1);
-	long maxTileY = min(ceil(ViewTop() / kForegroundTileSize + 0.5), world.ForegroundTilesY() - 1);
+	long maxTileX = min((long)ceil(ViewRight() / kForegroundTileSize + 0.5), world.ForegroundTilesX() - 1);
+	long maxTileY = min((long)ceil(ViewTop() / kForegroundTileSize + 0.5), world.ForegroundTilesY() - 1);
 	long yi, xi;
 	for ( yi = minTileY; yi <= maxTileY; yi ++ )
 		for ( xi = minTileX; xi <= maxTileX; xi ++ )
@@ -136,7 +136,7 @@ void GBPortal::DrawObjectList(const GBObject * list) {
 		where.bottom = where.top + diameter;
 		if ( where.right > 0 && where.left < Width()
 				&& where.bottom > 0 && where.top < Height() ) {
-			cur->Draw(Graphics(), CalcExternalRect(where), showDetails && scale >= kMinDetailsScale);
+			cur->Draw(Graphics(), *this, CalcExternalRect(where), showDetails && scale >= kMinDetailsScale);
 		}
 	}
 }

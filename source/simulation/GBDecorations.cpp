@@ -15,8 +15,6 @@ const GBDistance kBlasterSparkGrowthRate = 0.03125;
 const GBSpeed kTransmissionGrowthRate = 0.1;
 const short kTransmissionLifetime = 12;
 
-const GBDistance kSparkleRadius = 0.0625;
-
 
 // GBTimedDecoration //
 
@@ -55,7 +53,7 @@ const GBColor GBSmoke::Color() const {
 	return GBColor(intensity);
 }
 
-void GBSmoke::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBSmoke::Draw(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {
 	g.DrawSolidOval(where, Color());
 }
 
@@ -74,7 +72,7 @@ const GBColor GBBlasterSpark::Color() const {
 	return GBColor::white;
 }
 
-void GBBlasterSpark::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBBlasterSpark::Draw(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {
 	g.DrawOpenOval(where, Color());
 }
 
@@ -97,31 +95,10 @@ const GBColor GBTransmission::Color() const {
 	return (message ? GBColor(0.6f, 0.5f, 1) : GBColor(1, 0.8f, 0.5f)) * intensity;
 }
 
-void GBTransmission::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBTransmission::Draw(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {
 	g.DrawOpenOval(where, Color());
 }
 
 void GBTransmission::DrawMini(GBGraphics & g, const GBRect & where) const {
 	g.DrawOpenOval(where, Color());
 }
-
-// GBSparkle //
-
-GBSparkle::GBSparkle(const GBPosition where, const GBVelocity vel,
-		const GBColor & col, const GBFrames life)
-	: GBTimedDecoration(where, kSparkleRadius, vel, life),
-	color(col)
-{}
-
-const GBColor GBSparkle::Color() const {
-	return color;
-}
-
-void GBSparkle::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
-	g.DrawSolidRect(where, color);
-}
-
-void GBSparkle::DrawMini(GBGraphics & g, const GBRect & where) const {
-	g.DrawSolidRect(where, color * 0.7f);
-}
-

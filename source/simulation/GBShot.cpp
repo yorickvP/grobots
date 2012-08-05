@@ -12,6 +12,7 @@
 #include "GBSound.h"
 #include "GBStringUtilities.h"
 #include <math.h>
+#include "GBMilliseconds.h"
 
 
 const GBRatio kBlastPushRatio = 0.003;
@@ -145,12 +146,12 @@ long GBBlast::Type() const { return 1; }
 //Long-range blasts are orangish; short-range ones are magenta.
 const GBColor GBBlast::Color() const {
 	float fadeout = hit ? 1.0f : min(lifetime / min((float)originallifetime, 10.0f), 1.0f);
-	float whiteness = pow(0.95, power.ToDouble());
+	float whiteness = pow(0.95, ToDouble(power));
 	float blueness = pow(0.9995, originallifetime * originallifetime);
 	return GBColor::white.Mix(whiteness, GBColor(1, 0.5f - blueness * 1.5f, blueness * 1.5f)) * fadeout;
 }
 
-void GBBlast::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBBlast::Draw(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {
 	if ( where.Width() <= 3 ) {
 		g.DrawSolidRect(where,Color());
 	} else if ( hit ) {
@@ -201,7 +202,7 @@ const GBColor GBGrenade::Color() const {
 	return GBColor::yellow;
 }
 
-void GBGrenade::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBGrenade::Draw(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {
 	if (where.Width() <= 3)
 		g.DrawSolidRect(where,Color());
 	else
@@ -252,7 +253,7 @@ const GBColor GBExplosion::Color() const {
 	return GBColor(1, 0.9f, 0.2f);
 }
 
-void GBExplosion::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBExplosion::Draw(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {
 	g.DrawSolidOval(where, Color());
 }
 
@@ -298,12 +299,17 @@ const GBColor GBForceField::Color() const {
 	return GBColor(0, 0.8f, 1);
 }
 
-void GBForceField::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBForceField::Draw(GBGraphics & g, const GBProjection &proj, const GBRect & where, bool /*detailed*/) const {
+	short weight = where.Width() >= 20 ? 2 : 1;
+	GBFinePoint edge = Position() - Velocity().Unit() * Radius();
+	g.DrawLine(proj.ToScreenX(edge.x), proj.ToScreenY(edge.y),
+			   proj.ToScreenX(Position().x - Velocity().x), proj.ToScreenY(Position().y - Velocity().y),
+			   Color() * 0.5f, weight);
 	short cx = (where.right + where.left) / 2;
 	short cy = (where.bottom + where.top) / 2;
 	g.DrawLine(cx, cy, cx + round(cos(direction) * where.Width() / 2),
 		cy - round((sin(direction) * where.Height() / 2)), owner ? owner->Color() : Color());
-	g.DrawOpenOval(where, Color(), where.Width() >= 20 ? 2 : 1);
+	g.DrawOpenOval(where, Color(), weight);
 }
 
 void GBForceField::DrawMini(GBGraphics & g, const GBRect & where) const {
@@ -391,7 +397,20 @@ const GBColor GBSyphon::Color() const {
 	return (hitsEnemies ? GBColor(0.6f, 1, 0) : GBColor(0.5f, 0.8f, 1));
 }
 
-void GBSyphon::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBSyphon::Draw(GBGraphics & g, const GBProjection & proj, const GBRect & where, bool detailed) const {
+//draw tail showing origin, rate and whether it's working
+	if ( detailed ) {
+		GBColor tailcolor = Owner()->Color() * (creator->Syphoned() ? 0.8f : 0.4f);
+		GBFinePoint unit = - Velocity().Unit();
+		double phase = Milliseconds() / 1000.0 * ToDouble(creator->Rate());
+		for (GBDistance d = Speed() + (phase - trunc(phase)); d >= Radius(); d -= 1 ) {
+			short x = proj.ToScreenX(Position().x + unit.x * d);
+			short y = proj.ToScreenY(Position().y + unit.y * d);
+			GBRect r(x - 1, y - 1, x + 1, y + 1);
+			g.DrawSolidRect(r, tailcolor);
+		}
+	}
+//draw the syphon
 	g.DrawLine(where.left, where.top, where.right, where.bottom, Color());
 	g.DrawLine(where.right, where.top, where.left, where.bottom, Color());
 }

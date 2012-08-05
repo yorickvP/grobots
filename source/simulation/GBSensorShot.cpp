@@ -70,7 +70,7 @@ const GBObjectClass GBSensorShot::Seen() const {
 
 GBSide * GBSensorShot::Owner() const { return side; }
 
-void GBSensorShot::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBSensorShot::Draw(GBGraphics & g, const GBProjection & proj, const GBRect & where, bool /*detailed*/) const {
 	// show focus, owner, and side?
 	g.DrawOpenOval(where, Color());
 }

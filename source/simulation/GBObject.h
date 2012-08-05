@@ -11,6 +11,15 @@
 #include "GBGraphics.h"
 #include "GBDeletionReporter.h"
 
+//Maps GBFinePoints to screen locations
+class GBProjection {
+public:
+	virtual short ToScreenX(const GBCoordinate x) const = 0;
+	virtual short ToScreenY(const GBCoordinate y) const = 0;
+	virtual GBCoordinate FromScreenX(const short h) const = 0;
+	virtual GBCoordinate FromScreenY(const short v) const = 0;
+	virtual GBFinePoint FromScreen(short x, short y) const = 0;
+};
 
 class GBWorld;
 
@@ -86,7 +95,7 @@ public:
 	virtual string Details() const;
 // evil antimodular drawing code
 	virtual const GBColor Color() const;
-	virtual void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	virtual void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 	virtual void DrawMini(GBGraphics & g, const GBRect & where) const;
 };
 

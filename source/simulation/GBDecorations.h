@@ -31,7 +31,7 @@ public:
 	string Description() const;
 // drawing code
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 };
 
 
@@ -41,7 +41,7 @@ public:
 	void Act(GBWorld * world);
 // drawing code
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 };
 
 class GBTransmission : public GBTimedDecoration {
@@ -52,20 +52,8 @@ public:
 	string Description() const;
 // drawing code
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 	void DrawMini(GBGraphics & g, const GBRect & where) const;
 };
-
-class GBSparkle : public GBTimedDecoration {
-	GBColor color;
-public:
-	GBSparkle(const GBPosition where, const GBVelocity vel,
-		const GBColor & color, const GBFrames life);
-// drawing code
-	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
-	void DrawMini(GBGraphics & g, const GBRect & where) const;
-};
-
 
 #endif

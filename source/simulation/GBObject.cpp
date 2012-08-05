@@ -247,7 +247,7 @@ const GBColor GBObject::Color() const {
 	return GBColor(1);
 }
 
-void GBObject::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBObject::Draw(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {
 	g.DrawOpenOval(where, Color());
 }
 

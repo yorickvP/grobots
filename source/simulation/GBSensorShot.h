@@ -35,7 +35,7 @@ public:
 	string Description() const;
 // drawing
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 	void DrawMini(GBGraphics & g, const GBRect & where) const;
 };
 

@@ -21,7 +21,10 @@ enum {
 
 class GBApplication;
 
-class GBPortal : public GBView, public GBModel, public GBDeletionListener {
+class GBPortal : public GBView,
+				 public GBModel, //so minimap can listen for changes
+				 public GBDeletionListener,
+				 public GBProjection {
 	GBWorld & world;
 	GBPosition viewpoint;
 	short defaultwidth, defaultheight;

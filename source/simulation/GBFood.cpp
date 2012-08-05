@@ -89,7 +89,7 @@ const GBColor GBFood::Color() const {
 	return GBColor::white;
 }
 
-void GBFood::Draw(GBGraphics & g, const GBRect & where, bool /*detailed*/) const {
+void GBFood::Draw(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {
 	g.DrawSolidRect(where, Color());
 }
 
@@ -147,8 +147,8 @@ const GBColor GBCorpse::Color() const {
 	return GBColor::red;
 }
 
-void GBCorpse::Draw(GBGraphics & g, const GBRect & where, bool detailed) const {
-	GBFood::Draw(g, where, detailed);
+void GBCorpse::Draw(GBGraphics & g, const GBProjection & proj, const GBRect & where, bool detailed) const {
+	GBFood::Draw(g, proj, where, detailed);
 	if ( detailed && where.Width() >= 4 ) {
 		g.DrawOpenRect(where, Owner()->Color());
 		if ( killer && where.Width() >= 6 ) {

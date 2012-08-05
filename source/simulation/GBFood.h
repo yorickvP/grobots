@@ -29,7 +29,7 @@ public:
 	void Act(GBWorld * world);
 // evil antimodular drawing code
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 };
 
 class GBManna : public GBFood {
@@ -54,7 +54,7 @@ public:
 	string Description() const;
 	string Details() const;
 	const GBColor Color() const;
-	void Draw(GBGraphics & g, const GBRect & where, bool detailed) const;
+	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 };
 
 #endif

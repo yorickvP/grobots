@@ -636,12 +636,6 @@ void GBForceFieldState::Act(GBRobot * robot, GBWorld * world) {
 			robot->Owner(), effective / (distance * kForceFieldRangeAttenuation + 1), angle);
 		world->AddObjectNew(shot);
 		//robot->PushBy(- effective * kForceFieldRecoilPerPower, angle);  // recoil
-		if ( gRandoms.Boolean((distance - robot->Radius() - 2) * 0.05) ) {
-			GBSparkle * sparkle = new GBSparkle(
-				robot->Position().AddPolar(gRandoms.InRange(robot->Radius(), distance - 2), direction),
-				robot->Velocity().AddPolar(0.05, direction), shot->Color(), 15);
-			world->AddObjectNew(sparkle);
-		}
 	}
 }
 
@@ -688,14 +682,6 @@ void GBSyphonState::Act(GBRobot * robot, GBWorld * world) {
 			robot->Position().AddPolar(min(distance, robot->Radius() + MaxRange()), direction),
 			actual, robot, this, spec->HitsEnemies());
 		world->AddObjectNew(shot);
-		if ( gRandoms.Boolean((distance - robot->Radius() - 1) * 0.1) ) {
-			//TODO making sparkles is expensive - 4% of runtime
-			GBSparkle * sparkle = new GBSparkle(
-				robot->Position().AddPolar(gRandoms.InRange(robot->Radius(), distance - 1) + (actual > 0 ? 1 : 0), direction),
-				GBFinePoint::MakePolar(actual > 0 ? -0.1 : 0.1, direction),
-				robot->Color(), 10);
-			world->AddObjectNew(sparkle);
-		}
 	}
 	syphoned = 0;
 }
@@ -839,7 +825,7 @@ void GBHardwareState::Act(GBRobot * robot, GBWorld * world) {
 		if ( power ) {
 			power = UseEnergyUpTo(min(power, enginePower));
 			robot->Owner()->Scores().Expenditure().ReportEngine(power);
-			robot->PushBy(delta * (power * kEngineEfficiency / effective / delta.Norm()));
+			robot->PushBy(delta * GBNumber(power * kEngineEfficiency / effective / delta.Norm()));
 		}
 	}
 // complex hardware
@@ -858,8 +844,6 @@ void GBHardwareState::Act(GBRobot * robot, GBWorld * world) {
 		GBEnergy repairCost = UseEnergyUpTo(min(repairRate, (MaxArmor() - armor) * kRunningCostPerRepair));
 		robot->Owner()->Scores().Expenditure().ReportRepairs(repairCost);
 		armor += repairCost / kRunningCostPerRepair;
-		if ( gRandoms.Boolean(repairCost * 0.5) )
-			world->AddObjectNew(new GBBlasterSpark(robot->Position() + gRandoms.Vector(robot->Radius())));
 	}
 // do shield
 	if ( shield ) {
