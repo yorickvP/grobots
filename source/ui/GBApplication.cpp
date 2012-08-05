@@ -509,8 +509,8 @@ GBApplication::GBApplication()
 	minimapWindow = MakeWindow(new GBDoubleBufferedView(minimap), left, screen.bottom - minimap->PreferredHeight() - edge);
 	rosterWindow = MakeWindow(roster, left, top);
 	aboutWindow = MakeWindow(new GBAboutBox(), 200, 150, false);
-	scoresWindow = MakeWindow(scores, left + minimap->PreferredWidth() + gap, scorestop, false);
-	typeWindow = MakeWindow(new GBRobotTypeView(world), right, 270, false);
+	scoresWindow = MakeWindow(scores, left + minimap->PreferredWidth() + gap, scorestop);
+	typeWindow = MakeWindow(new GBRobotTypeView(world), right, 270);
 	tournamentWindow = MakeWindow(new GBTournamentView(world), 100, 100, false);
 	SetupMenus();
 	SetStepPeriod(kNormalSpeedLimit);
@@ -749,7 +749,11 @@ void GBApplication::Redraw() {
 		debuggerWindow->DrawChanges(world.running || dragging);
 		sideDebuggerWindow->DrawChanges(world.running || dragging);
 	} catch ( GBError & err ) {
-		NonfatalError("Error drawing: " + err.ToString());
+		try {
+			NonfatalError("Error drawing: " + err.ToString());
+		} catch ( GBAbort & ) {
+			world.running = false;
+		}
 	}
 }
 
