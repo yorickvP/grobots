@@ -28,11 +28,11 @@ void GBIncomeStatistics::Reset() {
 	kleptotrophy = 0;
 }
 
-void GBIncomeStatistics::ReportAutotrophy(const GBEnergy en) { autotrophy += en;}
-void GBIncomeStatistics::ReportTheotrophy(const GBEnergy en) { theotrophy += en;}
-void GBIncomeStatistics::ReportHeterotrophy(const GBEnergy en) { heterotrophy += en;}
-void GBIncomeStatistics::ReportCannibalism(const GBEnergy en) { cannibalism += en;}
-void GBIncomeStatistics::ReportKleptotrophy(const GBEnergy en) { kleptotrophy += en;}
+void GBIncomeStatistics::ReportAutotrophy(const GBEnergy en) { autotrophy += ToDouble(en);}
+void GBIncomeStatistics::ReportTheotrophy(const GBEnergy en) { theotrophy += ToDouble(en);}
+void GBIncomeStatistics::ReportHeterotrophy(const GBEnergy en) { heterotrophy += ToDouble(en);}
+void GBIncomeStatistics::ReportCannibalism(const GBEnergy en) { cannibalism += ToDouble(en);}
+void GBIncomeStatistics::ReportKleptotrophy(const GBEnergy en) { kleptotrophy += ToDouble(en);}
 
 long GBIncomeStatistics::Autotrophy() const { return autotrophy; }
 long GBIncomeStatistics::Theotrophy() const { return theotrophy; }
@@ -74,16 +74,16 @@ void GBExpenditureStatistics::Reset() {
 	stolen = 0; wasted = 0;
 }
 
-void GBExpenditureStatistics::ReportConstruction(const GBEnergy en) { construction += en;}
-void GBExpenditureStatistics::ReportEngine(const GBEnergy en) { engine += en;}
-void GBExpenditureStatistics::ReportForceField(const GBEnergy en) { forceField += en;}
-void GBExpenditureStatistics::ReportWeapons(const GBEnergy en) { weapons += en;}
-void GBExpenditureStatistics::ReportShield(const GBEnergy en) { shield += en;}
-void GBExpenditureStatistics::ReportRepairs(const GBEnergy en) { repairs += en;}
-void GBExpenditureStatistics::ReportSensors(const GBEnergy en) { sensors += en;}
-void GBExpenditureStatistics::ReportBrain(const GBEnergy en) { brain += en;}
-void GBExpenditureStatistics::ReportStolen(const GBEnergy en) { stolen += en;}
-void GBExpenditureStatistics::ReportWasted(const GBEnergy en) { wasted += en;}
+void GBExpenditureStatistics::ReportConstruction(const GBEnergy en) { construction += ToDouble(en);}
+void GBExpenditureStatistics::ReportEngine(const GBEnergy en) { engine += ToDouble(en);}
+void GBExpenditureStatistics::ReportForceField(const GBEnergy en) { forceField += ToDouble(en);}
+void GBExpenditureStatistics::ReportWeapons(const GBEnergy en) { weapons += ToDouble(en);}
+void GBExpenditureStatistics::ReportShield(const GBEnergy en) { shield += ToDouble(en);}
+void GBExpenditureStatistics::ReportRepairs(const GBEnergy en) { repairs += ToDouble(en);}
+void GBExpenditureStatistics::ReportSensors(const GBEnergy en) { sensors += ToDouble(en);}
+void GBExpenditureStatistics::ReportBrain(const GBEnergy en) { brain += ToDouble(en);}
+void GBExpenditureStatistics::ReportStolen(const GBEnergy en) { stolen += ToDouble(en);}
+void GBExpenditureStatistics::ReportWasted(const GBEnergy en) { wasted += ToDouble(en);}
 
 long GBExpenditureStatistics::Construction() const { return construction; }
 long GBExpenditureStatistics::Engine() const { return engine; }
@@ -346,23 +346,23 @@ void GBSideScores::Reset() {
 void GBSideScores::ReportRobot(const GBEnergy &botBiomass, const GBEnergy &construc,
 							   const GBEnergy &econ, const GBEnergy &combat, const GBEnergy hw) {
 	population += 1;
-	biomass += botBiomass;
-	constructor += construc;
-	economyHardware += econ;
-	combatHardware += combat;
-	totalHardware += hw;
+	biomass += ToDouble(botBiomass);
+	constructor += ToDouble(construc);
+	economyHardware += ToDouble(econ);
+	combatHardware += ToDouble(combat);
+	totalHardware += ToDouble(hw);
 }
 
-void GBSideScores::ReportDead(const GBEnergy en) { dead += en; }
-void GBSideScores::ReportKilled(const GBEnergy en) { killed += en; }
-void GBSideScores::ReportSuicide(const GBEnergy en) { suicide += en; }
+void GBSideScores::ReportDead(const GBEnergy en) { dead += ToDouble(en); }
+void GBSideScores::ReportKilled(const GBEnergy en) { killed += ToDouble(en); }
+void GBSideScores::ReportSuicide(const GBEnergy en) { suicide += ToDouble(en); }
 
-void GBSideScores::ReportDamageDone(const GBDamage d) { damageDone += d; }
-void GBSideScores::ReportDamageTaken(const GBDamage d) { damageTaken += d; }
-void GBSideScores::ReportFriendlyFire(const GBDamage d) { friendlyFire += d; }
+void GBSideScores::ReportDamageDone(const GBDamage d) { damageDone += ToDouble(d); }
+void GBSideScores::ReportDamageTaken(const GBDamage d) { damageTaken += ToDouble(d); }
+void GBSideScores::ReportFriendlyFire(const GBDamage d) { friendlyFire += ToDouble(d); }
 
 void GBSideScores::ReportSeeded(const GBEnergy en) {
-	seeded += en;
+	seeded += ToDouble(en);
 	if ( biomassHistory.size() == 1 )
 		biomassHistory[0] = seeded;
 	sides = 1;
