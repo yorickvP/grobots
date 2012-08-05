@@ -149,15 +149,6 @@ GBNumber pow(const GBNumber & base, const GBNumber & ex) {
 	return pow(base.ToDouble(), ex.ToDouble());
 }
 
-GBNumber signum(const GBNumber &x) {
-	if ( x.data < 0 )
-		return -1;
-	else if ( x.data > 0 )
-		return 1;
-	else
-		return 0;
-}
-
 long floor(const GBNumber &x) {
 	return x.data >> kNumFractionBits;
 }
@@ -173,25 +164,15 @@ GBNumber abs(const GBNumber &x) {
 	return x.data < 0 ? - x : x;
 }
 
-long truncate(const GBNumber &x) {
+long trunc(const GBNumber &x) {
 	return x.data < 0 ? ceil(x) : floor(x);
-}
-
-long round(const GBNumber & x) {
-	return floor(x + 0.5);
 }
 
 bool IsInteger(const GBNumber &x) {
 	return ! (x.data & kFractionalPartMask);
 }
 
-GBNumber fpart(const GBNumber &x) {
-	return x - GBNumber(truncate(x));
-}
-
-GBNumber reorient(const GBNumber &theta) {
-	return mod(theta + kPi - kEpsilon, kPi * 2) - kPi + kEpsilon;
-}
+double ToDouble(GBNumberParam x) { return x.ToDouble(); }
 
 GBNumber cos(const GBNumber & x) { return cos(x.ToDouble()); }
 GBNumber sin(const GBNumber & x) { return sin(x.ToDouble()); }
@@ -203,7 +184,44 @@ GBNumber atan(const GBNumber & x) { return atan(x.ToDouble()); }
 GBNumber atan2(const GBNumber & y, const GBNumber & x) {
 	return atan2(y.ToDouble(), x.ToDouble());
 }
+#else // ! USE_GBNUMBER
+
+long floor(GBNumberParam x) { return (long)floor((double)x); }
+long ceil(GBNumberParam x) { return ceil((double)x); }
+double ToDouble(GBNumberParam x) { return x; }
+
+bool IsInteger(GBNumberParam x) {
+	return x == (long)x;
+}
+
+GBNumber abs(GBNumberParam x) { return fabs(x); }
+
+GBNumber mod(GBNumberParam x, GBNumberParam divisor) { return x - floor(x / divisor) * divisor; }
+GBNumber rem(GBNumberParam x, GBNumberParam divisor) { return x - trunc(x / divisor) * divisor; }
+
 #endif
+
+GBNumber reorient(GBNumberParam theta) {
+	return mod(theta + kPi - kEpsilon, kPi * 2) - kPi + kEpsilon;
+}
+
+long round(GBNumberParam x) {
+	return floor(x + 0.5);
+}
+
+GBNumber fpart(GBNumberParam x) {
+	return x - GBNumber(trunc(x));
+}
+
+
+GBNumber signum(GBNumberParam x) {
+	if ( x < 0 )
+		return -1;
+	else if ( x > 0 )
+		return 1;
+	else
+		return 0;
+}
 
 GBNumber max(const GBNumber &a, int b) {
 	return a < b ? GBNumber(b) : a;

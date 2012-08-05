@@ -88,11 +88,7 @@ GBNumber sqrt(const GBNumber &);
 GBNumber pow(const GBNumber & base, const GBNumber & ex);
 long floor(const GBNumber &);
 long ceil(const GBNumber &);
-long round(const GBNumber &);
-GBNumber abs(const GBNumber &);
-GBNumber signum(const GBNumber &);
 
-GBNumber reorient(const GBNumber &);
 GBNumber cos(const GBNumber &);
 GBNumber sin(const GBNumber &);
 GBNumber tan(const GBNumber &);
@@ -101,11 +97,13 @@ GBNumber asin(const GBNumber &);
 GBNumber atan(const GBNumber &);
 GBNumber atan2(const GBNumber & y, const GBNumber & x);
 
-bool IsInteger(const GBNumber &);
-GBNumber fpart(const GBNumber &);
-
+typedef const GBNumber & GBNumberParam;
 #else
 typedef float GBNumber;
+typedef GBNumber GBNumberParam;
+
+long floor(GBNumberParam);
+long ceil(GBNumberParam);
 #endif
 
 typedef GBNumber GBAngle;
@@ -293,8 +291,17 @@ inline GBNumber GBNumber::MakeRaw(const long raw) {
 template <typename T>
 T square(T x) { return x * x; }
 
-GBNumber mod(const GBNumber &x, const GBNumber &divisor);
-GBNumber rem(const GBNumber &x, const GBNumber &divisor);
+bool IsInteger(GBNumberParam);
+GBNumber fpart(GBNumberParam);
+GBNumber abs(GBNumberParam);
+GBNumber signum(GBNumberParam);
+long round(GBNumberParam);
+double ToDouble(GBNumberParam);
+
+GBNumber mod(GBNumberParam x, GBNumberParam divisor);
+GBNumber rem(GBNumberParam x, GBNumberParam divisor);
+
+GBNumber reorient(GBNumberParam);
 
 using std::min;
 using std::max;
@@ -305,8 +312,13 @@ template <typename T>
 T clamp(T x, T low, T high) { return x < low ? low : x > high ? high : x; }
 
 // constants
+#if USE_GBNUMBER
 const GBNumber kEpsilon = GBNumber::MakeRaw(1);
 const GBNumber kInfinity = GBNumber::MakeRaw(0x7FFFFFFF);
+#else //keep the same values, even though they no longer make sense
+const GBNumber kEpsilon = 1.0f / 4096;
+const GBNumber kInfinity = (float)0x7FFFFFFF / 4096;
+#endif
 const GBNumber kPi = 3.14159265358979;
 const GBNumber kE = 2.71828182846;
 
