@@ -76,12 +76,18 @@ const GBMilliseconds kNoSpeedLimit = 0;
 const int kMaxFasterSteps = 3;
 const GBMilliseconds kMaxEventInterval = 50;
 
+#if MAC
+#define ELLIPSIS "É"
+#else
+#define ELLIPSIS "..."
+#endif
+
 void GBApplication::SetupMenus() {
 	GBMenuItem fileMenu[] = {
 		{ kFileMenu, "File" },
-		{ miLoadSide, "Open SideÉ", 'O' },
+		{ miLoadSide, "Open Side" ELLIPSIS, 'O' },
 		{ miDuplicateSide, "Duplicate Side" },
-		{ miLoadSide, "Reload Side", 'L' },
+		{ miReloadSide, "Reload Side", 'L' },
 		{ -1 },
 		{ miRemoveSide, "Remove Side", 'K' },
 		{ miRemoveAllSides, "Remove All Sides" },
@@ -95,7 +101,8 @@ void GBApplication::SetupMenus() {
 	};
 	GBMenuItem windowMenu[] = {
 		{ kWindowMenu, "Window" },
-		{ miAbout, "About GrobotsÉ" },
+		//About is here temporarily - it should be in the application menu on Mac, and the Help menu on Windows.
+		{ miAbout, "About Grobots" ELLIPSIS },
 		{ miRosterView, "Roster" },
 	#if MAC
 		{ miMainView, "World", 'V' },
@@ -124,12 +131,21 @@ void GBApplication::SetupMenus() {
 		{ miUnlimitedSpeed, "Unlimited", 'U' },
 		{ -1 },
 		{ miNewRound, "New Round", 'N' },
+#if WINDOWS
+		{ miRestart, "Clear Map", VK_DELETE, modNone },
+		{ miSeed, "Add Seeds", VK_F1, modNone },
+#else
 		{ miRestart, "Restart", '\\' },
 		{ miSeed, "Add Seeds", '=' },
+#endif
 		{ miReseed, "Reseed Dead Sides" },
 		{ -1 },
-		{ miRules, "RulesÉ" },
-		{ miTournament, "TournamentÉ", 'T' },
+		{ miRules, "Rules" ELLIPSIS },
+#if MAC
+		{ miTournament, "Tournament" ELLIPSIS, 'T' },
+#else
+		{ miTournament, "Tournament", 'T' },
+#endif
 		{ miSaveScores, "Save Tournament Scores" },
 		{ miResetScores, "Reset Tournament Scores" },
 		0
@@ -157,9 +173,15 @@ void GBApplication::SetupMenus() {
 		{ miRandomNear, "Random Near", '\t', modNone },
 		{ miAutofollow, "Autofollow", 'A' },
 		{ -1 },
+#if MAC
 		{ miNextPageMemory, "Next Page", kPageUpCharCode, modNone },
 		{ miPreviousPageMemory, "Previous Page", kPageDownCharCode, modNone },
 		{ miFirstPageMemory, "First Page", kHomeCharCode, modNone },
+#elif WINDOWS
+		{ miNextPageMemory, "Next Page", VK_PRIOR, modNone },
+		{ miPreviousPageMemory, "Previous Page", VK_NEXT, modNone },
+		{ miFirstPageMemory, "First Page", VK_HOME, modNone },
+#endif
 		0
 	};
 	GBMenuItem toolsMenu[] = {
@@ -178,20 +200,21 @@ void GBApplication::SetupMenus() {
 		{ miEraseBig, "Erase Area", 'A', modNone },
 		0
 	};
-#if MAC
+#if WINDOWS
+	mainMenu = CreateMenu();
+	numAccelKeys = 0;
+#endif
 	AddMenu(fileMenu);
 	AddMenu(windowMenu);
 	AddMenu(simulationMenu);
 	AddMenu(viewMenu);
 	AddMenu(toolsMenu);
 	// help items...?
+#if MAC
 	DrawMenuBar();
 #elif WINDOWS
-	HMENU mbar = LoadMenu(hInstance, MAKEINTRESOURCE(101));
-	if (!mbar)
-		FatalError("Couldn't load menu bar.");
-	SetMenu(mainWindow->win, mbar);
-	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(102));
+	SetMenu(mainWindow->win, mainMenu);
+	hAccelTable = CreateAcceleratorTable(accelKeys, numAccelKeys);
 #endif
 }
 

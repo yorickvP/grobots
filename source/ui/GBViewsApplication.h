@@ -38,7 +38,10 @@ protected:
 #if WINDOWS
 	HINSTANCE hInstance;
 	int showCmd;
+	ACCEL accelKeys[1000];
+	int numAccelKeys;
 	HACCEL hAccelTable;
+	HMENU mainMenu;
 #endif
 private:
 #if MAC

@@ -14,6 +14,8 @@
 #include <ToolUtils.h>
 #include <Sound.h>
 #include <Navigation.h>
+#elif WINDOWS
+#include <string.h>
 #endif
 #include "GBWindow.h"
 #include "GBErrors.h"
@@ -273,8 +275,10 @@ HRESULT CALLBACK GBViewsApplication::WindowProc(HWND hWin, UINT msg,
 			self->app->dragging = nil;
 			break;
 		case WM_KEYDOWN:
+#ifndef MAPVK_VK_TO_CHAR
 			#define MAPVK_VK_TO_CHAR 2 //should be in WinUser.h but it's not;
 			// see http://www.codeguru.com/forum/archive/index.php/t-426785.html
+#endif
 			self->AcceptKeystroke(MapVirtualKey(wParam,MAPVK_VK_TO_CHAR));
 			break;
 		case WM_INITMENU:
@@ -424,6 +428,50 @@ void GBViewsApplication::AddMenu(const GBMenuItem * items) {
 			SetMenuItemModifiers(menu, ix, kMenuNoCommandModifier | kMenuShiftModifier);
 	}
 	InsertMenu(menu, 0);
+#elif WINDOWS
+	HMENU newmenu = CreateMenu();
+	for ( int ix = 0; items[ix].id; ++ ix ) {
+		if ( ! items[ix].name )
+			//This is just a separator line
+			AppendMenu(newmenu, MF_SEPARATOR, UINT_PTR(newmenu), "-");
+		else {
+			string MenuText(items[ix].name);
+			if ( items[ix].key ) {
+				//It has a shortcut key, so tell people what it is
+				MenuText.append("\t");
+				switch ( items[ix].modifier ) {
+					case modShift: MenuText.append("Shift-"); break;
+					case modDefault: MenuText.append("Ctrl-"); break;
+					default: break;
+				}
+				string givenkey(1,items[ix].key);
+				string key = "";
+				switch ( items[ix].key ) {
+					case '\r': key = "Enter"; break;
+					case '\t': key = "Tab"; break;
+					case VK_PRIOR: key = "PgUp"; break;
+					case VK_NEXT: key = "PgDown"; break;
+					case VK_HOME: key = "Home"; break;
+					case VK_F1: key = "F1"; break;
+					case VK_DELETE: key = "Del"; break;
+					default: key.append(givenkey); break;
+				}
+				MenuText.append(key);
+				//And add it to the accelerator table
+				accelKeys[numAccelKeys].fVirt = FVIRTKEY
+					| (items[ix].modifier == modDefault ? FCONTROL : 0)
+					| (items[ix].modifier == modShift ? FSHIFT : 0);
+				accelKeys[numAccelKeys].cmd = items[ix].id;
+				accelKeys[numAccelKeys].key = items[ix].key;
+				++numAccelKeys;
+			}
+			//Now add the MenuItem to the submenu, or the submenu to the main menu
+			if (ix)
+				AppendMenu(newmenu, MF_STRING, items[ix].id, (char*)MenuText.c_str());
+			else
+				AppendMenu(mainMenu, MF_POPUP, UINT_PTR(newmenu), items[ix].name);
+		}
+	}
 #else
 	//TODO
 #endif
