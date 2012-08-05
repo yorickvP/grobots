@@ -170,11 +170,7 @@ void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect
 	GrafPtr port;
 	GetPort(&port);
 	ForeColor(blackColor);
-#if CARBON
 	CopyBits(src.Bits(), GetPortBitMapForCopyBits(port), &r1, &r2, srcCopy, nil);
-#else
-	CopyBits(src.Bits(), &(port->portBits), &r1, &r2, srcCopy, nil);
-#endif
 }
 
 #elif WINDOWS
