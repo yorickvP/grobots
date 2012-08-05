@@ -138,10 +138,12 @@ void GBMiniMapView::Draw() {
 	if ( showDecorations ) DrawLayer(ocDecoration, 1);
 // draw side labels
 	if ( portal.showSideNames ) {
-		for (const GBSide *side = world.Sides(); side; side = side->next)
+		for ( int i = 0; i < world.Sides().size(); ++ i ) {
+			GBSide * side = world.Sides()[i];
 			if ( side->Scores().Population() && ! side->Scores().Sterile() )
 				DrawStringCentered(side->Name(), ToScreenX(side->center.x), ToScreenY(side->center.y),
 								   9, GBColor::gray);
+		}
 	}
 // draw viewing area
 	GBRect box;
