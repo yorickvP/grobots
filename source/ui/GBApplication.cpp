@@ -49,8 +49,8 @@ enum {
 		miShowSensors = 13107, miShowDecorations, miShowMeters,
 		miMinimapTrails,
 		miReportErrors = 13112, miReportPrints,
-		miRefollow = 13114, miFollowRandom, miRandomNear, miAutofollow,
-		miNextPageMemory = 13119, miPreviousPageMemory, miFirstPageMemory,
+		miRefollow = 13115, miFollowRandom, miRandomNear, miAutofollow,
+		miNextPageMemory = 13120, miPreviousPageMemory, miFirstPageMemory,
 	kSimulationMenu = 132,
 		miRun = 13201, miSingleFrame, miStep, miPause, miStartStopBrain,
 		miSlowerSpeed = 13207, miSlowSpeed, miNormalSpeed, miFastSpeed, miFasterSpeed, miUnlimitedSpeed,
@@ -203,6 +203,7 @@ void GBApplication::DoLoadSide() {
 	options.dialogOptionFlags |= kNavSelectAllReadableItem | kNavNoTypePopup;
 	options.dialogOptionFlags &= ~ kNavAllowPreviews;
 	ToPascalString(string("Load side"), options.windowTitle);
+	//TODO filter to only .gb
 	#if MAC_OS_X
 	if ( NavGetFile(nil, &reply, &options, nil, nil, nil, nil, nil) || ! reply.validRecord )
 	#else
@@ -219,6 +220,7 @@ void GBApplication::DoLoadSide() {
 	if ( AECountItems(&reply.selection, &items) )
 		return;
 	for ( long i = 1; i <= items; i ++ ) {
+		//TODO use typeFSRef instead
 		if ( ! AEGetNthPtr(&reply.selection, i, typeFSS, &dummyKey, &dummyType,
 				(Ptr)&spec, sizeof(FSSpec), &dummySize) )
 			OpenFile(spec);
@@ -650,8 +652,8 @@ void GBApplication::HandleMenuSelection(int item) {
 			case miFollowRandom: portal->FollowRandom(); break;
 			case miRandomNear: portal->FollowRandomNear(); break;
 			case miAutofollow: portal->autofollow = ! portal->autofollow; break;
- 			case miNextPageMemory: -- sideDebugger->pane; break;
- 			case miPreviousPageMemory: ++ sideDebugger->pane; break;
+ 			case miNextPageMemory: ++ sideDebugger->pane; break;
+ 			case miPreviousPageMemory: -- sideDebugger->pane; break;
  			case miFirstPageMemory: sideDebugger->pane = 0; break;
 		//Simulation menu:
 			case miRun:
