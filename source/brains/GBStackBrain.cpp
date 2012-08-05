@@ -206,8 +206,13 @@ void GBStackBrain::WriteLocalMemory(GBStackAddress addr, GBStackDatum val, GBRob
 }
 
 GBStackAddress GBStackBrain::ToAddress(const GBStackDatum value) {
+#if USE_GBNUMBER
+	if ( IsInteger(value) ) {
+		GBStackAddress addr = floor(value);
+#else
 	GBStackAddress addr = (GBStackAddress)value;
 	if ( addr == value ) {
+#endif
 		if ( addr >= 0 && addr < spec->NumInstructions() )
 			return addr;
 	}
