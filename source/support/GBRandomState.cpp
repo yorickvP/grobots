@@ -45,7 +45,11 @@ long GBRandomState::LongInRange(const long min, const long max) {
 }
 
 GBNumber GBRandomState::InRange(const GBNumber min, const GBNumber max) {
+#if USE_GBNUMBER
 	return GBNumber::MakeRaw(LongInRange(min.data, max.data));
+#else
+	return FloatInRange(min, max);
+#endif
 }
 
 float GBRandomState::FloatInRange(const float min, const float max) {
