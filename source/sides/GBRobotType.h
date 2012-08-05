@@ -8,7 +8,6 @@
 #include "GBHardwareSpec.h"
 #include "GBColor.h"
 #include "GBModel.h"
-#include "GBLongNumber.h"
 
 
 class GBSide;
@@ -33,7 +32,7 @@ class GBRobotType : public GBModel {
 	GBHardwareSpec hardware;
 	GBBrainSpec * brain;
 	long population;
-	GBLongNumber biomass;
+	double biomass;
 public:
 	GBRobotType * next;
 private:

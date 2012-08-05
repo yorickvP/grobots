@@ -49,7 +49,7 @@ void GBRobotType::ReportRobot(GBEnergy botBiomass) {
 
 long GBRobotType::Population() const { return population; }
 
-long GBRobotType::Biomass() const { return biomass.Round(); }
+long GBRobotType::Biomass() const { return biomass; }
 
 GBSide * GBRobotType::Side() const { return side; }
 

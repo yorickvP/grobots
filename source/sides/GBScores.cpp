@@ -34,11 +34,11 @@ void GBIncomeStatistics::ReportHeterotrophy(const GBEnergy en) { heterotrophy +=
 void GBIncomeStatistics::ReportCannibalism(const GBEnergy en) { cannibalism += en;}
 void GBIncomeStatistics::ReportKleptotrophy(const GBEnergy en) { kleptotrophy += en;}
 
-long GBIncomeStatistics::Autotrophy() const { return autotrophy.Round(); }
-long GBIncomeStatistics::Theotrophy() const { return theotrophy.Round(); }
-long GBIncomeStatistics::Heterotrophy() const { return heterotrophy.Round(); }
-long GBIncomeStatistics::Cannibalism() const { return cannibalism.Round(); }
-long GBIncomeStatistics::Kleptotrophy() const { return kleptotrophy.Round(); }
+long GBIncomeStatistics::Autotrophy() const { return autotrophy; }
+long GBIncomeStatistics::Theotrophy() const { return theotrophy; }
+long GBIncomeStatistics::Heterotrophy() const { return heterotrophy; }
+long GBIncomeStatistics::Cannibalism() const { return cannibalism; }
+long GBIncomeStatistics::Kleptotrophy() const { return kleptotrophy; }
 
 long GBIncomeStatistics::Total() const {
 	// excludes cannibalism and seeded
@@ -85,16 +85,16 @@ void GBExpenditureStatistics::ReportBrain(const GBEnergy en) { brain += en;}
 void GBExpenditureStatistics::ReportStolen(const GBEnergy en) { stolen += en;}
 void GBExpenditureStatistics::ReportWasted(const GBEnergy en) { wasted += en;}
 
-long GBExpenditureStatistics::Construction() const { return construction.Round(); }
-long GBExpenditureStatistics::Engine() const { return engine.Round(); }
-long GBExpenditureStatistics::Weapons() const { return weapons.Round(); }
-long GBExpenditureStatistics::ForceField() const { return forceField.Round(); }
-long GBExpenditureStatistics::Shield() const { return shield.Round(); }
-long GBExpenditureStatistics::Repairs() const { return repairs.Round(); }
-long GBExpenditureStatistics::Sensors() const { return sensors.Round(); }
-long GBExpenditureStatistics::Brain() const { return brain.Round(); }
-long GBExpenditureStatistics::Stolen() const { return stolen.Round(); }
-long GBExpenditureStatistics::Wasted() const { return wasted.Round(); }
+long GBExpenditureStatistics::Construction() const { return construction; }
+long GBExpenditureStatistics::Engine() const { return engine; }
+long GBExpenditureStatistics::Weapons() const { return weapons; }
+long GBExpenditureStatistics::ForceField() const { return forceField; }
+long GBExpenditureStatistics::Shield() const { return shield; }
+long GBExpenditureStatistics::Repairs() const { return repairs; }
+long GBExpenditureStatistics::Sensors() const { return sensors; }
+long GBExpenditureStatistics::Brain() const { return brain; }
+long GBExpenditureStatistics::Stolen() const { return stolen; }
+long GBExpenditureStatistics::Wasted() const { return wasted; }
 
 long GBExpenditureStatistics::Total() const {
 	return Construction() + Engine()
@@ -190,9 +190,10 @@ GBScores & GBScores::operator +=(const GBScores & other) {
 //add biomass
 	if (biomassHistory.size() < other.biomassHistory.size())
 		biomassHistory.resize(other.biomassHistory.size(), biomassHistory.back());
-	for ( int i = other.biomassHistory.size(); i < biomassHistory.size(); ++ i )
+	int osize = other.biomassHistory.size();
+	for ( int i = osize; i < biomassHistory.size(); ++ i )
 		biomassHistory[i] += other.biomassHistory.back();
-	for ( int i = 0; i < other.biomassHistory.size(); ++ i )
+	for ( int i = 0; i < osize; ++ i )
 		biomassHistory[i] += other.biomassHistory[i];
 	return *this;
 }
@@ -264,7 +265,7 @@ const std::vector<long> GBScores::BiomassHistory() const {
 	return avg;
 }
 
-long GBScores::Constructor() const { return constructor / rounds; }
+long GBScores::Constructor() const { return rounds ? constructor / rounds : 0; }
 
 long GBScores::Territory() const { return territory; }
 
@@ -272,7 +273,7 @@ GBRatio GBScores::EconFraction() const { return economyHardware / totalHardware;
 GBRatio GBScores::CombatFraction() const { return combatHardware / totalHardware; }
 
 
-long GBScores::Seeded() const { return seeded / rounds; }
+long GBScores::Seeded() const { return rounds ? seeded / rounds : 0; }
 
 GBIncomeStatistics & GBScores::Income() { return income;}
 const GBIncomeStatistics & GBScores::Income() const { return income;}
@@ -293,19 +294,19 @@ float GBScores::KilledFraction() const {
 	return killedFraction / (rounds ? rounds : 1);}
 
 float GBScores::KillRate() const {
-	if ( ! biomass.Round() ) return 0.0;
-	return (float)killed.Round() / biomass.Round();
+	if ( ! biomass ) return 0.0;
+	return killed / biomass;
 }
 
+//What fraction of income has ended up as growth?
 float GBScores::Efficiency() const {
 	if ( ! income.Total() ) return 0.0;
-	return (float)(biomass.Round() - seeded.Round()) / Income().Total();
+	return (biomass - seeded) / Income().Total();
 }
 
 GBFrames GBScores::Doubletime(GBFrames currentTime) const {
-	if ( ! seeded.Round() || ! biomass.Round() ) return 0;
-	return (GBFrames)(currentTime
-		* (log(2.0) / log((double)biomass.Round() / (double)seeded.Round())));
+	if ( ! seeded || biomass <= 1 ) return 0;
+	return (GBFrames)(currentTime * log(2.0) / log(biomass) / seeded);
 }
 
 float GBScores::BiomassFractionSD() const {
@@ -363,7 +364,7 @@ void GBSideScores::ReportFriendlyFire(const GBDamage d) { friendlyFire += d; }
 void GBSideScores::ReportSeeded(const GBEnergy en) {
 	seeded += en;
 	if ( biomassHistory.size() == 1 )
-		biomassHistory[0] = seeded.Round();
+		biomassHistory[0] = seeded;
 	sides = 1;
 	rounds = 1;
 }
@@ -371,20 +372,19 @@ void GBSideScores::ReportSeeded(const GBEnergy en) {
 void GBSideScores::ReportTerritory() { ++ territory; }
 
 void GBSideScores::ReportTotals(const GBScores & totals) {
-	biomassFraction = totals.Biomass() ? (float)biomass.Round() / totals.Biomass() : 0.0;
+	biomassFraction = totals.Biomass() ? biomass / totals.Biomass() : 0.0;
 	biomassFractionSquared = biomassFraction * biomassFraction;
-	earlyBiomassFraction = totals.EarlyBiomass() ?
-		(float)earlyBiomass.Round() / totals.EarlyBiomass() : 0.0;
-	killedFraction = totals.Killed() ? (float)killed.Round() / totals.Killed() : 0.0;
+	earlyBiomassFraction = totals.EarlyBiomass() ? earlyBiomass / totals.EarlyBiomass() : 0.0;
+	killedFraction = totals.Killed() ? killed / totals.Killed() : 0.0;
 	if ( totals.Survived() == 1 && survived ) elimination = 1;
 }
 
 void GBSideScores::ReportFrame(const GBFrames frame) {
-    if ( seeded.Zero() ) return;
+    if ( ! seeded ) return;
 	if ( population ) {
 		extinctTime = 0;
 		survived = 1;
-		if ( constructor.Round() <= kMaxSterileConstructor ) {
+		if ( constructor <= kMaxSterileConstructor ) {
 			if ( ! sterile ) {
 				sterile = 1;
 				sterileTime = frame;
@@ -404,7 +404,7 @@ void GBSideScores::ReportFrame(const GBFrames frame) {
 		if ( sterile ) earlyDeaths = 1;
 	}
 	if ( frame % 100 == 0 && frame )
-		biomassHistory.push_back(biomass.Round());
+		biomassHistory.push_back(biomass);
 }
 
 GBFrames GBSideScores::ExtinctTime() const { return extinctTime; }

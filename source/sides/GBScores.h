@@ -7,15 +7,14 @@
 #define GBScores_h
 
 #include "GBTypes.h"
-#include "GBLongNumber.h"
 #include <vector>
 
 class GBIncomeStatistics {
-	GBLongNumber autotrophy;
-	GBLongNumber theotrophy;
-	GBLongNumber heterotrophy;
-	GBLongNumber cannibalism;
-	GBLongNumber kleptotrophy;
+	double autotrophy;
+	double theotrophy;
+	double heterotrophy;
+	double cannibalism;
+	double kleptotrophy;
 public:
 	GBIncomeStatistics();
 	~GBIncomeStatistics();
@@ -38,16 +37,16 @@ public:
 };
 
 class GBExpenditureStatistics {
-	GBLongNumber construction;
-	GBLongNumber engine;
-	GBLongNumber weapons;
-	GBLongNumber forceField;
-	GBLongNumber shield;
-	GBLongNumber repairs;
-	GBLongNumber sensors;
-	GBLongNumber brain;
-	GBLongNumber stolen;
-	GBLongNumber wasted;
+	double construction;
+	double engine;
+	double weapons;
+	double forceField;
+	double shield;
+	double repairs;
+	double sensors;
+	double brain;
+	double stolen;
+	double wasted;
 public:
 	GBExpenditureStatistics();
 	~GBExpenditureStatistics();
@@ -90,17 +89,17 @@ protected:
 	long elimination;
 // sampled
 	long population, populationEver;
-	GBLongNumber biomass, earlyBiomass;
+	double biomass, earlyBiomass;
 	std::vector<long> biomassHistory; //may eventually be a vector of GBScores
-	GBLongNumber constructor;
-	GBLongNumber economyHardware, combatHardware, totalHardware;
+	double constructor;
+	double economyHardware, combatHardware, totalHardware;
 	long territory;
 // accumulated
-	GBLongNumber seeded;
+	double seeded;
 	GBIncomeStatistics income;
 	GBExpenditureStatistics expenditure;
-	GBLongNumber dead, killed, suicide;
-	GBLongNumber damageDone, damageTaken, friendlyFire;
+	double dead, killed, suicide;
+	double damageDone, damageTaken, friendlyFire;
 // fractions
 	float biomassFraction, earlyBiomassFraction;
 	float killedFraction;
