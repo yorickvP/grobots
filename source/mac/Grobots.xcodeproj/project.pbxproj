@@ -35,7 +35,6 @@
 		00DD37450B4098CF00390993 /* GBErrors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00DD36FF0B4098CF00390993 /* GBErrors.cpp */; };
 		00DD37460B4098CF00390993 /* GBFinePoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00DD37010B4098CF00390993 /* GBFinePoint.cpp */; };
 		00DD37470B4098CF00390993 /* GBGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00DD37030B4098CF00390993 /* GBGraphics.cpp */; };
-		00DD37480B4098CF00390993 /* GBLongNumber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00DD37050B4098CF00390993 /* GBLongNumber.cpp */; };
 		00DD37490B4098CF00390993 /* GBMilliseconds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00DD37070B4098CF00390993 /* GBMilliseconds.cpp */; };
 		00DD374A0B4098CF00390993 /* GBModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00DD37090B4098CF00390993 /* GBModel.cpp */; };
 		00DD374B0B4098CF00390993 /* GBNumber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00DD370B0B4098CF00390993 /* GBNumber.cpp */; };
@@ -129,8 +128,6 @@
 		00DD37020B4098CF00390993 /* GBFinePoint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = GBFinePoint.h; sourceTree = "<group>"; };
 		00DD37030B4098CF00390993 /* GBGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = GBGraphics.cpp; sourceTree = "<group>"; };
 		00DD37040B4098CF00390993 /* GBGraphics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = GBGraphics.h; sourceTree = "<group>"; };
-		00DD37050B4098CF00390993 /* GBLongNumber.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = GBLongNumber.cpp; sourceTree = "<group>"; };
-		00DD37060B4098CF00390993 /* GBLongNumber.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = GBLongNumber.h; sourceTree = "<group>"; };
 		00DD37070B4098CF00390993 /* GBMilliseconds.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = GBMilliseconds.cpp; sourceTree = "<group>"; };
 		00DD37080B4098CF00390993 /* GBMilliseconds.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = GBMilliseconds.h; sourceTree = "<group>"; };
 		00DD37090B4098CF00390993 /* GBModel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = GBModel.cpp; sourceTree = "<group>"; };
@@ -273,8 +270,6 @@
 				00DD37020B4098CF00390993 /* GBFinePoint.h */,
 				00DD37030B4098CF00390993 /* GBGraphics.cpp */,
 				00DD37040B4098CF00390993 /* GBGraphics.h */,
-				00DD37050B4098CF00390993 /* GBLongNumber.cpp */,
-				00DD37060B4098CF00390993 /* GBLongNumber.h */,
 				00DD37070B4098CF00390993 /* GBMilliseconds.cpp */,
 				00DD37080B4098CF00390993 /* GBMilliseconds.h */,
 				00DD37090B4098CF00390993 /* GBModel.cpp */,
@@ -363,12 +358,12 @@
 		20286C2AFDCF999611CA2CEA /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				00DD36C70B4098A000390993 /* brains */,
 				00DD36DA0B4098CF00390993 /* sides */,
 				00DD36E50B4098CF00390993 /* simulation */,
 				00DD36FA0B4098CF00390993 /* support */,
 				00DD37150B4098CF00390993 /* ui */,
 				00DD371D0B4098CF00390993 /* views */,
-				00DD36C70B4098A000390993 /* brains */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -491,7 +486,6 @@
 				00DD37450B4098CF00390993 /* GBErrors.cpp in Sources */,
 				00DD37460B4098CF00390993 /* GBFinePoint.cpp in Sources */,
 				00DD37470B4098CF00390993 /* GBGraphics.cpp in Sources */,
-				00DD37480B4098CF00390993 /* GBLongNumber.cpp in Sources */,
 				00DD37490B4098CF00390993 /* GBMilliseconds.cpp in Sources */,
 				00DD374A0B4098CF00390993 /* GBModel.cpp in Sources */,
 				00DD374B0B4098CF00390993 /* GBNumber.cpp in Sources */,
