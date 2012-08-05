@@ -604,6 +604,8 @@ void GBStackBrainSpec::Check() {
 	for ( int i = 0; i < labels.size(); i ++ )
 		if ( labels[i].address < 0 )
 			throw GBUnresolvedSymbolError(labels[i].name);
+// add sentinel
+	AddPrimitiveCall(opEnd, -1);
 }
 
 GBStackAddress GBStackBrainSpec::NumInstructions() const {
@@ -622,10 +624,6 @@ GBSymbolIndex GBStackBrainSpec::NumLabels() const {
 	return labels.size();}
 
 GBStackInstruction GBStackBrainSpec::ReadInstruction(const GBStackAddress index) const {
-	if ( index < 0 )
-		throw GBBadAddressError(index);
-	if ( index >= code.size() )
-		throw GBOffEndError();
 	return code[index];
 }
 

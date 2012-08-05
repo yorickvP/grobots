@@ -89,6 +89,7 @@ enum { // primitives
 	opLeadBlaster, opLeadGrenade,
 	opSetForceField,
 // limit
+	opEnd,
 	kNumPrimitives
 };
 

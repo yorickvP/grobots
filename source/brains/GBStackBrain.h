@@ -51,8 +51,11 @@ private:
 	void DoPrint(const string & str);
 	void FirePeriodic(GBSensorState & sensor, GBWorld * world);
 // operations
-	void NumberToNumberOp(GBNumber (*op)(const GBNumber &));
-	void TwoNumberToNumberOp(GBNumber (*op)(const GBNumber &, const GBNumber &));
+	void NumberToNumberOp(GBNumber (*op)(GBNumberParam));
+#if ! USE_GBNUMBER
+	//void NumberToNumberOp(double (*op)(double));
+#endif
+	void TwoNumberToNumberOp(GBNumber (*op)(GBNumberParam, GBNumberParam));
 	void VectorToVectorOp(GBFinePoint (GBFinePoint::* op)() const);
 	void VectorToScalarOp(GBNumber (GBFinePoint::* op)() const);
 	void TwoVectorToVectorOp(GBFinePoint (GBFinePoint::* op)(const GBFinePoint &) const);

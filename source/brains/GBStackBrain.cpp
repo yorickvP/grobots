@@ -95,13 +95,13 @@ void GBStackBrain::DoPrint(const string & str) {
 	lastPrint = new string(str);
 }
 
-void GBStackBrain::NumberToNumberOp(GBNumber (*op)(const GBNumber &)) {
+void GBStackBrain::NumberToNumberOp(GBNumber (*op)(GBNumberParam)) {
 	if ( stackHeight < 1 )
 		throw GBStackUnderflowError();
 	stack[stackHeight - 1] = op(stack[stackHeight - 1]);
 }
 
-void GBStackBrain::TwoNumberToNumberOp(GBNumber (*op)(const GBNumber &, const GBNumber &)) {
+void GBStackBrain::TwoNumberToNumberOp(GBNumber (*op)(GBNumberParam, GBNumberParam)) {
 	if ( stackHeight < 2 )
 		throw GBStackUnderflowError();
 	-- stackHeight;
@@ -206,10 +206,9 @@ void GBStackBrain::WriteLocalMemory(GBStackAddress addr, GBStackDatum val, GBRob
 }
 
 GBStackAddress GBStackBrain::ToAddress(const GBStackDatum value) {
-	if ( IsInteger(value) ) {
-		GBStackAddress addr = floor(value);
-		if ( addr >= 0 && addr <= spec->NumInstructions() )
-			// note: addr immediately after the last instruction is allowed
+	GBStackAddress addr = (GBStackAddress)value;
+	if ( addr == value ) {
+		if ( addr >= 0 && addr < spec->NumInstructions() )
 			return addr;
 	}
 	throw GBBadAddressError(value);
@@ -287,6 +286,8 @@ void GBStackBrain::ThinkOne(GBRobot * robot, GBWorld * world) {
 }
 
 void GBStackBrain::Step(GBRobot * robot, GBWorld * world) {
+	if ( Status() != bsOK )
+		return;
 	try {
 		ThinkOne(robot, world);
 	} catch ( GBError & err ) {

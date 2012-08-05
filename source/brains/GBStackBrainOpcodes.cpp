@@ -72,6 +72,8 @@ const string primitiveNames[kNumPrimitives] = {
 	"fire-blaster", "fire-grenade",
 	"lead-blaster", "lead-grenade",
 	"set-force-field",
+//sentinel
+	"end"
 };
 
 const string hardwareVariableNames[kNumHardwareVariables] = {

@@ -354,10 +354,9 @@ void GBStackBrain::ExecutePrimitive(GBSymbolIndex index, GBRobot * robot, GBWorl
 		case opNotIfReturn: if ( ! Pop() ) pc = PopReturn(); break;
 		case opNotIfCall: temp = Pop(); if ( ! Pop() ) ExecuteCall(ToAddress(temp)); break;
 	// arithmetic
-		case opAdd: TwoNumberToNumberOp(operator +); break;
-		case opSubtract: TwoNumberToNumberOp(operator -); break;
-		case opNegate: NumberToNumberOp(operator -); break;
-		// mult and divide are written out because of MrCpp internal error
+		case opAdd: temp = Pop(); Push(Pop() + temp); break;
+		case opSubtract: temp = Pop(); Push(Pop() - temp); break;
+		case opNegate: Push(- Pop()); break;
 		case opMultiply: temp = Pop(); Push(Pop() * temp); break;
 		case opDivide: temp = Pop(); Push(Pop() / temp); break;
 		case opReciprocal: Push(GBNumber(1) / Pop()); break;
@@ -365,7 +364,7 @@ void GBStackBrain::ExecutePrimitive(GBSymbolIndex index, GBRobot * robot, GBWorl
 		case opRem: TwoNumberToNumberOp(rem); break;
 		case opSquare: Push(square(Pop())); break;
 		case opSqrt: NumberToNumberOp(sqrt); break;
-		case opExponent: TwoNumberToNumberOp(pow); break;
+		case opExponent: temp = Pop(); Push(pow(Pop(), temp)); break;
 		case opIsInteger: PushBoolean(IsInteger(Pop())); break;
 		case opFloor: Push(floor(Pop())); break;
 		case opCeiling: Push(ceil(Pop())); break;
@@ -589,6 +588,8 @@ void GBStackBrain::ExecutePrimitive(GBSymbolIndex index, GBRobot * robot, GBWorl
 			robot->hardware.forceField.SetPower(robot->hardware.forceField.MaxPower());
 			} break;
 	// otherwise...
+		case opEnd:
+			throw GBOffEndError();
 		default:	
 			throw GBUnknownInstructionError();
 			break;
