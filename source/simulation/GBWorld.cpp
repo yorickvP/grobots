@@ -136,7 +136,7 @@ void GBWorld::AddInitialManna() {
 
 GBWorld::GBWorld()
 	: GBObjectWorld(),
-	sides(nil), selectedSide(nil),
+	sides(), selectedSide(nil),
 	roundScores(), tournamentScores(),
 	currentFrame(0),
 	followed(nil),
@@ -217,8 +217,8 @@ void GBWorld::CollectStatistics() {
 // reset
 	mannas = 0; corpses = 0;
 	mannaValue = 0; corpseValue = 0; robotValue = 0;
-	for ( GBSide * cur = sides; cur != nil; cur = cur->next )
-		cur->ResetSampledStatistics();
+	for ( int i = 0; i < sides.size(); ++ i )
+		sides[i]->ResetSampledStatistics();
 // collect
 	try {
 		for ( long i = 0; i <= tilesX * tilesY; i ++ ) {
@@ -243,14 +243,13 @@ void GBWorld::CollectStatistics() {
 	}
 // report
 	roundScores.Reset();
-	GBSide * side;
-	for ( side = sides; side != nil; side = side->next ) {
-		side->Scores().ReportFrame(currentFrame);
-		roundScores += side->Scores();
+	for ( int i = 0; i < sides.size(); ++ i ) {
+		sides[i]->Scores().ReportFrame(currentFrame);
+		roundScores += sides[i]->Scores();
 	}
 	roundScores.OneRound();
-	for ( side = sides; side != nil; side = side->next )
-		side->Scores().ReportTotals(roundScores);
+	for ( int i = 0; i < sides.size(); ++ i )
+		sides[i]->Scores().ReportTotals(roundScores);
 }
 
 void GBWorld::AddSeed(GBSide * side, const GBPosition & where) {
@@ -322,11 +321,11 @@ void GBWorld::AddSeeds() {
 // seed sides
 	long seedsLeft = numSeeds;
 	long sidesLeft = numSides;
-	for ( GBSide * side = sides; side != nil && seedsLeft; side = side->next, -- sidesLeft )
+	for ( int i = 0; i < sides.size() && seedsLeft; ++ i, -- sidesLeft )
 		if ( seedsLeft >= sidesLeft || random.Boolean(GBNumber(seedsLeft) / sidesLeft) ) {
 			if ( ! seedsLeft ) throw GBTooManyIterationsError();
-			side->center = positions[numSeeds - seedsLeft];
-			AddSeed(side, positions[numSeeds - seedsLeft]);
+			sides[i]->center = positions[numSeeds - seedsLeft];
+			AddSeed(sides[i], positions[numSeeds - seedsLeft]);
 			-- seedsLeft;
 		}
 	delete[] positions;
@@ -337,10 +336,10 @@ void GBWorld::AddSeeds() {
 
 void GBWorld::ReseedDeadSides() {
 // since this uses side statistics, be sure statistics have been gathered
-	for ( GBSide * side = sides; side != nil; side = side->next )
-		if ( side->Scores().Sterile() ) {
-			//side->Reset(); //why?
-			AddSeed(side, RandomLocation());
+	for ( int i = 0; i < sides.size(); ++ i )
+		if ( sides[i]->Scores().Sterile() ) {
+			//sides[i]->Reset(); //why?
+			AddSeed(sides[i], RandomLocation());
 		}
 	CollectStatistics();
 }
@@ -350,8 +349,8 @@ void GBWorld::Reset() {
 	mannaLeft = 0;
 	sidesSeeded = 0;
 	ClearLists();
-	for ( GBSide * cur = sides; cur != nil; cur = cur->next )
-		cur->Reset();
+	for ( int i = 0; i < sides.size(); ++ i )
+		sides[i]->Reset();
 	roundScores.Reset();
 	AddInitialManna();
 	Changed();
@@ -384,81 +383,44 @@ GBFinePoint GBWorld::RandomLocation(GBDistance walldist) {
 void GBWorld::AddSide(GBSide * side) {
 	if ( ! side )
 		throw GBNilPointerError();
-	side->next = nil;
-	if ( sides == nil ) {
-		sides = side;
-	} else {
-		GBSide * cur;
-		for ( cur = sides; cur->next != nil; cur = cur->next )
-			;
-		cur->next = side;
-	}
+	for ( int i = 0; i < sides.size(); ++ i )
+		if ( sides[i]->Name() == side->Name() )
+			side->SetName(side->Name() + '\'');
+	sides.push_back(side);
 	Changed();
 }
 
 void GBWorld::ReplaceSide(GBSide * oldSide, GBSide * newSide) {
 	if ( ! oldSide || ! newSide ) throw GBNilPointerError();
-	if ( sides == oldSide ) {
-		sides = newSide;
-	} else {
-		GBSide * cur;
-		for ( cur = sides; cur != nil; cur = cur->next ) {
-			if ( cur->next == oldSide ) {
-				cur->next = newSide;
-				break;
-			}
-		}
-		if ( ! cur ) throw GBBadArgumentError();
-	}
+	std::replace(sides.begin(), sides.end(), oldSide, newSide);
 	if ( oldSide == selectedSide ) selectedSide = newSide;
-	newSide->next = oldSide->next;
 	delete oldSide;
 	Changed();
 }
 
 void GBWorld::RemoveSide(GBSide * side) {
 	if ( ! side ) throw GBNilPointerError();
-	if ( side == selectedSide )
-		selectedSide = nil;
-	if ( sides == side ) {
-		sides = side->next;
-		delete side;
-	} else {
-		for ( GBSide * cur = sides; cur != nil; cur = cur->next ) {
-			if ( cur->next == side ) {
-				cur->next = cur->next->next;
-				delete side;
-			}
-		}
-	}
+	sides.erase(std::remove(sides.begin(), sides.end(), side), sides.end());
 	Changed();
 }
 
 void GBWorld::RemoveAllSides() {
-	GBSide * temp;
-	for ( GBSide * cur = sides; cur != nil; cur = temp ) {
-		temp = cur->next;
-		delete cur;
-	}
-	sides = nil;
+	for (int i = 0; i < sides.size(); ++ i )
+		delete sides[i];
+	sides.clear();
 	selectedSide = nil;
 	ResetTournamentScores();
 	Changed();
 }
 
-GBSide * GBWorld::Sides() const {
+const std::vector<GBSide *> & GBWorld::Sides() const {
 	return sides;
 }
 
 GBSide * GBWorld::GetSide(long index) const {
-	GBSide * side = sides;
-	if ( index <= 0 ) throw GBIndexOutOfRangeError();
-	for ( long i = 1; i < index; i ++ )
-		if ( side->next )
-			side = side->next;
-		else
-			throw GBIndexOutOfRangeError();
-	return side;
+	if ( index <= 0 || index > sides.size() )
+		throw GBIndexOutOfRangeError();
+	return sides[index - 1];
 }
 
 GBSide * GBWorld::SelectedSide() const {
@@ -473,16 +435,13 @@ void GBWorld::SelectSide(GBSide * which) {
 }
 
 long GBWorld::CountSides() const {
-	long count = 0;
-	for ( GBSide * cur = sides; cur != nil; cur = cur->next )
-		count ++;
-	return count;
+	return sides.size();
 }
 
 int GBWorld::SidesAlive() const {
 	int sidesAlive = 0;
-	for ( GBSide * cur = sides; cur != nil; cur = cur->next )
-		if ( cur->Scores().Population() > 0 )
+	for ( int i = 0; i < sides.size(); ++ i )
+		if ( sides[i]->Scores().Population() > 0 )
 			sidesAlive++;
 	return sidesAlive;
 }
@@ -518,18 +477,18 @@ void GBWorld::ReportRobot(GBEnergy amount) {
 
 void GBWorld::ReportRound() {
 	roundScores.Reset();
-	for ( GBSide * cur = sides; cur != nil; cur = cur->next )
-		if ( cur->Scores().Seeded() ) {
-			roundScores += cur->Scores(); // re-sum sides to get elimination right
-			cur->TournamentScores() += cur->Scores();
+	for ( int i = 0; i < sides.size(); ++ i )
+		if ( sides[i]->Scores().Seeded() ) {
+			roundScores += sides[i]->Scores(); // re-sum sides to get elimination right
+			sides[i]->TournamentScores() += sides[i]->Scores();
 		}
 	roundScores.OneRound();
 	tournamentScores += roundScores;
 }
 
 void GBWorld::ResetTournamentScores() {
-	for ( GBSide * cur = sides; cur != nil; cur = cur->next )
-		cur->TournamentScores().Reset();
+	for ( int i = 0; i < sides.size(); ++ i )
+		sides[i]->TournamentScores().Reset();
 	tournamentScores.Reset();
 	Changed();
 }
@@ -560,9 +519,7 @@ void GBWorld::DumpTournamentScores() {
 		"<th>Score<th>Nonsterile<br>survival<th>Early<br>death<th>Late<br>death"
 		"<th>Early<br>score<th>Fraction<th>Kills\n"
 		"<tbody>\n";
-	std::vector<const GBSide *> sorted;
-	for (const GBSide * s = sides; s; s = s->next)
-		sorted.push_back(s);
+	std::vector<GBSide *> sorted = sides;
 	std::sort(sorted.begin(), sorted.end(), GBSide::Better);
 	for (int i = 0; i < sorted.size(); ++i) {
 		f << "<tr><td>" << i + 1 << "<td><a href='sides/" << sorted[i]->Filename() << "'>";

@@ -24,7 +24,7 @@ const GBRobotType * GBRobotTypeView::SelectedType() const {
 	if ( ! side ) return nil;
 	const GBRobotType * type = side->SelectedType();
 	if ( ! type && side->CountTypes() == 1 )
-		type = side->GetFirstType();
+		type = side->GetType(1);
 	return type;
 }
 

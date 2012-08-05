@@ -67,14 +67,16 @@ void GBScoresView::DrawGraph(const GBRect & box, long vscale, int hscale,
 }
 
 void GBScoresView::DrawGraph(const GBRect & box, bool allRounds) {
-	if ( ! world.Sides() ) return;
+	if ( ! world.CountSides() ) return;
 	DrawBox(box);
 	GBRect graph(box.left + 1, box.top + 1, box.right - 2, box.bottom - 2);
 	const GBSide * side = world.SelectedSide();
 //find scale
 	long scale = 1;
 	int hscale = 1;
-	for ( const GBSide * s = world.Sides(); s; s = s->next ) {
+	const std::vector<GBSide *> & sides = world.Sides();
+	for ( int i = 0; i < sides.size(); ++ i ) {
+		GBSide * s = sides[i];
 		if ( (allRounds ? s->TournamentScores().Rounds() : s->Scores().Rounds()) == 0 )
 			continue;
 		const std::vector<long> & hist = allRounds ? s->TournamentScores().BiomassHistory() : s->Scores().BiomassHistory();
@@ -95,7 +97,8 @@ void GBScoresView::DrawGraph(const GBRect & box, bool allRounds) {
 		}
 	}
 //draw curves
-	for ( const GBSide * s = world.Sides(); s; s = s->next ) {
+	for ( int i = 0; i < sides.size(); ++ i ) {
+		GBSide * s = sides[i];
 		if ( (allRounds ? s->TournamentScores().Rounds() : s->Scores().Rounds()) == 0 )
 			continue;
 		const std::vector<long> & hist = (allRounds ? s->TournamentScores().BiomassHistory() : s->Scores().BiomassHistory());

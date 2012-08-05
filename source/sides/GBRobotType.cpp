@@ -19,7 +19,6 @@ GBRobotType::GBRobotType(GBSide * owner)
 	color(), name(),
 	decoration(rdNone), decorationColor(GBColor::black),
 	hardware(), brain(nil),
-	next(nil),
 	population(0), biomass(0)
 {}
 

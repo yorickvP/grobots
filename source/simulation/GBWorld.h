@@ -10,6 +10,7 @@
 #include "GBModel.h"
 #include "GBObjectWorld.h"
 #include "GBScores.h"
+#include <vector>
 
 #if MAC && ! HEADLESS
 #define GBWORLD_PROFILING 1
@@ -20,7 +21,7 @@
 const GBDistance kRandomMinWallDistance = 2;
 
 class GBWorld : public GBObjectWorld, public GBModel, public GBDeletionListener {
-	GBSide * sides;
+	std::vector<GBSide *> sides;
 	GBSide * selectedSide;
 	GBFrames currentFrame;
 	int previousSidesAlive; //num of non-extinct sides last frame
@@ -87,7 +88,7 @@ public:
 	void RemoveSide(GBSide * side);
 	void RemoveAllSides();
 // sides
-	GBSide * Sides() const;
+	const std::vector<GBSide *> & Sides() const;
 	GBSide * GetSide(long index) const;
 // selected side
 	GBSide * SelectedSide() const;

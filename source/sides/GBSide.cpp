@@ -12,12 +12,11 @@
 const float kSideCopyColorDistance = 0.3f;
 
 GBSide::GBSide()
-	: types(nil), selected(nil),
+	: selected(nil),
 	id(0),
 	seedIDs(),
 	color(), name(), author(),
-	scores(), cScores(), center(), groupPosition(),
-	next(nil)
+	scores(), cScores(), center(), groupPosition()
 {
 	int i;
 	for ( i = 0; i < kSharedMemorySize; i ++ )
@@ -34,8 +33,8 @@ GBSide::~GBSide() {
 
 GBSide * GBSide::Copy() const {
 	GBSide * side = new GBSide();
-	for ( GBRobotType * cur = types; cur != nil; cur = cur->next )
-		side->AddType(cur->Copy(side));
+	for ( int i = 0; i < types.size(); ++ i )
+		side->AddType(types[i]->Copy(side));
 	side->name = name;
 	side->author = author;
 	side->SetColor(gRandoms.ColorNear(color, kSideCopyColorDistance));
@@ -80,19 +79,10 @@ void GBSide::SetColor(const GBColor & newcolor) {
 	Changed();
 }
 
-GBRobotType * GBSide::GetFirstType() const {
-	return types;
-}
-
 GBRobotType * GBSide::GetType(long index) const {
-	if ( index <= 0 ) throw GBIndexOutOfRangeError();
-	GBRobotType * type = types;
-	for ( long i = 1; i < index; i ++ )
-		if ( type->next )
-			type = type->next;
-		else
-			throw GBIndexOutOfRangeError();
-	return type;
+	if ( index <= 0 || index > types.size() )
+		throw GBIndexOutOfRangeError();
+	return types[index - 1];
 }
 
 void GBSide::SelectType(GBRobotType * which) const {
@@ -114,49 +104,30 @@ long GBSide::SelectedTypeID() const {
 long GBSide::GetTypeIndex(const GBRobotType * type) const {
 	if ( ! type )
 		return 0;
-	long index = 1;
-	for ( GBRobotType * cur = types; cur; cur = cur->next ) {
-		if ( type == cur )
-			return index;
-		index ++;
-	}
+	for ( int i = 0; i < types.size(); ++ i )
+		if ( type == types[i] )
+			return i + 1;
 	return 0;
 }
 
 long GBSide::CountTypes() const {
-	long index = 0;
-	for ( GBRobotType * cur = types; cur; cur = cur->next )
-		index ++;
-	return index;
+	return types.size();
 }
 
 void GBSide::AddType(GBRobotType * type) {
 // adds type at end so they will stay in order
 	if ( ! type )
 		throw GBNilPointerError();
-	type->next = nil;
 	type->Recalculate();
-	if ( types == nil ) {
-		types = type;
-		type->SetID(1);
-	} else {
-		long curid = 2;
-		GBRobotType * cur;
-		for ( cur = types; cur->next != nil; cur = cur->next )
-			curid ++;
-		cur->next = type;
-		type->SetID(curid);
-	}
+	types.push_back(type);
+	type->SetID(types.size());
 	Changed();
 }
 
 void GBSide::RemoveAllTypes() {
-	GBRobotType * temp;
-	for ( GBRobotType * cur = types; cur != nil; cur = temp ) {
-		temp = cur->next;
-		delete cur;
-	}
-	types = nil;
+	for ( int i = 0; i < types.size(); ++ i )
+		delete types[i];
+	types.clear();
 	Changed();
 }
 
@@ -194,9 +165,8 @@ void GBSide::ResetSampledStatistics() {
 		center = (center + groupPosition / (int)scores.Population()) / 2;
 	groupPosition.Set(0, 0);
 	scores.ResetSampledStatistics();
-	for ( GBRobotType * cur = types; cur != nil; cur= cur -> next ) {
-		cur->ResetSampledStatistics();
-	}
+	for ( int i = 0; i < types.size(); ++ i )
+		types[i]->ResetSampledStatistics();
 	Changed();
 }
 

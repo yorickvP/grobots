@@ -33,8 +33,6 @@ class GBRobotType : public GBModel {
 	GBBrainSpec * brain;
 	long population;
 	double biomass;
-public:
-	GBRobotType * next;
 private:
 	GBEnergy cost;
 	GBMass mass;

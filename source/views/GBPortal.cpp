@@ -263,10 +263,12 @@ void GBPortal::Draw() {
 				10, GBColor::white);
 	}
 	if ( showSideNames ) {
-		for (const GBSide *side = world.Sides(); side; side = side->next)
+		for ( int i = 0; i < world.Sides().size(); ++ i ) {
+			GBSide * side = world.Sides()[i];
 			if ( side->Scores().Seeded() )
 				DrawStringCentered(side->Name(), ToScreenX(side->center.x), ToScreenY(side->center.y),
 					14, side->Scores().Sterile() ? GBColor::gray : GBColor::white);
+		}
 	}
 // record drawn
 	worldChanges = world.ChangeCount();
@@ -492,7 +494,7 @@ void GBPortal::DoAddRobot(const GBFinePoint where) {
 	if ( side ) {
 		GBRobotType * type = side->SelectedType();
 		if ( ! type )
-			type = side->GetFirstType();
+			type = side->GetType(1);
 		if ( type ) {
 			world.AddObjectDirectly(new GBRobot(type, where));
 			side->Scores().ReportSeeded(type->Cost());

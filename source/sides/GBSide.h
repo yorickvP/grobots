@@ -33,7 +33,7 @@ const int kSharedMemorySize = 1000;
 const int kMaxSeedIDs = 20;
 
 class GBSide : public GBModel {
-	GBRobotType * types;
+	std::vector<GBRobotType *> types;
 	GBRobotType * selected; // really a view property - could remove
 	string name, author;
 	long id;
@@ -50,7 +50,6 @@ class GBSide : public GBModel {
 // seeding
 	std::vector<long> seedIDs;
 public:
-	GBSide * next;
 	GBFilename filename;
     GBPosition center;
 public:
@@ -66,7 +65,6 @@ public:
 	void SetID(long newid);
 	GBColor Color() const;
 	void SetColor(const GBColor & newcolor);
-	GBRobotType * GetFirstType() const;
 	GBRobotType * GetType(long index) const;
 	void SelectType(GBRobotType * which) const;
 	GBRobotType * SelectedType() const;

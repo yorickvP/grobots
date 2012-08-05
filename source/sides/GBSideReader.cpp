@@ -232,8 +232,6 @@ void GBSideReader::ProcessTag(GBElementType element) {
 		}
 		side->AddType(type);
 		type = nil;
-		if ( ! side->GetFirstType() )
-			throw GBGenericError("type not showing up in side");
 	}
 // legality check
 	if ( state == etEnd )
@@ -655,9 +653,9 @@ void GBSideReader::LoadIt() {
 GBSide * GBSideReader::Side() {
 	if ( state == etEnd && side ) {
 		if ( side->NumSeedTypes() == 0 )  // auto-generate seeding
-			for ( GBRobotType * type = side->GetFirstType(); type != nil; type = type->next )
-				if ( ! type->Hardware().Bomb() )
-					side->AddSeedID(type->ID());
+			for ( int i = 1; i <= side->CountTypes(); ++ i )
+				if ( ! side->GetType(i)->Hardware().Bomb() )
+					side->AddSeedID(side->GetType(i)->ID());
 		return side;
 	} else
 		throw GBGenericError("tried to get unfinished side from SideReader - was #end missing?");

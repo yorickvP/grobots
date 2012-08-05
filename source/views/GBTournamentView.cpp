@@ -35,9 +35,7 @@ GBTournamentView::GBTournamentView(GBWorld & target)
 {}
 
 void GBTournamentView::Draw() {
-	sorted.empty();
-	for (const GBSide * s = world.Sides(); s; s = s->next)
-		sorted.push_back(s);
+	sorted = world.Sides();
 	std::sort(sorted.begin(), sorted.end(), GBSide::Better);
 	GBListView::Draw();
 	sorted.clear();

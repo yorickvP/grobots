@@ -17,7 +17,7 @@ class GBTournamentView : public GBListView {
 	GBWorld & world;
 	long lastRounds;
 	int numSides;
-	std::vector<const GBSide *> sorted;
+	std::vector<GBSide *> sorted;
 	
 	static GBColor RangeColor(float value, float min, float max,
 		const GBColor & low, const GBColor & high,

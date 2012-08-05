@@ -533,7 +533,7 @@ void GBApplication::AdjustMenus() {
 	EnableOne(miDuplicateSide, world.SelectedSide() != 0);
 	EnableOne(miReloadSide, world.SelectedSide() != 0);
 	EnableOne(miRemoveSide, world.SelectedSide() != 0);
-	EnableOne(miRemoveAllSides, world.Sides() != 0);
+	EnableOne(miRemoveAllSides, world.CountSides() != 0);
 // check windows in Window menu
 #if MAC
 	GBWindow * wind = GBWindow::GetFromWindow(FrontWindow());
