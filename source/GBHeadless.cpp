@@ -55,7 +55,9 @@ int main(int argc, const char * argv[]) {
 		} while ( world.running );
 	//print final statistics
 		cout << "#results: score error survival early-death late-death early-score fraction kills rounds name\n";
-		for ( const GBSide * s = world.Sides(); s; s = s->next )
+		const std::vector<GBSide *> & sides = world.Sides();
+		for ( int i = 0; i < sides.size(); ++i ) {
+			const GBSide * s = sides[i];
 			cout << ToPercentString(s->TournamentScores().BiomassFraction()) << '\t'
 				<< ToPercentString(s->TournamentScores().BiomassFractionError()) << '\t'
 				<< ToPercentString(s->TournamentScores().SurvivalNotSterile(), 0) << '\t'
@@ -66,6 +68,7 @@ int main(int argc, const char * argv[]) {
 				<< ToPercentString(s->TournamentScores().KilledFraction(), 0) << '\t'
 				<< s->TournamentScores().Rounds() << '\t'
 				<< s->Name() << '\n';
+		}
 		cout << "#total\t\t" << ToPercentString(world.TournamentScores().SurvivalNotSterile(), 0)
 			<< '\t' << ToPercentString(world.TournamentScores().EarlyDeathRate(), 0)
 			<< '\t' << ToPercentString(world.TournamentScores().LateDeathRate(), 0)
@@ -143,7 +146,7 @@ static void ProcessArg(const char * arg, GBWorld & world,
 		ToPascalString(arg, fname);
 		FSSpec fs;
 		if ( FSMakeFSSpec(0, 0, fname, &fs) )
-			continue;
+			return;
 		GBSide * side = GBSideReader::Load(fs);
 	#else
 		GBSide * side = GBSideReader::Load(arg);
@@ -151,10 +154,12 @@ static void ProcessArg(const char * arg, GBWorld & world,
 		if ( side ) {
 			world.AddSide(side);
 			cout << "#side " << side->Name() << endl;
-			for (const GBRobotType * type = side->GetFirstType(); type; type = type->next)
+			for ( int i = 1; i <= side->CountTypes(); ++ i ) {
+				const GBRobotType * type = side->GetType(i);
 				cout << "\t#type " << type->Name()
 					<< "\tcost " << ToString(type->Cost(), 0)
 					<< "\tmass " << ToString(type->Mass(), 1) << endl;
+			}
 		}
 	}
 }
@@ -176,7 +181,8 @@ static void DieWithUsage(const char * name) {
 
 static void PrintStatistics(const GBWorld & world) {
 	cout << world.CurrentFrame();
-	for ( const GBSide * s = world.Sides(); s; s = s->next )
-		cout << '\t' << s->Scores().Biomass();
+	const std::vector<GBSide *> & sides = world.Sides();
+	for ( int i = 0; i < sides.size(); ++i )
+		cout << '\t' << sides[i]->Scores().Biomass();
 	cout << "\ttotal " << world.RobotValue() << endl;
 }
