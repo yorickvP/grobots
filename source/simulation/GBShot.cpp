@@ -403,7 +403,7 @@ void GBSyphon::Draw(GBGraphics & g, const GBProjection & proj, const GBRect & wh
 		GBColor tailcolor = Owner()->Color() * (creator->Syphoned() ? 0.8f : 0.4f);
 		GBFinePoint unit = - Velocity().Unit();
 		double phase = Milliseconds() / 1000.0 * ToDouble(creator->Rate());
-		for (GBDistance d = Speed() + (phase - floor(phase)); d >= Radius(); d -= 1 ) {
+		for (GBDistance d = Speed() + (phase - floor(phase)) - 1 - sink->Radius(); d >= Radius(); d -= 1 ) {
 			short x = proj.ToScreenX(Position().x + unit.x * d);
 			short y = proj.ToScreenY(Position().y + unit.y * d);
 			GBRect r(x - 1, y - 1, x + 1, y + 1);
