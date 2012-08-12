@@ -7,6 +7,7 @@
 #include "GBWorld.h"
 #include "GBRobotType.h"
 #include "GBStringUtilities.h"
+#include <algorithm>
 
 const short kColumnWidth = 95;
 const short kGraphTop = 15;

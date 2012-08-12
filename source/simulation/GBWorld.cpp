@@ -14,6 +14,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <time.h>
 
 #if MAC && ! MAC_OS_X
 #include <Timer.h>
