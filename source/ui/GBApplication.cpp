@@ -133,7 +133,7 @@ void GBApplication::SetupMenus() {
 		{ miNewRound, "New Round", 'N' },
 #if WINDOWS
 		{ miRestart, "Clear Map", VK_DELETE, modNone },
-		{ miSeed, "Add Seeds", VK_F1, modNone },
+		{ miSeed, "Add Seeds", VK_F12, modNone },
 #else
 		{ miRestart, "Restart", '\\' },
 		{ miSeed, "Add Seeds", '=' },

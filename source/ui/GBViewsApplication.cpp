@@ -12,8 +12,6 @@
 #include <Dialogs.h>
 #include <Menus.h>
 #include <ToolUtils.h>
-#include <Sound.h>
-#include <Navigation.h>
 #elif WINDOWS
 #include <string.h>
 #endif
@@ -453,6 +451,7 @@ void GBViewsApplication::AddMenu(const GBMenuItem * items) {
 					case VK_NEXT: key = "PgDown"; break;
 					case VK_HOME: key = "Home"; break;
 					case VK_F1: key = "F1"; break;
+					case VK_F12: key = "F12"; break;
 					case VK_DELETE: key = "Del"; break;
 					default: key.append(givenkey); break;
 				}
