@@ -329,7 +329,7 @@ GBRect GBViewsApplication::GetScreenSize() {
 		return GBRect(bounds);
 #elif WIN
 	RECT desktop;
-	if (!GetWindowRect(GetDesktopWindow(), &desktop))
+	if (GetWindowRect(GetDesktopWindow(), &desktop))
 		return GBRect(desktop);
 #endif
 	return GBRect(2, 44, 1024, 768);
