@@ -78,7 +78,7 @@ bool NamesEquivalent(const string & a, const string & b) {
 }
 
 unsigned short HexDigitValue(char digit) {
-	if ( isdigit(digit) )
+	if ( isdigit((unsigned char)digit) )
 		return digit - '0';
 	return toupper(digit) - 'A' + 10;
 }
@@ -167,7 +167,7 @@ bool ParseColor(const string & token, GBColor & color) {
 // could do named colors, but not urgent
 // check digits
 	for ( int i = 0; i < token.length(); i ++ )
-		if ( ! isxdigit(token[i]) )
+		if ( ! isxdigit((unsigned char)token[i]) )
 			return false;
 // check length
 	if ( token.length() == 3 ) {
@@ -189,7 +189,7 @@ bool ParseColor(const string & token, GBColor & color) {
 bool ExtractToken(string & token, const string & line, int & cur) {
 	bool intoken = false;
 	while ( cur < line.length() && line[cur] != ';' ) {
-		if ( isspace(line[cur]) ) {
+		if ( isspace((unsigned char)line[cur]) ) {
 			if ( intoken )
 				return true;
 		} else { // a real character
@@ -210,7 +210,7 @@ bool ExtractToken(string & token, const string & line, int & cur) {
 bool ExtractRest(string & rest, const string & line, int & cur) {
 	bool intoken = false;
 	while ( cur < line.length() && line[cur] != ';' && line[cur] != '\r' && line[cur] != '\n' ) {
-		if ( intoken || ! isspace(line[cur]) ) {
+		if ( intoken || ! isspace((unsigned char)line[cur]) ) {
 			if ( ! intoken ) {
 				intoken = true;
 				rest = "";

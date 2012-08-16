@@ -599,7 +599,7 @@ GBNumber GBSideReader::GetHardwareNumber(const GBNumber & defaultNum) {
 // returns true if EOL or semicolon reached.
 bool GBSideReader::SkipWhitespace() {
 	while ( pos < line.length() && line[pos] != ';' ) {
-		if ( ! isspace(line[pos]) )
+		if ( ! isspace((unsigned char)line[pos]) )
 			return false;
 		++ pos;
 	}
