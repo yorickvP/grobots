@@ -61,7 +61,7 @@ enum { // primitives
 	opVectorAdd, opVectorSubtract, opVectorNegate,
 	opVectorScalarMultiply, opVectorScalarDivide,
 	opVectorNorm, opVectorAngle,
-	opDotProduct, opProject, opCross, opUnitize,
+	opDotProduct, opProject, opCross, opUnitize, opVectorRotateTo, opVectorRotateFrom,
 	opDistance, opInRange,
 	opVectorEqual, opVectorNotEqual,
 // comparisons and Boolean operations
@@ -164,9 +164,9 @@ enum { // hardware vector variables
 // 
 	hvvEngineVelocity,
 // sensors
-	hvvRobotSensorWhereFound, hvvRobotSensorVelocityFound, hvvRobotSensorWhereOverall,
-	hvvFoodSensorWhereFound, hvvFoodSensorVelocityFound, hvvFoodSensorWhereOverall,
-	hvvShotSensorWhereFound, hvvShotSensorVelocityFound, hvvShotSensorWhereOverall,
+	hvvRobotSensorWhereFound, hvvRobotSensorWhereRelative, hvvRobotSensorVelocityFound, hvvRobotSensorWhereOverall,
+	hvvFoodSensorWhereFound, hvvFoodSensorWhereRelative, hvvFoodSensorVelocityFound, hvvFoodSensorWhereOverall,
+	hvvShotSensorWhereFound, hvvShotSensorWhereRelative, hvvShotSensorVelocityFound, hvvShotSensorWhereOverall,
 //
 	kNumHardwareVectors
 };

@@ -45,7 +45,7 @@ const string primitiveNames[kNumPrimitives] = {
 	"v+", "v-", "vnegate",
 	"vs*", "vs/",
 	"norm", "angle",
-	"dot", "project", "cross", "unitize",
+	"dot", "project", "cross", "unitize", "rotate-to", "rotate-from",
 	"dist", "in-range",
 	"v=", "v<>",
 // comparisons and Boolean ops
@@ -141,9 +141,9 @@ const string hardwareVectorNames[kNumHardwareVectors] = {
 	"position", "velocity",
 	"engine-velocity",
 // sensors
-	"robot-position", "robot-velocity", "robot-position-overall",
-	"food-position", "food-velocity", "food-position-overall",
-	"shot-position", "shot-velocity", "shot-position-overall"
+	"robot-position", "robot-relative-position", "robot-velocity", "robot-position-overall",
+	"food-position", "food-relative-position", "food-velocity", "food-position-overall",
+	"shot-position", "shot-relative-position", "shot-velocity", "shot-position-overall"
 };
 
 const string cWordNames[kNumCWords] = {

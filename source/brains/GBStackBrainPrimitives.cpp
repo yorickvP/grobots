@@ -279,12 +279,15 @@ GBVector GBStackBrain::ReadHardwareVector(const GBSymbolIndex index, GBRobot * r
 		case hvvEngineVelocity: return robot->hardware.EngineVelocity();
 	// sensors
 		case hvvRobotSensorWhereFound: return robot->hardware.sensor1.WhereFound();
+		case hvvRobotSensorWhereRelative: return robot->hardware.sensor1.WhereFound() - robot->Position();
 		case hvvRobotSensorVelocityFound: return robot->hardware.sensor1.Velocity();
 		case hvvRobotSensorWhereOverall: return robot->hardware.sensor1.WhereOverall();
 		case hvvFoodSensorWhereFound: return robot->hardware.sensor2.WhereFound();
+		case hvvFoodSensorWhereRelative: return robot->hardware.sensor2.WhereFound() - robot->Position();
 		case hvvFoodSensorVelocityFound: return robot->hardware.sensor2.Velocity();
 		case hvvFoodSensorWhereOverall: return robot->hardware.sensor2.WhereOverall();
 		case hvvShotSensorWhereFound: return robot->hardware.sensor3.WhereFound();
+		case hvvShotSensorWhereRelative: return robot->hardware.sensor3.WhereFound() - robot->Position();
 		case hvvShotSensorVelocityFound: return robot->hardware.sensor3.Velocity();
 		case hvvShotSensorWhereOverall: return robot->hardware.sensor3.WhereOverall();
 	//
@@ -405,6 +408,8 @@ void GBStackBrain::ExecutePrimitive(GBSymbolIndex index, GBRobot * robot, GBWorl
 		case opProject: TwoVectorToVectorOp(&GBFinePoint::Projection); break;
 		case opCross: TwoVectorToScalarOp(&GBFinePoint::Cross); break;
 		case opUnitize: VectorToVectorOp(&GBFinePoint::Unit); break;
+		case opVectorRotateTo: TwoVectorToVectorOp(&GBFinePoint::RotateTo); break;
+		case opVectorRotateFrom: TwoVectorToVectorOp(&GBFinePoint::RotateFrom); break;
 		case opDistance: Push((PopVector() - PopVector()).Norm()); break;
 		case opInRange: temp = Pop(); PushBoolean(PopVector().InRange(PopVector(), temp)); break;
 		case opRestrictPosition: {
