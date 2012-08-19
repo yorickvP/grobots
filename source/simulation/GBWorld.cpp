@@ -522,6 +522,9 @@ void GBWorld::DumpTournamentScores() {
 		"<tbody>\n";
 	std::vector<GBSide *> sorted = sides;
 	std::sort(sorted.begin(), sorted.end(), GBSide::Better);
+	float survival = tournamentScores.SurvivalNotSterile();
+	float earlyDeaths = tournamentScores.EarlyDeathRate();
+	float lateDeaths = tournamentScores.LateDeathRate();
 	for (int i = 0; i < sorted.size(); ++i) {
 		f << "<tr><td>" << i + 1 << "<td><a href='sides/" << sorted[i]->Filename() << "'>";
 		f << sorted[i]->Name() << "</a><td>" << sorted[i]->Author() << "\n";
@@ -529,9 +532,12 @@ void GBWorld::DumpTournamentScores() {
 		long rounds = sc.Rounds();
 		long notearly = rounds - sc.EarlyDeaths();
 		PutPercentCell(f, sc.BiomassFraction(), 1, true, 0.0, 1.0, NULL, NULL);
-		PutPercentCell(f, sc.SurvivalNotSterile(), 0, rounds >= kMinColorRounds, 0.2f, 0.4f, "bad", "good");
-		PutPercentCell(f, sc.EarlyDeathRate(), 0, rounds >= kMinColorRounds, 0.2f, 0.4f, "good", "bad");
-		PutPercentCell(f, sc.LateDeathRate(), 0, notearly >= kMinColorRounds, 0.4f, 0.6f, "good", "bad");
+		PutPercentCell(f, sc.SurvivalNotSterile(), 0, rounds >= kMinColorRounds,
+					   min(survival, 0.2f), max(survival, 0.4f), "bad", "good");
+		PutPercentCell(f, sc.EarlyDeathRate(), 0, rounds >= kMinColorRounds,
+					   min(0.2f, earlyDeaths), max(earlyDeaths, 0.4f), "good", "bad");
+		PutPercentCell(f, sc.LateDeathRate(), 0, notearly >= kMinColorRounds,
+					   min(0.4f, lateDeaths), max(lateDeaths, 0.6f), "good", "bad");
 		PutPercentCell(f, sc.EarlyBiomassFraction(), 1, rounds + notearly >= kMinColorRounds * 2,
 					   0.08f, 0.12f, "bad", "good");
 		PutPercentCell(f, sc.SurvivalBiomassFraction(), 0, sc.Survived() >= kMinColorRounds,
