@@ -89,14 +89,14 @@ public:
 // accessors for debugger
 	GBInstructionCount Remaining() const;
 	GBStackAddress PC() const;
-	GBLineNumber PCLine() const;
 	long StackHeight() const;
 	long ReturnStackHeight() const;
 	GBStackDatum StackAt(long index) const;
 	GBStackAddress ReturnStackAt(long index) const;
 	bool ValidAddress(const GBStackAddress addr) const;
 	string AddressName(const GBStackAddress addr) const;
-	string AddressLastLabel(const GBStackAddress addr) const;
+	string AddressDescription(const GBStackAddress addr) const;
+	string AddressAndLine(const GBStackAddress addr) const;
 	string DisassembleAddress(const GBStackAddress addr) const;
 	string LastPrint() const;
 	GBSymbolIndex NumVariables() const;

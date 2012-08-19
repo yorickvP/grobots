@@ -233,8 +233,8 @@ GBStackDatum GBStackBrain::FromBoolean(const bool value) {
 
 void GBStackBrain::BrainError(GBError & err, GBRobot * robot, GBWorld * world) {
 	if ( world->reportErrors )
-		NonfatalError(robot->Description() + " had error in brain, probably at line "
-			+ ToString(spec->LineNumber(pc - 1)) + ": " + err.ToString());
+		NonfatalError(robot->Description() + " had error in brain, probably at "
+			+ AddressAndLine(pc - 1) + ": " + err.ToString());
 	SetStatus(bsError);
 }
 
@@ -310,9 +310,6 @@ GBInstructionCount GBStackBrain::Remaining() const {return remaining;}
 
 GBStackAddress GBStackBrain::PC() const {return pc;}
 
-GBLineNumber GBStackBrain::PCLine() const {
-	return spec->LineNumber(pc);}
-
 long GBStackBrain::StackHeight() const {return stackHeight;}
 
 long GBStackBrain::ReturnStackHeight() const {return returnStackHeight;}
@@ -333,8 +330,11 @@ bool GBStackBrain::ValidAddress(const GBStackAddress addr) const {
 string GBStackBrain::AddressName(const GBStackAddress addr) const {
 	return spec->AddressName(addr);}
 
-string GBStackBrain::AddressLastLabel(const GBStackAddress addr) const {
-	return spec->AddressLastLabel(addr);}
+string GBStackBrain::AddressDescription(const GBStackAddress addr) const {
+	return spec->AddressDescription(addr);}
+
+string GBStackBrain::AddressAndLine(const GBStackAddress addr) const {
+	return spec->AddressAndLine(addr);}
 
 string GBStackBrain::DisassembleAddress(const GBStackAddress addr) const {
 	return spec->DisassembleAddress(addr);}

@@ -38,8 +38,7 @@ void GBDebuggerView::DrawStatusBox(const GBRect & box) {
 void GBDebuggerView::DrawPCBox(const GBRect & box, const GBStackBrain * brain) {
 	DrawBox(box);
 	GBStackAddress pc = brain->PC();
-	DrawStringPair("PC:", brain->AddressLastLabel(pc) + " (line " + ToString(brain->PCLine()) + ')',
-		box, 11, 10, GBColor::black, true);
+	DrawStringPair("PC:", brain->AddressAndLine(pc), box, 11, 10, GBColor::black, true);
 	for ( long i = -4; i <= 3; i ++ )
 		if ( brain->ValidAddress(pc + i) )
 			DrawStringPair(brain->AddressName(pc + i) + ':', brain->DisassembleAddress(pc + i),
@@ -66,7 +65,7 @@ void GBDebuggerView::DrawReturnStackBox(const GBRect & box, const GBStackBrain *
 	if ( height ) {
 		for ( long i = 0; i < 5 && i < height; i ++ )
 			DrawStringPair(ToString(height - i) + ':',
-				brain->AddressLastLabel((brain->ReturnStackAt(height - i - 1))),
+				brain->AddressDescription(brain->ReturnStackAt(height - i - 1)),
 				box.left + 3, box.right - 3, box.bottom - 44 + 10 * i, 10);
 	} else
 		DrawStringRight("empty", box.right - 3, box.top + 31, 10);

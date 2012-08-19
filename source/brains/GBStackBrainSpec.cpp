@@ -663,6 +663,7 @@ GBLineNumber GBStackBrainSpec::LineNumber(const GBStackAddress index) const {
 	return lineNumbers[index];
 }
 
+//For the debugger: label name if available, or else the raw address.
 string GBStackBrainSpec::AddressName(const GBStackAddress addr) const {
 	for ( GBSymbolIndex i = 0; i < labels.size(); i ++ )
 		if ( labels[i].address == addr )
@@ -670,13 +671,25 @@ string GBStackBrainSpec::AddressName(const GBStackAddress addr) const {
 	return ToString(addr);
 }
 
-string GBStackBrainSpec::AddressLastLabel(const GBStackAddress addr) const {
+//Human-readable address, e.g. "main + 62"
+string GBStackBrainSpec::AddressDescription(const GBStackAddress addr) const {
+	const GBLabel * label = AddressLastLabel(addr);
+	if (label)
+		return addr == label->address ? label->name : label->name + " + " + ToString(addr - label->address);
+	else
+		return ToString(addr);
+}
+
+string GBStackBrainSpec::AddressAndLine(const GBStackAddress addr) const {
+	return AddressDescription(addr) + " (line " + ToString(LineNumber(addr)) + ")";
+}
+
+const GBLabel * GBStackBrainSpec::AddressLastLabel(const GBStackAddress addr) const {
 	const GBLabel * closest = nil;
 	for ( GBSymbolIndex i = 0; i < labels.size(); i ++ )
 		if ( !labels[i].gensym && labels[i].address < addr && (!closest || labels[i].address > closest->address) )
 			closest = &labels[i];
-	if ( closest ) return closest->name;
-	else return ToString(addr);
+	return closest;
 }
 
 string GBStackBrainSpec::DisassembleAddress(const GBStackAddress addr) const {
