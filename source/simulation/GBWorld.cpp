@@ -401,6 +401,8 @@ void GBWorld::ReplaceSide(GBSide * oldSide, GBSide * newSide) {
 
 void GBWorld::RemoveSide(GBSide * side) {
 	if ( ! side ) throw GBNilPointerError();
+	if ( side == selectedSide )
+		selectedSide = nil;
 	sides.erase(std::remove(sides.begin(), sides.end(), side), sides.end());
 	Changed();
 }
