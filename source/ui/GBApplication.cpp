@@ -132,10 +132,10 @@ void GBApplication::SetupMenus() {
 		{ -1 },
 		{ miNewRound, "New Round", 'N' },
 #if WINDOWS
-		{ miRestart, "Clear Map", VK_DELETE, modNone },
+		{ miRestart, "Clear World", VK_DELETE, modNone },
 		{ miSeed, "Add Seeds", VK_F12, modNone },
 #else
-		{ miRestart, "Restart", '\\' },
+		{ miRestart, "Clear World", '\\' },
 		{ miSeed, "Add Seeds", '=' },
 #endif
 		{ miReseed, "Reseed Dead Sides" },
