@@ -121,7 +121,7 @@ short GBSideDebuggerView::PreferredHeight() const {
 }
 
 const string GBSideDebuggerView::Name() const {
-	return "Side Debugger";
+	return "Shared Memory";
 }
 
 void GBSideDebuggerView::AcceptKeystroke(const char what) {
