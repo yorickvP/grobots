@@ -95,3 +95,12 @@ GBNumber GBFinePoint::Cross(const GBFinePoint & other) const {
 	return x * other.y - other.x * y;
 }
 
+GBFinePoint GBFinePoint::RotateTo(const GBFinePoint & base) const {
+	GBFinePoint u = base.Unit();
+	return GBFinePoint(x * u.x - y * u.y, y * u.x + x * u.y);
+}
+
+GBFinePoint GBFinePoint::RotateFrom(const GBFinePoint & base) const {
+	GBFinePoint u = base.Unit();
+	return GBFinePoint(x * u.x + y * u.y, y * u.x - x * u.y);
+}

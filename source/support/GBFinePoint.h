@@ -56,6 +56,8 @@ public:
 	GBNumber DotProduct(const GBFinePoint & other) const;
 	GBFinePoint Projection(const GBFinePoint & base) const;	// projection of self on base
 	GBNumber Cross(const GBFinePoint & other) const; // magnitude of cross, kind of
+	GBFinePoint RotateTo(const GBFinePoint & base) const;
+	GBFinePoint RotateFrom(const GBFinePoint & base) const;
 };
 
 typedef GBFinePoint GBVector;
