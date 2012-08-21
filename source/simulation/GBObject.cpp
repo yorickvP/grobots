@@ -247,9 +247,20 @@ const GBColor GBObject::Color() const {
 	return GBColor(1);
 }
 
+//Draw a shadow slightly offset from our location.
+void GBObject::DrawShadow(GBGraphics & g, const GBProjection & proj,
+						  const GBVelocity & offset, const GBColor & color) const {
+	GBRect shadow(proj.ToScreenX(Left() + offset.x), proj.ToScreenY(Top() + offset.y), 
+				  proj.ToScreenX(Right() + offset.x), proj.ToScreenY(Bottom() + offset.y));
+	g.DrawSolidOval(shadow, color);
+}
+
 void GBObject::Draw(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {
 	g.DrawOpenOval(where, Color());
 }
+
+void GBObject::DrawUnderlay(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {}
+void GBObject::DrawOverlay(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {}
 
 void GBObject::DrawMini(GBGraphics & g, const GBRect & where) const {
 	if ( where.Width() < kMaxSquareMiniSize )

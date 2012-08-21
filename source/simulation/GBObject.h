@@ -95,7 +95,10 @@ public:
 	virtual string Details() const;
 // evil antimodular drawing code
 	virtual const GBColor Color() const;
-	virtual void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
+	void DrawShadow(GBGraphics &, const GBProjection &, const GBVelocity & offset, const GBColor &) const;
+	virtual void Draw(GBGraphics &, const GBProjection &, const GBRect &, bool detailed) const;
+	virtual void DrawUnderlay(GBGraphics &, const GBProjection &, const GBRect &, bool detailed) const;
+	virtual void DrawOverlay(GBGraphics &, const GBProjection &, const GBRect &, bool detailed) const;
 	virtual void DrawMini(GBGraphics & g, const GBRect & where) const;
 };
 
