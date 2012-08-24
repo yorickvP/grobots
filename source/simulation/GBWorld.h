@@ -106,7 +106,7 @@ public:
 	void ReportRobot(GBEnergy amount);
 	void ReportRound();
 	void ResetTournamentScores();
-	void DumpTournamentScores();
+	void DumpTournamentScores(bool html);
 	const GBScores & RoundScores() const;
 	const GBScores & TournamentScores() const;
 // selected object

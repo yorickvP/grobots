@@ -496,63 +496,87 @@ void GBWorld::ResetTournamentScores() {
 	Changed();
 }
 
-static void PutPercentCell(std::ofstream &f, const GBNumber &percent, int digits, bool enoughData,
+static void PutPercentCell(std::ofstream &f, bool html, const GBNumber &percent, int digits, bool enoughData,
 						   const GBNumber &low, const GBNumber &high, const char *lowclass, const char *highclass) {
 	const char *label = !enoughData ? "uncertain" :
 		percent < low ? lowclass : percent > high ? highclass : NULL;
-	if ( label )
-		f << "<td class=" << label << ">";
-	else
-		f << "<td>";
+	if ( html ) {
+		if ( label )
+			f << "<td class=" << label << ">";
+		else
+			f << "<td>";
+	} else {
+		f << "||";
+		if ( label )
+			f << " class='" << label << "'|";
+	}
 	f << ToPercentString(percent, digits);
 }
 
 const long kMinColorRounds = 10;
 
 //The low/high classification logic is duplicated from GBTournamentView::DrawItem.
-void GBWorld::DumpTournamentScores() {
+void GBWorld::DumpTournamentScores(bool html) {
 	std::ofstream f("tournament-scores.html", std::ios::app);
 	if ( !f.good() ) return;
 	char date[32];
 	time_t now = time(NULL);
 	strftime(date, 32, "%d %b %Y %H:%M:%S", localtime(&now));
-	f << "\n<h3>Tournament " << date << "</h3>\n\n<table>\n"
-		"<colgroup><col><col><col><colgroup><col class=key><col><col><col><col><col><col>\n"
-		"<thead><tr><th>Rank<th>Side<th>Author\n"
-		"<th>Score<th>Nonsterile<br>survival<th>Early<br>death<th>Late<br>death"
-		"<th>Early<br>score<th>Fraction<th>Kills\n"
-		"<tbody>\n";
+	if ( html )
+		f << "\n<h3>Tournament " << date << "</h3>\n\n<table>\n"
+			"<colgroup><col><col><col><colgroup><col class=key><col><col><col><col><col><col>\n"
+			"<thead><tr><th>Rank<th>Side<th>Author\n"
+			"<th>Score<th>Nonsterile<br>survival<th>Early<br>death<th>Late<br>death"
+			"<th>Early<br>score<th>Fraction<th>Kills\n"
+			"<tbody>\n";
+	else
+		f << "\n===" << date << "===\n\n"
+			"{| class=\"wikitable sortable\"\n|-\n"
+			"!Rank\n!Side\n!Author\n!Score\n!Nonsterile survival\n!Early death\n!Late death\n"
+			"!Early score\n!Fraction\n!Kills\n";
 	std::vector<GBSide *> sorted = sides;
 	std::sort(sorted.begin(), sorted.end(), GBSide::Better);
 	float survival = tournamentScores.SurvivalNotSterile();
 	float earlyDeaths = tournamentScores.EarlyDeathRate();
 	float lateDeaths = tournamentScores.LateDeathRate();
 	for (int i = 0; i < sorted.size(); ++i) {
-		f << "<tr><td>" << i + 1 << "<td><a href='sides/" << sorted[i]->Filename() << "'>";
-		f << sorted[i]->Name() << "</a><td>" << sorted[i]->Author() << "\n";
-		const GBScores & sc = sorted[i]->TournamentScores();
+		const GBSide * s = sorted[i];
+		if ( html ) {
+			f << "<tr><td>" << i + 1 << "<td><a href='sides/" << s->Filename() << "'>";
+			f << s->Name() << "</a><td>" << s->Author() << "\n";
+		} else
+			f << "|-\n|" << i + 1 << "||" << s->Name() << "||" << s->Author(); 
+		const GBScores & sc = s->TournamentScores();
 		long rounds = sc.Rounds();
 		long notearly = rounds - sc.EarlyDeaths();
-		PutPercentCell(f, sc.BiomassFraction(), 1, true, 0.0, 1.0, NULL, NULL);
-		PutPercentCell(f, sc.SurvivalNotSterile(), 0, rounds >= kMinColorRounds,
+		PutPercentCell(f, html, sc.BiomassFraction(), 1, true, 0.0, 1.0, NULL, NULL);
+		PutPercentCell(f, html, sc.SurvivalNotSterile(), 0, rounds >= kMinColorRounds,
 					   min(survival, 0.2f), max(survival, 0.4f), "bad", "good");
-		PutPercentCell(f, sc.EarlyDeathRate(), 0, rounds >= kMinColorRounds,
+		PutPercentCell(f, html, sc.EarlyDeathRate(), 0, rounds >= kMinColorRounds,
 					   min(0.2f, earlyDeaths), max(earlyDeaths, 0.4f), "good", "bad");
-		PutPercentCell(f, sc.LateDeathRate(), 0, notearly >= kMinColorRounds,
+		PutPercentCell(f, html, sc.LateDeathRate(), 0, notearly >= kMinColorRounds,
 					   min(0.4f, lateDeaths), max(lateDeaths, 0.6f), "good", "bad");
-		PutPercentCell(f, sc.EarlyBiomassFraction(), 1, rounds + notearly >= kMinColorRounds * 2,
+		PutPercentCell(f, html, sc.EarlyBiomassFraction(), 1, rounds + notearly >= kMinColorRounds * 2,
 					   0.08f, 0.12f, "bad", "good");
-		PutPercentCell(f, sc.SurvivalBiomassFraction(), 0, sc.Survived() >= kMinColorRounds,
+		PutPercentCell(f, html, sc.SurvivalBiomassFraction(), 0, sc.Survived() >= kMinColorRounds,
 					   0.2f, 0.4f, "low", "high");
-		PutPercentCell(f, sc.KilledFraction(), 0, rounds >= kMinColorRounds,
+		PutPercentCell(f, html, sc.KilledFraction(), 0, rounds >= kMinColorRounds,
 					   0.05f, 0.15f, "low", "high");
 		f << "\n";
 	}
-	f << "<tfoot><tr><th colspan=4>Overall (" << ToString(tournamentScores.Rounds())
-	  << " rounds):<td>" << ToPercentString(tournamentScores.SurvivalNotSterile(), 0)
-	  << "<td>" << ToPercentString(tournamentScores.EarlyDeathRate(), 0)
-	  << "<td>" << ToPercentString(tournamentScores.LateDeathRate(), 0)
-	  << "<th colspan=2><td>" << ToPercentString(tournamentScores.KillRate(), 0) << "\n</table>\n";
+	if ( html )
+		f << "<tfoot><tr><th colspan=4>Overall (" << ToString(tournamentScores.Rounds())
+		  << " rounds):<td>" << ToPercentString(tournamentScores.SurvivalNotSterile(), 0)
+		  << "<td>" << ToPercentString(tournamentScores.EarlyDeathRate(), 0)
+		  << "<td>" << ToPercentString(tournamentScores.LateDeathRate(), 0)
+		  << "<th colspan=2><td>" << ToPercentString(tournamentScores.KillRate(), 0) << "\n</table>\n";
+	else
+		f << "|-\n!colspan='4'|Overall (" << ToString(tournamentScores.Rounds())
+		  << " rounds):||" << ToPercentString(tournamentScores.SurvivalNotSterile(), 0)
+		  << "||" << ToPercentString(tournamentScores.EarlyDeathRate(), 0)
+		  << "||" << ToPercentString(tournamentScores.LateDeathRate(), 0)
+		  << "!!colspan='2'| ||" << ToPercentString(tournamentScores.KillRate(), 0)
+		  << "\n|}\n";
 }
 
 const GBScores & GBWorld::RoundScores() const {

@@ -57,7 +57,7 @@ enum {
 		miNewRound = 13214, miRestart,
 		miSeed, miReseed,
 		miRules = 13219,
-		miTournament = 13220, miSaveScores, miResetScores,
+	miTournament = 13220, miSaveScoresHtml, miSaveScoresWiki, miResetScores,
 	kToolsMenu = 133,
 		miScroll = 13301,
 		miAddManna = 13303, miAddRobot, miAddSeed,
@@ -146,7 +146,8 @@ void GBApplication::SetupMenus() {
 #else
 		{ miTournament, "Tournament", 'T' },
 #endif
-		{ miSaveScores, "Save Tournament Scores" },
+		{ miSaveScoresHtml, "Save Tournament Scores (HTML)" },
+		{ miSaveScoresWiki, "Save Tournament Scores (MediaWiki)" },
 		{ miResetScores, "Reset Tournament Scores" },
 		0
 	};
@@ -719,7 +720,8 @@ void GBApplication::HandleMenuSelection(int item) {
 #endif
 					world.tournament = true;
 				break;
-			case miSaveScores: world.DumpTournamentScores(); break;
+			case miSaveScoresHtml: world.DumpTournamentScores(true); break;
+			case miSaveScoresWiki: world.DumpTournamentScores(false); break;
 			case miResetScores: world.ResetTournamentScores(); break;
 			case miStartStopBrain: debugger->StartStopBrain(); break;
 		//Tools menu
