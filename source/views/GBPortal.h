@@ -19,6 +19,8 @@ enum {
 	kNumPortalTools
 };
 
+enum GBDrawingLayer { layerNormal, layerUnderlay, layerOverlay };
+
 class GBApplication;
 
 class GBPortal : public GBView,
@@ -53,8 +55,9 @@ private:
 	void DrawBackgroundTile(long ix, long iy);
 	void DrawOneTile(const GBRect & b, GBGraphics & g);
 	void InitBackground();
+	void DrawLayer(GBObjectClass cl, long minTileX, long minTileY, long maxTileX, long maxTileY, GBDrawingLayer);
 	void DrawObjects();
-	void DrawObjectList(const GBObject * list);
+	void DrawObjectList(const GBObject * list, GBDrawingLayer);
 	void DrawRangeCircle(const GBPosition & center, GBDistance radius, const GBColor &color);
 // coordinate conversions
 	short ToScreenX(const GBCoordinate x) const;

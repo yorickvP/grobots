@@ -37,26 +37,23 @@ const GBDistance kBlastSpacing = 0.001;
 const GBSpeed kBabyInitialSpeed = 0.01;
 const GBSpeed kBabyDisplacementFraction = 0.6;
 
-const GBEnergy kRadioWriteCost = 0.05;
-const GBEnergy kRadioSendCost = 0.05;
-
 const GBRatio kForceFieldRangeAttenuation = 0.05; // 1/range where efficiency halves due to range.
 const GBRatio kForceFieldRecoilPerPower = 0.25;
 
 // GBRadioState //
 
-GBRadioState::GBRadioState()
-	: writes(0), sent(0)
-{
+GBRadioState::GBRadioState() {
 	for ( long i = 0; i < kNumMessageChannels; i ++ )
 		nextMessage[i] = 0;
+	for ( int i = 0; i < kRadioHistory; ++ i )
+		sent[i] = writes[i] = 0;
 }
 
 GBRadioState::~GBRadioState() {}
 
 void GBRadioState::Write(GBNumber value, long address, GBSide * side) {
 	side->WriteSharedMemory(value, address);
-	writes += 1;
+	writes[0] += 1;
 }
 
 GBNumber GBRadioState::Read(long address, GBSide * side) {
@@ -65,7 +62,7 @@ GBNumber GBRadioState::Read(long address, GBSide * side) {
 
 void GBRadioState::Send(const GBMessage & mess, long channel, GBSide * side) {
 	side->SendMessage(mess, channel);
-	sent += mess.Length() + 1;  // note overhead
+	sent[0] += mess.Length() + 1;  // note overhead
 }
 
 long GBRadioState::MessagesWaiting(long channel, GBSide * side) const {
@@ -100,11 +97,11 @@ void GBRadioState::SkipMessages(long channel, long skip, GBSide * side) {
 }
 
 void GBRadioState::Act(GBRobot * robot, GBWorld * world) {
-	if ( ! writes && ! sent ) return;
-	//GBEnergy en = kRadioWriteCost * writes + kRadioSendCost * sent;
-	//robot->hardware.UseEnergy(en);
-	world->AddObjectNew(new GBTransmission(robot->Position(), robot->Radius(), sent > 0));
-	writes = 0; sent = 0;
+	for ( int i = kRadioHistory - 1; i > 0; -- i ) {
+		sent[i] = sent[i - 1];
+		writes[i] = writes[i - 1];
+	}
+	sent[0] = writes[0] = 0;
 }
 
 // GBConstructorState //

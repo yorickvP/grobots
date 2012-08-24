@@ -44,16 +44,4 @@ public:
 	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 };
 
-class GBTransmission : public GBTimedDecoration {
-	bool message;
-public:
-	GBTransmission(const GBPosition where, GBDistance initialradius, bool msg);
-	void Act(GBWorld * world);
-	string Description() const;
-// drawing code
-	const GBColor Color() const;
-	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
-	void DrawMini(GBGraphics & g, const GBRect & where) const;
-};
-
 #endif

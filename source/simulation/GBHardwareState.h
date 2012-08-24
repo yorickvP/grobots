@@ -17,10 +17,14 @@ class GBWorld;
 class GBObject;
 class GBSensorResult;
 
+const GBFrames kRadioHistory = 12;
+
 class GBRadioState {
 // state
-	long writes;
-	long sent;
+public:
+	long writes[kRadioHistory];
+	long sent[kRadioHistory];
+private:
 	GBMessageNumber nextMessage[kNumMessageChannels];
 public:
 	GBRadioState();

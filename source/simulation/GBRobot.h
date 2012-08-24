@@ -70,7 +70,9 @@ public:
 	string Details() const;
 // evil antimodular drawing code
 	const GBColor Color() const;
+	void DrawUnderlay(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
+	void DrawOverlay(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
 	void DrawMini(GBGraphics & g, const GBRect & where) const;
 };
 

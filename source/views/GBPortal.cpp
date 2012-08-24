@@ -90,43 +90,31 @@ void GBPortal::InitBackground() {
 	background->StopDrawing();
 }
 
+void GBPortal::DrawLayer(GBObjectClass cl, long minTileX, long minTileY, long maxTileX, long maxTileY, GBDrawingLayer layer) {
+	for ( long yi = minTileY; yi <= maxTileY; yi ++ )
+		for ( long xi = minTileX; xi <= maxTileX; xi ++ )
+			DrawObjectList(world.GetObjects(xi, yi, cl), layer);
+	DrawObjectList(world.GetLargeObjects(cl), layer);
+}
+
 void GBPortal::DrawObjects() {
 	long minTileX = max(floor(ViewLeft() / kForegroundTileSize - 0.5), 0L);
 	long minTileY = max(floor(ViewBottom() / kForegroundTileSize - 0.5), 0L);
 	long maxTileX = min((long)ceil(ViewRight() / kForegroundTileSize + 0.5), world.ForegroundTilesX() - 1);
 	long maxTileY = min((long)ceil(ViewTop() / kForegroundTileSize + 0.5), world.ForegroundTilesY() - 1);
-	long yi, xi;
-	for ( yi = minTileY; yi <= maxTileY; yi ++ )
-		for ( xi = minTileX; xi <= maxTileX; xi ++ )
-			DrawObjectList(world.GetObjects(xi, yi, ocFood));
-	DrawObjectList(world.GetLargeObjects(ocFood));
-	for ( yi = minTileY; yi <= maxTileY; yi ++ )
-		for ( xi = minTileX; xi <= maxTileX; xi ++ )
-			DrawObjectList(world.GetObjects(xi, yi, ocRobot));
-	DrawObjectList(world.GetLargeObjects(ocRobot));
-	for ( yi = minTileY; yi <= maxTileY; yi ++ )
-		for ( xi = minTileX; xi <= maxTileX; xi ++ )
-			DrawObjectList(world.GetObjects(xi, yi, ocArea));
-	DrawObjectList(world.GetLargeObjects(ocArea));
-	for ( yi = minTileY; yi <= maxTileY; yi ++ )
-		for ( xi = minTileX; xi <= maxTileX; xi ++ )
-			DrawObjectList(world.GetObjects(xi, yi, ocShot));
-	DrawObjectList(world.GetLargeObjects(ocShot));
-	if ( showDecorations ) {
-		for ( yi = minTileY; yi <= maxTileY; yi ++ )
-			for ( xi = minTileX; xi <= maxTileX; xi ++ )
-				DrawObjectList(world.GetObjects(xi, yi, ocDecoration));
-		DrawObjectList(world.GetLargeObjects(ocDecoration));
-	}
-	if ( showSensors ) {
-		for ( yi = minTileY; yi <= maxTileY; yi ++ )
-			for ( xi = minTileX; xi <= maxTileX; xi ++ )
-				DrawObjectList(world.GetObjects(xi, yi, ocSensorShot));
-		DrawObjectList(world.GetLargeObjects(ocSensorShot));
-	}
+	DrawLayer(ocRobot, minTileX, minTileY, maxTileX, maxTileY, layerUnderlay);
+	DrawLayer(ocFood, minTileX, minTileY, maxTileX, maxTileY, layerNormal);
+	DrawLayer(ocRobot, minTileX, minTileY, maxTileX, maxTileY, layerNormal);
+	DrawLayer(ocArea, minTileX, minTileY, maxTileX, maxTileY, layerNormal);
+	DrawLayer(ocShot, minTileX, minTileY, maxTileX, maxTileY, layerNormal);
+	DrawLayer(ocRobot, minTileX, minTileY, maxTileX, maxTileY, layerOverlay);
+	if ( showDecorations )
+		DrawLayer(ocDecoration, minTileX, minTileY, maxTileX, maxTileY, layerNormal);
+	if ( showSensors )
+		DrawLayer(ocSensorShot, minTileX, minTileY, maxTileX, maxTileY, layerNormal);
 }
 
-void GBPortal::DrawObjectList(const GBObject * list) {
+void GBPortal::DrawObjectList(const GBObject * list, GBDrawingLayer layer) {
 	for ( const GBObject * cur = list; cur != nil; cur = cur->next ) {
 		short diameter = round(max(cur->Radius() * 2 * scale, 1));
 		GBRect where;
@@ -136,7 +124,13 @@ void GBPortal::DrawObjectList(const GBObject * list) {
 		where.bottom = where.top + diameter;
 		if ( where.right > 0 && where.left < Width()
 				&& where.bottom > 0 && where.top < Height() ) {
-			cur->Draw(Graphics(), *this, CalcExternalRect(where), showDetails && scale >= kMinDetailsScale);
+			bool selected = cur == world.Followed();
+			if ( layer == layerNormal )
+				cur->Draw(Graphics(), *this, CalcExternalRect(where), selected || showDetails && scale >= kMinDetailsScale);
+			else if ( layer == layerUnderlay )
+				cur->DrawUnderlay(Graphics(), *this, CalcExternalRect(where), selected);
+			else if ( layer == layerOverlay )
+				cur->DrawOverlay(Graphics(), *this, CalcExternalRect(where), selected);
 		}
 	}
 }

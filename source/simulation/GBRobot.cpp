@@ -30,6 +30,7 @@ const float kMinMinimapBotContrast = 0.35f;
 const float kMinMeterContrast = 0.3f;
 const GBFrames kRecentDamageTime = 10;
 
+const GBSpeed kRingGrowthRate = 0.1f;
 
 void GBRobot::Recalculate() {
 	mass = type->Mass() + hardware.constructor.FetusMass();
@@ -278,24 +279,34 @@ static void DrawMeter(GBGraphics & g, const GBNumber & fraction, const GBRect & 
 			  color * (pulse ? 0.85 + 0.15f * sin(phase) : 1.0f), width);
 }
 
+void GBRobot::DrawUnderlay(GBGraphics & g, const GBProjection & proj, const GBRect & where, bool detailed) const {
+//halo: crashes, prints
+	GBRect halo(where);
+	halo.Shrink(-3);
+	if ( brain && brain->Status() != bsOK )
+		g.DrawSolidOval(halo, brain->Status() == bsStopped ? GBColor::yellow : GBColor::red);
+//velocity and engine-velocity
+	//if ( Velocity().Nonzero() )
+	//	DrawShadow(g, proj, Velocity() * -2.5, hardware.EnginePower() ? GBColor::gray : GBColor::darkGray);
+	if ( detailed && hardware.EnginePower() && hardware.EngineVelocity().Nonzero() ) {
+		GBVelocity dv = hardware.EngineVelocity() - Velocity();
+		if ( dv.Norm() > 0.01 ) {
+			GBPosition head = Position() + dv.Unit() * (Radius() + hardware.EnginePower() / sqrt(Mass()) * 30);
+			g.DrawLine(proj.ToScreenX(Position().x), proj.ToScreenY(Position().y),
+					   proj.ToScreenX(head.x), proj.ToScreenY(head.y), GBColor::darkGreen, 2);
+			//DrawShadow(g, proj, dv.Unit() * hardware.EnginePower() / Mass() * -30, GBColor::darkGreen);
+		}
+	}
+//weapon ranges?
+//sensor results?
+}
+
 void GBRobot::Draw(GBGraphics & g, const GBProjection & proj, const GBRect & where, bool detailed) const {
 	if(where.Width() <= 5) {
 		DrawMini(g,where);
 		return;
 	}
 	short meterWidth = max(1, (where.Width() + 10) / 10);
-//halo: damage, crashes, prints
-	GBRect halo(where);
-	halo.Shrink(-2);
-	if ( detailed ) {
-		if ( brain && brain->Status() != bsOK )
-			g.DrawSolidOval(halo, brain->Status() == bsStopped ? GBColor::yellow : GBColor::red);
-		//TODO show velocity as a shadow or tail
-	}
-// shield
-	if ( hardware.ActualShield() > 0 )
-		g.DrawOpenOval(halo, GBColor(0.3f, 0.5f, 1)
-			* (hardware.ActualShield() / (mass * kStandardShieldPerMass)));
 //background and rim
 	g.DrawSolidOval(where, GBColor::darkRed.Mix(0.8f * recentDamage / kRecentDamageTime, Owner()->Color()));
 	g.DrawOpenOval(where, type->Color());
@@ -382,8 +393,26 @@ void GBRobot::Draw(GBGraphics & g, const GBProjection & proj, const GBRect & whe
 				color, thickness);
 			break;
 	}
-//overlay
-	//radio rings?
+}
+
+void GBRobot::DrawOverlay(GBGraphics & g, const GBProjection & proj, const GBRect & where, bool /*detailed*/) const {
+// shield
+	if ( hardware.ActualShield() > 0 ) {
+		GBRect halo(where);
+		halo.Shrink(-2);
+		g.DrawOpenOval(halo, GBColor(0.3f, 0.5f, 1)
+					   * (hardware.ActualShield() / (mass * kStandardShieldPerMass)));
+	}
+//radio rings
+	for ( int age = 0; age < kRadioHistory; ++ age ) {
+		if ( ! hardware.radio.sent[age] && ! hardware.radio.writes[age] )
+			continue;
+		GBDistance r = kRingGrowthRate * (age + 1);
+		GBRect ring(proj.ToScreenX(Position().x - r), proj.ToScreenY(Position().y + r),
+					proj.ToScreenX(Position().x + r), proj.ToScreenY(Position().y - r));
+		float intensity = min(2.0f * (kRadioHistory - age) / kRadioHistory, 1.0f);
+		g.DrawOpenOval(ring, (hardware.radio.sent[age] ? GBColor(0.6f, 0.5f, 1) : GBColor(1, 0.8f, 0.5f)) * intensity);
+	}
 }
 
 void GBRobot::DrawMini(GBGraphics & g, const GBRect & where) const {
