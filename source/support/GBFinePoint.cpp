@@ -88,7 +88,8 @@ GBNumber GBFinePoint::DotProduct(const GBFinePoint & other) const {
 }
 
 GBFinePoint GBFinePoint::Projection(const GBFinePoint & base) const {
-	return base * DotProduct(base) / base.NormSquare();
+	const GBFinePoint u = base.Unit();
+	return u * DotProduct(u);
 }
 
 GBNumber GBFinePoint::Cross(const GBFinePoint & other) const {
