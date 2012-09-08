@@ -75,6 +75,7 @@ public:
 	GBObjectClass Class() const;
 	void CollideWith(GBObject * other);
 	void Act(GBWorld * world);
+	long Type() const;
 // drawing code
 	const GBColor Color() const;
 	void Draw(GBGraphics &, const GBProjection &, const GBRect & where, bool detailed) const;
