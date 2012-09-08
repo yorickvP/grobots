@@ -70,6 +70,7 @@ public:
 	void AdvanceFrame();
 	void EndRound();
 	void CollectStatistics();
+	void EnsureSideID(GBSide * side);
 	void AddSeed(GBSide * side, const GBPosition & where);
 	void AddSeeds();
 	void ReseedDeadSides();

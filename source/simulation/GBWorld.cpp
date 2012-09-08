@@ -253,12 +253,15 @@ void GBWorld::CollectStatistics() {
 		sides[i]->Scores().ReportTotals(roundScores);
 }
 
+void GBWorld::EnsureSideID(GBSide * side) {
+	if ( ! side->ID() )
+		side->SetID(++sidesSeeded);	
+}
+
 void GBWorld::AddSeed(GBSide * side, const GBPosition & where) {
 	try {
 		GBEnergy cost = seedValue - seedTypePenalty * side->CountTypes();
-	//give side a number
-		if ( ! side->ID() )
-			side->SetID(++sidesSeeded);
+		EnsureSideID(side);
 	//add cells
 		GBRobotType * type;
 		GBRobot * bot = nil;

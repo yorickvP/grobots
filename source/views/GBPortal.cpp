@@ -490,6 +490,7 @@ void GBPortal::DoAddRobot(const GBFinePoint where) {
 		if ( ! type )
 			type = side->GetType(1);
 		if ( type ) {
+			world.EnsureSideID(side);
 			world.AddObjectDirectly(new GBRobot(type, where));
 			side->Scores().ReportSeeded(type->Cost());
 			world.Changed();
