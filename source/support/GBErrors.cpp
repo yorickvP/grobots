@@ -15,8 +15,9 @@
 #elif MAC && MAC_OS_X
 	#include <Carbon/Carbon.h>
 #elif WINDOWS
-	#include <stdlib.h>
 	#include <windows.h>
+	#include "resource.h"
+	#include <string.h>
 #endif
 
 
@@ -136,13 +137,35 @@ bool Confirm(const string & message, const string & operation) {
 
 #elif WINDOWS
 
+//Handler for dialog that gets number of tournament rounds to run
+BOOL CALLBACK dlgNonfatalError(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	switch (uMsg) {
+		case WM_COMMAND: 
+			switch (LOWORD(wParam)) {
+				case IDABORT:
+				case IDRETRY:
+				case IDIGNORE:
+					EndDialog(hWnd, LOWORD(wParam));
+					break;
+			}
+			break;
+		case WM_INITDIALOG:
+			SetDlgItemText(hWnd, ID_ERRORMESSAGE, (LPCSTR)lParam);
+			SetFocus(hWnd);
+			break;
+		default: return false;
+	}
+	return 0;
+}
+
 void FatalError(const string & message) {
 	MessageBox(NULL, message.c_str(), "Fatal Error", MB_OK | MB_ICONWARNING);
 	exit(1);
 }
 
 void NonfatalError(const string & message) {
-	switch ( MessageBox(NULL, message.c_str(), "Nonfatal Error", MB_ICONWARNING | MB_ABORTRETRYIGNORE) ) {
+	switch (DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(ID_NONFATALERROR), 
+						  NULL, dlgNonfatalError, (LPARAM)message.c_str())) {
 		case IDIGNORE: // continue, clicked ignore
 		default:
 			return;
@@ -154,8 +177,7 @@ void NonfatalError(const string & message) {
 }
 
 bool Confirm(const string & message, const string & operation) {
-	//TODO this should actually ask
-	return true;
+	return MessageBox(NULL, message.c_str(), "Confirm", MB_ICONQUESTION | MB_YESNO) == IDYES;
 }
 
 #else

@@ -29,6 +29,10 @@
 #endif
 
 
+#if WINDOWS
+#include "resource.h"
+#endif
+
 //Menu item IDs: these are 100*menuid + itemposition
 enum {
 	kFileMenu = 129,
@@ -493,6 +497,40 @@ void GBApplication::DoRulesDialog() {
 }
 
 #if WINDOWS
+//Handler for dialog that gets number of tournament rounds to run
+BOOL CALLBACK dlgTournamentProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	long rounds = -1;
+	char inputValue[10];
+	switch(uMsg) {
+		case WM_COMMAND: 
+			switch (LOWORD(wParam)) {
+				case ID_OK: 
+					GetDlgItemText(hWnd, ID_TOURN_ROUNDS, inputValue, 10);
+					if ( ParseInteger(inputValue, rounds) && rounds != 0 )
+						EndDialog(hWnd, rounds);
+					else
+						MessageBox(hWnd, "Tournament length must be a positive integer, or -1 for unlimited length.",
+								   "Invalid Tournament Length", MB_OK);
+					break;
+				case ID_CANCEL:
+					EndDialog(hWnd, 0);
+					break;
+			}
+			break;
+		case WM_CLOSE:
+			EndDialog(hWnd, 0);
+			break;
+		case WM_INITDIALOG:
+			SetDlgItemInt(hWnd, ID_TOURN_ROUNDS, lParam, true);
+			SetFocus(hWnd);
+			break;
+		default: return false;
+	}
+	return rounds > 0;
+}
+#endif
+
+#if WINDOWS
 GBApplication::GBApplication(HINSTANCE hInstance, int showCmd)
 	: GBViewsApplication(hInstance, showCmd),
 #else
@@ -724,8 +762,19 @@ void GBApplication::HandleMenuSelection(int item) {
 				else
 #if MAC
 					if ( DoNumberDialog("\pNumber of rounds:", world.tournamentLength, -1) )
-#endif
+						world.tournament = true;
+#elif WINDOWS
+					{
+						int ret = DialogBoxParam(hInstance, MAKEINTRESOURCE(ID_TOURNAMENT), 
+												 mainWindow->win, dlgTournamentProc, -1);
+						if (ret) {
+							world.tournamentLength = ret;
+							world.tournament = true;
+						}
+					}
+#else
 					world.tournament = true;
+#endif
 				break;
 			case miSaveScoresHtml: world.DumpTournamentScores(true); break;
 			case miSaveScoresWiki: world.DumpTournamentScores(false); break;
