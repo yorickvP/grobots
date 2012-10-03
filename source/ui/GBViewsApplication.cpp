@@ -327,10 +327,10 @@ GBRect GBViewsApplication::GetScreenSize() {
 	Rect bounds;
 	if ( !GetAvailableWindowPositioningBounds(GetMainDevice(), &bounds) )
 		return GBRect(bounds);
-#elif WIN
-	RECT desktop;
-	if (GetWindowRect(GetDesktopWindow(), &desktop))
-		return GBRect(desktop);
+#elif WINDOWS
+	RECT workArea;
+	if (SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0))
+		return GBRect(workArea.left, workArea.top, workArea.right, workArea.bottom);
 #endif
 	return GBRect(2, 44, 1024, 768);
 }

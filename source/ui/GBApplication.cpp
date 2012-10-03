@@ -514,7 +514,14 @@ GBApplication::GBApplication()
 	sideDebugger = new GBSideDebuggerView(world);
 //lay out windows...
 	GBRect screen = GetScreenSize();
-	short edge = 5, titlebar = 22, rightedge = edge; //TODO get these from window manager
+#if WINDOWS
+	short edge = GetSystemMetrics(SM_CXBORDER) + GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CXEDGE);
+	short titlebar = GetSystemMetrics(SM_CYCAPTION);
+	short rightedge = edge;
+	short menuheight = GetSystemMetrics(SM_CYMENUSIZE);
+#else
+	short edge = 5, titlebar = 22, rightedge = edge, menuheight = 0; //TODO get these from window manager
+#endif
 #if MAC
 	edge = 0;
 	rightedge = screen.Width() > 800 ? 100 : edge;
@@ -525,9 +532,9 @@ GBApplication::GBApplication()
 	short right = screen.right - debugger->PreferredWidth() - rightedge;
 	short top = screen.top + titlebar + edge;
 	short scorestop = screen.bottom - scores->PreferredHeight() - edge;
-	portal->SetDefaultSize(max(right - mainleft - gap, 311), max(scorestop - top - titlebar, 311));
+	portal->SetDefaultSize(max(right - mainleft - gap, 311), max(scorestop - top - titlebar - 2 * edge - menuheight, 311));
 //...and create them
-	mainWindow = MakeWindow(new GBDoubleBufferedView(portal), mainleft, top);
+	mainWindow = MakeWindow(new GBDoubleBufferedView(portal), mainleft, top + menuheight);
 	debuggerWindow = MakeWindow(debugger, right, top, false);
 	sideDebuggerWindow = MakeWindow(sideDebugger, 200, 400, false);
 	minimapWindow = MakeWindow(new GBDoubleBufferedView(minimap), left, screen.bottom - minimap->PreferredHeight() - edge);
