@@ -77,7 +77,7 @@ class GBSideReader {
 	void LoadIt();
 	GBSide * Side();
 public:
-	static GBSide * Load(const GBFilename & filename);
+	static GBSide * Load(const char *& filename);
 };
 
 #endif
