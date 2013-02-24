@@ -9,7 +9,7 @@
 #include <iostream>
 #include "GBStringUtilities.h"
 #include "GBSideReader.h"
-#include "GBSound.h"
+//#include "GBSound.h"
 #include "GBSide.h"
 #include "GBRobotType.h"
 #include <time.h>
@@ -81,7 +81,7 @@ int main(int argc, const char * argv[]) {
 		if (dumpHtml)
 			world.DumpTournamentScores(true);
 	//clean up
-		if ( SoundActive() ) CleanupSound();
+//		if ( SoundActive() ) CleanupSound();
 		return EXIT_SUCCESS;
 	} catch ( GBError & err ) {
 		FatalError("Uncaught GBError: " + err.ToString());
@@ -108,9 +108,9 @@ static void ProcessArg(const char * arg, GBWorld & world,
 					DieWithUsage(name);
 				cout << "#tournament " << world.tournamentLength << endl;
 				break;
-			case 'S':
-				SetupSound();
-				SetSoundActive(true);
+//			case 'S':
+//				SetupSound();
+//				SetSoundActive(true);
 				break;
 			case 'l':
 				if ( ! ParseInteger(arg + 2, world.timeLimit) )

@@ -10,7 +10,7 @@ support/GBErrors.cpp support/GBDeletionReporter.cpp \
 support/GBFinePoint.cpp support/GBGraphics.cpp \
 support/GBMilliseconds.cpp \
 support/GBModel.cpp support/GBNumber.cpp support/GBRandomState.cpp \
-support/GBSound.cpp support/GBStringUtilities.cpp \
+support/GBStringUtilities.cpp \
 simulation/GBDecorations.cpp simulation/GBFood.cpp \
 simulation/GBHardwareState.cpp simulation/GBMessages.cpp \
 simulation/GBObject.cpp simulation/GBObjectWorld.cpp \

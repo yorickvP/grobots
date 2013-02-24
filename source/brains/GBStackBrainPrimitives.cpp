@@ -449,7 +449,7 @@ void GBStackBrain::ExecutePrimitive(GBSymbolIndex index, GBRobot * robot, GBWorl
 			if ( world->reportPrints )
 				NonfatalError(robot->Description() + " prints: " + *lastPrint);
 			break;
-		case opBeep: StartSound(siBeep); break;
+//		case opBeep: StartSound(siBeep); break;
 		case opStop: SetStatus(bsStopped); break;
 		case opPause: if ( world->reportErrors ) world->running = false; break;
 		case opSync: remaining = 0; break;

@@ -15,6 +15,7 @@
 #include <vector>
 #include <algorithm>
 #include <time.h>
+#include <string>
 
 #if MAC && ! MAC_OS_X
 #include <Timer.h>
@@ -181,8 +182,8 @@ void GBWorld::SimulateOneFrame() {
 	PROFILE_PHASE(collideTime, CollideAllObjects();)
 	currentFrame ++;
 	PROFILE_PHASE(statisticsTime, CollectStatistics();)
-	if ( previousSidesAlive > SidesAlive() )
-		StartSound(siExtinction);
+//	if ( previousSidesAlive > SidesAlive() )
+//		StartSound(siExtinction);
 #if GBWORLD_PROFILING && MAC
 	Microseconds(&end);
 	simulationTime = U64Add(U64Subtract(UnsignedWideToUInt64(end), UnsignedWideToUInt64(start)), simulationTime);
@@ -197,7 +198,7 @@ void GBWorld::AdvanceFrame() {
 }
 
 void GBWorld::EndRound() {
-		StartSound(siEndRound);
+  //		StartSound(siEndRound);
 		//TODO extend biomassHistory to 18k when ending? (to avoid misleading graph)
 		ReportRound();
 		if ( tournament ) {
@@ -545,7 +546,7 @@ void GBWorld::DumpTournamentScores(bool html) {
 	for (int i = 0; i < sorted.size(); ++i) {
 		const GBSide * s = sorted[i];
 		if ( html ) {
-			f << "<tr><td>" << i + 1 << "<td><a href='sides/" << s->Filename() << "'>";
+//			f << "<tr><td>" << i + 1 << "<td><a href='sides/" << s->string() << "'>";
 			f << s->Name() << "</a><td>" << s->Author() << "\n";
 		} else
 			f << "|-\n|" << i + 1 << "||" << s->Name() << "||" << s->Author(); 

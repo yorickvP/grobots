@@ -13,7 +13,7 @@
 #include "GBRobotType.h"
 #include "GBSide.h"
 #include "GBDecorations.h"
-#include "GBSound.h"
+//#include "GBSound.h"
 
 
 // constants //
@@ -159,7 +159,7 @@ void GBConstructorState::Act(GBRobot * robot, GBWorld * world) {
 		robot->Owner()->Scores().Expenditure().ReportConstruction(actual);
 		progress += actual;
 		if ( Remaining() <= 0 && ! robot->hardware.ActualShield() ) {
-			StartSound(siBirth);
+//			StartSound(siBirth);
 			GBAngle dir = world->Randoms().Angle();
 			GBRobot * child = new GBRobot(type,
 				robot->Position().AddPolar(kBabyDisplacementFraction * robot->Radius(), dir),
@@ -486,8 +486,8 @@ void GBBlasterState::Act(GBRobot * robot, GBWorld * world) {
 		if ( ! robot->hardware.ActualShield()
 				&& robot->hardware.UseEnergy(FiringCost() * effectiveness) ) {
 			robot->Owner()->Scores().Expenditure().ReportWeapons(FiringCost() * effectiveness);
-			if ( Damage() >= 12 ) StartSound(siBlast);
-			else StartSound(siSmallBlast);
+//			if ( Damage() >= 12 ) StartSound(siBlast);
+//			else StartSound(siSmallBlast);
 			GBObject * shot = new GBBlast(robot->Position().AddPolar(robot->Radius(), direction),
 				robot->Velocity().AddPolar(Speed(), direction),
 				robot->Owner(), Damage() * effectiveness, MaxLifetime());
@@ -559,7 +559,7 @@ void GBGrenadesState::Act(GBRobot * robot, GBWorld * world) {
 		if ( ! robot->hardware.ActualShield()
 				&& robot->hardware.UseEnergy(FiringCost() * effectiveness) ) {
 			robot->Owner()->Scores().Expenditure().ReportWeapons(FiringCost() * effectiveness);
-			StartSound(siGrenade);
+//			StartSound(siGrenade);
 			GBFrames lifetime = max(floor((distance - robot->Radius()) / Speed()), 1L);
 			GBObject * shot = new GBGrenade(robot->Position().AddPolar(robot->Radius(), direction),
 				robot->Velocity().AddPolar(Speed(), direction),

@@ -281,10 +281,10 @@ bool GBSide::Better(const GBSide *a, const GBSide *b) {
 }
 
 //Return the basename of the file this side was loaded from.
-std::string GBSide::Filename() const {
-#if USE_MAC_IO
-	return FromPascalString(filename.name);
-#else
-	return filename.c_str(); //basename?
-#endif
-}
+//std::string GBSide::Filename() const {
+//#if USE_MAC_IO
+//	return FromPascalString(filename.name);
+//#else
+//	return filename(); //basename?
+//#endif
+//}

@@ -8,6 +8,7 @@
 #include "GBPlatform.h"
 #include "GBNumber.h"
 #include "GBSide.h"
+#include <string>
 
 #if ! USE_MAC_IO
 	#include <fstream>
