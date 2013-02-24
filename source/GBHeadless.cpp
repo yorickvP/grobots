@@ -141,16 +141,16 @@ static void ProcessArg(const char * arg, GBWorld & world,
 				DieWithUsage(name);
 		}
 	} else {
-	#if USE_MAC_IO
-		Str255 fname;
-		ToPascalString(arg, fname);
-		FSSpec fs;
-		if ( FSMakeFSSpec(0, 0, fname, &fs) )
-			return;
-		GBSide * side = GBSideReader::Load(fs);
-	#else
+//	#if USE_MAC_IO
+//		Str255 fname;
+//		ToPascalString(arg, fname);
+//		FSSpec fs;
+//		if ( FSMakeFSSpec(0, 0, fname, &fs) )
+//			return;
+//		GBSide * side = GBSideReader::Load(fs);
+//	#else
 		GBSide * side = GBSideReader::Load(arg);
-	#endif
+//	#endif
 		if ( side ) {
 			world.AddSide(side);
 			cout << "#side " << side->Name() << endl;

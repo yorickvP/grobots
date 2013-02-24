@@ -15,10 +15,10 @@
 #include <string>
 using std::string;
 
-#if MAC
-	void ToPascalString(const string & s, Str255 ps);
-	string FromPascalString(ConstStr255Param ps);
-#endif
+//#if MAC
+//	void ToPascalString(const string & s, Str255 ps);
+//	string FromPascalString(ConstStr255Param ps);
+//#endif
 
 string ToString(long n);
 string ToString(int n);
