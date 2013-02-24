@@ -79,7 +79,7 @@ int main(int argc, const char * argv[]) {
 			cerr << " in " << dt << " s (" << (totalFrames / dt) << " fps)";
 		cerr << endl;
 		if (dumpHtml)
-			world.DumpTournamentScores();
+			world.DumpTournamentScores(true);
 	//clean up
 		if ( SoundActive() ) CleanupSound();
 		return EXIT_SUCCESS;

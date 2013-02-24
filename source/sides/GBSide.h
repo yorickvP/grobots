@@ -107,7 +107,7 @@ public:
 
 	static bool Better(const GBSide *a, const GBSide *b);
 	
-	std::string GBSide::Filename() const;
+	std::string Filename() const;
 };
 
 
