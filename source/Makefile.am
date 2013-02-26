@@ -27,4 +27,4 @@ CXXFLAGS = -I$(srcdir)/support -I$(srcdir)/simulation \
 -I$(srcdir)/sides -I$(srcdir)/brains -I$(srcdir)/views -DHEADLESS -O
 
 # Data files
-dist_doc_DATA = Readme
+dist_doc_DATA = README
