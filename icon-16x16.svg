@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+     width="16" height="16">
+  <defs>
+    <radialGradient id="shiny" cx="50%" cy="33%" fx="50%" fy="33%" r="70%">
+      <stop offset='0%' stop-color='white' />
+      <stop offset='100%' stop-color='blue' />
+    </radialGradient>
+    <clipPath id='clip'>
+      <circle cx='50%' cy='50%' r='8.5'/>
+    </clipPath>
+  </defs>
+  <circle id='body' cx='50%' cy='50%' r='7.5'
+	  fill='url(#shiny)' stroke='#000066' stroke-width='1' />
+  <path id="damage" d="M 1,4 A 8,8 0 0 1 8,0"
+	fill='none' stroke='red' stroke-width='4' clip-path='url(#clip)' />
+  <path id="energy" d="M 15,4 A 8,8 0 0 1 8,16"
+	fill='none' stroke='lime' stroke-width='4' clip-path='url(#clip)' />
+  <path id="gestation" d="M 8,2 A 6,6 0 1 1 2,8"
+	fill='none' stroke='yellow' stroke-width='1' />
+</svg>
