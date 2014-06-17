@@ -8,16 +8,13 @@
 
 #include "GBPlatform.h"
 
-#if MAC && ! HEADLESS
-#if MAC_OS_X
-#include <Carbon/Carbon.h>
-#else
-#include <Quickdraw.h>
-#include <QDOffscreen.h>
-#endif
+#if HEADLESS
+	//nothing
+#elif MAC
+	#include <Carbon/Carbon.h>
 #elif WINDOWS
-#include <Windows.h>
-#undef SendMessage
+	#include <Windows.h>
+	#undef SendMessage
 	//this macro was clobbering GBSide::SendMessage
 #endif
 

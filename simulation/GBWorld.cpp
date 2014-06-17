@@ -16,11 +16,6 @@
 #include <algorithm>
 #include <time.h>
 
-#if MAC && ! MAC_OS_X
-#include <Timer.h>
-#include <Math64.h>
-#endif
-
 #if WINDOWS && _MSC_VER < 1300
 //this seems to be missing in MSVC6
 ostream & operator << (ostream & s, const string & str) {

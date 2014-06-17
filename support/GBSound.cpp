@@ -7,14 +7,8 @@
 #include "GBErrors.h"
 #include "GBPlatform.h"
 
-#if MAC
-	#if MAC_OS_X
-		#include <Carbon/Carbon.h>
-	#else
-		#include <Sound.h>
-		#include <Resources.h>
-	#endif
-
+#if MAC && !HEADLESS
+#include <Carbon/Carbon.h>
 
 const int kNumSoundChannels = 4;
 

@@ -14,14 +14,9 @@
 #include <vector>
 
 //identify files according to platform
-#define USE_MAC_IO (MAC)
+#define USE_MAC_IO (MAC && !HEADLESS)
 #if USE_MAC_IO
-	#if MAC_OS_X
-		#include <Carbon/Carbon.h>
-	#else
-		#include <Files.h>
-	#endif
-
+	#include <Carbon/Carbon.h>
 	typedef FSSpec GBFilename;
 #else
 	typedef std::string GBFilename;

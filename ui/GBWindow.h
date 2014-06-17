@@ -6,9 +6,7 @@
 #ifndef GBWindow_h
 #define GBWindow_h
 
-#if MAC && ! MAC_OS_X
-#include <Windows.h>
-#elif WINDOWS
+#if WINDOWS
 #include <Windows.h>
 #endif
 #include "GBView.h"

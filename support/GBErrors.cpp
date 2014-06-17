@@ -10,9 +10,7 @@
 	#include <iostream>
 	using std::cerr;
 	using std::endl;
-#elif MAC && ! MAC_OS_X
-	#include <Dialogs.h>
-#elif MAC && MAC_OS_X
+#elif MAC
 	#include <Carbon/Carbon.h>
 #elif WINDOWS
 	#include <windows.h>

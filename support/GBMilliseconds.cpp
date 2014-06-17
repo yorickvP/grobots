@@ -5,9 +5,7 @@
 #include "GBPlatform.h"
 #include "GBMilliseconds.h"
 
-#if MAC && ! MAC_OS_X
-	#include <Events.h>
-#elif UNIX || WINDOWS
+#if UNIX || WINDOWS
 	#include <time.h>
 #endif
 

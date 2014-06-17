@@ -3,16 +3,7 @@
 // Distributed under the GNU General Public License.
 
 #include "GBPlatform.h"
-#if MAC && ! MAC_OS_X
-#include <Quickdraw.h>
-#include <Events.h>
-#include <AppleEvents.h>
-#include <Menus.h>
-#include <Windows.h>
-#include <Dialogs.h>
-#include <Menus.h>
-#include <ToolUtils.h>
-#elif WINDOWS
+#if WINDOWS
 #include <string.h>
 #endif
 #include "GBWindow.h"
@@ -200,17 +191,6 @@ void GBViewsApplication::HandleUpdate(EventRecord * evt) {
 }
 
 void GBViewsApplication::AdjustCursor(Point where) {
-#if ! MAC_OS_X
-	WindowPtr window;
-	if ( FindWindow(where, &window) == inContent && GBWindow::IsGBWindow(window) ) {
-		GBWindow * mw = GBWindow::GetFromWindow(window);
-		if ( window == FrontWindow() || mw && mw->GetFrontClicks() )
-			SetCursor(mw->Cursor());
-		else
-			SetCursor(cuArrow);
-	} else
-		SetCursor(cuArrow);
-#endif
 }
 #endif
 
@@ -349,9 +329,6 @@ GBWindow * GBViewsApplication::MakeWindow(GBView * view, int x, int y, bool visi
 void GBViewsApplication::Run() {
 #if MAC
 	SetupAppleEvents();
-#if ! MAC_OS_X
-	InitCursor();
-#endif
 	EventRecord event;
 	do {
 		Process();

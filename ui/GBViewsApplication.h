@@ -8,9 +8,6 @@
 
 #include "GBView.h"
 #if MAC
-#if ! MAC_OS_X
-#include <Events.h>
-#endif
 class FSSpec;
 #endif
 

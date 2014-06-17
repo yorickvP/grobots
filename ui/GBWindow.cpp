@@ -9,11 +9,6 @@
 #include "GBViewsApplication.h"
 
 #if MAC
-#if ! MAC_OS_X
-#include <Windows.h>
-#include <ToolUtils.h>
-#endif
-
 const short kMacWindowKind = 190;
 #elif WINDOWS
 const char * kWindowClassName = "Grobots window";

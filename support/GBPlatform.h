@@ -9,7 +9,6 @@
 
 #if (defined(__APPLE__) && defined(__GNUC__)) || defined(__MACOSX__)
 	#define MAC 1
-	#define MAC_OS_X 1
 	#define CARBON 1
 	
 #elif defined __MRC__  // MrCpp

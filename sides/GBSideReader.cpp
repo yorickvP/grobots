@@ -11,12 +11,7 @@
 #include <ctype.h>
 
 #if USE_MAC_IO
-	#if CARBON
-		#include <Carbon/Carbon.h>
-	#else
-		#include <Devices.h>
-		#include <Errors.h>
-	#endif
+	#include <Carbon/Carbon.h>
 #else
 	using std::ifstream;
 #endif

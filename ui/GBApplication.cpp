@@ -20,15 +20,6 @@
 #include "GBStringUtilities.h"
 #include "GBWindow.h"
 
-#if MAC && ! MAC_OS_X
-#include <Sound.h>
-#include <NumberFormatting.h>
-#include <Dialogs.h>
-#include <Controls.h>
-#include <Navigation.h>
-#endif
-
-
 #if WINDOWS
 #include "resource.h"
 #endif
@@ -232,13 +223,7 @@ void GBApplication::DoLoadSide() {
 	options.dialogOptionFlags &= ~ kNavAllowPreviews;
 	ToPascalString(string("Load side"), options.windowTitle);
 	//TODO filter to only .gb
-	#if MAC_OS_X
 	if ( NavGetFile(nil, &reply, &options, nil, nil, nil, nil, nil) || ! reply.validRecord )
-	#else
-	NavTypeList types = { 'GBot', 0, 1, { 'TEXT' } };
-	NavTypeListPtr typesp = &types;
-	if ( NavGetFile(nil, &reply, &options, nil, nil, nil, &typesp, nil) || ! reply.validRecord )
-	#endif
 		return;
 //open the selected items
 	long items, dummySize;
@@ -846,9 +831,6 @@ long GBApplication::SleepTime() {
 }
 
 void GBApplication::OpenFile(FSSpec & file) {
-#if !MAC_OS_X
-	SetCursor(cuWait);
-#endif
 	GBSide * side = GBSideReader::Load(file);
 	if ( side ) world.AddSide(side);
 }

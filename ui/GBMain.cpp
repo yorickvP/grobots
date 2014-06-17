@@ -7,10 +7,6 @@
 #include "GBErrors.h"
 #include <exception>
 
-#if MAC && ! CARBON
-	QDGlobals qd;
-#endif
-
 #if WINDOWS
 	int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int showCmd) {
 #else
