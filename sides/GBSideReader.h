@@ -8,7 +8,6 @@
 #include "GBPlatform.h"
 #include "GBNumber.h"
 #include "GBSide.h"
-#include <string>
 
 #if ! USE_MAC_IO
 	#include <fstream>
@@ -78,7 +77,7 @@ class GBSideReader {
 	void LoadIt();
 	GBSide * Side();
 public:
-	static GBSide * Load(const char *& filename);
+	static GBSide * Load(const GBFilename & filename);
 };
 
 #endif

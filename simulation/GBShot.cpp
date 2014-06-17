@@ -215,10 +215,10 @@ GBExplosion::GBExplosion(const GBPosition & where, GBSide * const who, const GBD
 	: GBTimedShot(where, PowerRadius(howMuch), who, howMuch, kExplosionLifetime)
 {
 	if ( howMuch < 0 ) throw GBBadArgumentError();
-//	if ( howMuch > 100 ) StartSound(siLargeExplosion);
-//	else if ( howMuch > 30 ) StartSound(siMediumExplosion);
-//	else if ( howMuch > 10 ) StartSound(siSmallExplosion);
-//	else StartSound(siTinyExplosion);
+	if ( howMuch > 100 ) StartSound(siLargeExplosion);
+	else if ( howMuch > 30 ) StartSound(siMediumExplosion);
+	else if ( howMuch > 10 ) StartSound(siSmallExplosion);
+	else StartSound(siTinyExplosion);
 }
 
 GBObjectClass GBExplosion::Class() const {

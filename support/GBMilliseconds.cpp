@@ -5,23 +5,20 @@
 #include "GBPlatform.h"
 #include "GBMilliseconds.h"
 
-//#if MAC && ! MAC_OS_X
-//	#include <Events.h>
-//#elif UNIX || WINDOWS
+#if MAC && ! MAC_OS_X
+	#include <Events.h>
+#elif UNIX || WINDOWS
 	#include <time.h>
-//#endif
+#endif
 
-//#if MAC
-//GBMilliseconds Milliseconds() {
-//	return (GBMilliseconds)(TickCount()) * 1000 / 60;
-//}
-//#elif UNIX || WINDOWS
+#if MAC
 GBMilliseconds Milliseconds() {
-	clock_t ticks;
-	return ticks;
+	return (GBMilliseconds)(TickCount()) * 1000 / 60;
 }
+#elif UNIX || WINDOWS
+GBMilliseconds Milliseconds() { return clock(); }
 //FIXME this is process time, not real time
-//#else
-//	#warning "Need Milliseconds"
-//#endif
+#else
+	#warning "Need Milliseconds"
+#endif
 

@@ -606,7 +606,7 @@ bool GBSideReader::SkipWhitespace() {
 	return true;
 }
 
-GBSideReader::GBSideReader(const string & filename)
+GBSideReader::GBSideReader(const GBFilename & filename)
 #if USE_MAC_IO
 	: refNum(0),
 #else
@@ -662,7 +662,7 @@ GBSide * GBSideReader::Side() {
 	return nil; // not reached
 }
 
-GBSide * GBSideReader::Load(const char *& filename){
+GBSide * GBSideReader::Load(const GBFilename & filename){
 	try {
 		GBSideReader reader(filename);
 		reader.LoadIt();

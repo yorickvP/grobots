@@ -14,18 +14,18 @@
 #include <vector>
 
 //identify files according to platform
-//#define USE_MAC_IO (MAC)
-//#if USE_MAC_IO
-//	#if MAC_OS_X
-//		#include <Carbon/Carbon.h>
-//	#else
-//		#include <Files.h>
-//	#endif
+#define USE_MAC_IO (MAC)
+#if USE_MAC_IO
+	#if MAC_OS_X
+		#include <Carbon/Carbon.h>
+	#else
+		#include <Files.h>
+	#endif
 
-//	typedef FSSpec GBFilename;
-//#else
+	typedef FSSpec GBFilename;
+#else
 	typedef std::string GBFilename;
-//#endif
+#endif
 
 class GBRobotType;
 

@@ -6,17 +6,17 @@
 #include "GBStringUtilities.h"
 #include <ctype.h>
 
-//#if MAC
-//void ToPascalString(const string & s, Str255 ps) {
-//	ps[0] = s.length() > 255 ? 255 : s.length();
-//	for ( int i = 0; i < ps[0]; ++ i )
-//		ps[i + 1] = s[i];
-//}
+#if MAC
+void ToPascalString(const string & s, Str255 ps) {
+	ps[0] = s.length() > 255 ? 255 : s.length();
+	for ( int i = 0; i < ps[0]; ++ i )
+		ps[i + 1] = s[i];
+}
 
-//string FromPascalString(ConstStr255Param ps) {
-//	return string((const char *)&(ps[1]), ps[0]);
-//}
-//#endif
+string FromPascalString(ConstStr255Param ps) {
+	return string((const char *)&(ps[1]), ps[0]);
+}
+#endif
 
 // slow but who cares?
 string ToString(long n) {
