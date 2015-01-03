@@ -14,46 +14,42 @@ GBRandomState gRandoms;
 
 
 GBRandomState::GBRandomState()
-	: seed((long)time(0))
+	: seed((unsigned int)time(0))
 {}
 
-GBRandomState::GBRandomState(const long newseed)
+GBRandomState::GBRandomState(const unsigned int newseed)
 	: seed(newseed)
 {}
 
-long GBRandomState::GenerateLong() {
+unsigned int GBRandomState::Generate() {
 	seed = seed * 0734652105 + 662049451; // constants as recommended by Knuth
 	return seed;
 }
 
-short GBRandomState::GenerateShort() {
-	return (short)(GenerateLong() >> 16);
-}
-
-long GBRandomState::LongInRange(const long min, const long max) {
+int GBRandomState::IntInRange(const int min, const int max) {
 	if ( min == max )
 		return min;
 	else if ( min > max )
-		return LongInRange(max, min);
-	unsigned long range = max - min + 1;
-	long result = min + (((GBLongLong)(unsigned long)GenerateLong() * range) >> 32);
+		return IntInRange(max, min);
+	int range = max - min + 1;
+	int result = min + (((GBLongLong)Generate() * range) >> 32);
 	if ( result < min || result > max ) {
-		NonfatalError(string("GBRandomState::LongInRange(") + ToString(min) + ", "
-			+ ToString(max) + ") failed with result " + ToString(result));
+		NonfatalError(string("GBRandomState::IntInRange(") + ToString(min) + ", "
+			      + ToString(max) + ") failed with result " + ToString(result));
 	}
 	return result;
 }
 
 GBNumber GBRandomState::InRange(const GBNumber min, const GBNumber max) {
 #if USE_GBNUMBER
-	return GBNumber::MakeRaw(LongInRange(min.data, max.data));
+	return GBNumber::MakeRaw(IntInRange(min.data, max.data));
 #else
 	return FloatInRange(min, max);
 #endif
 }
 
 float GBRandomState::FloatInRange(const float min, const float max) {
-	return min + (float)(unsigned long)GenerateLong() / (float)0xFFFFFFFFUL * (max - min);
+	return min + (float)(unsigned int)Generate() / (float)0xFFFFFFFFUL * (max - min);
 }
 
 GBAngle GBRandomState::Angle() {
@@ -79,14 +75,6 @@ bool GBRandomState::Boolean(const GBNumber probability) {
 	return InRange(0, GBNumber(1) - kEpsilon) < probability;
 }
 
-bool GBRandomState::Boolean(const long num, const long denom) {
-	return LongInRange(0, denom - 1) < num;
-}
-
-long GBRandomState::GetSeed() const {
-	return seed;
-}
-
-void GBRandomState::SetSeed(const long newSeed) {
-	seed = newSeed;
+bool GBRandomState::Boolean(const int num, const int denom) {
+	return IntInRange(0, denom - 1) < num;
 }

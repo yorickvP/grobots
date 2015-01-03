@@ -385,7 +385,7 @@ void GBStackBrain::ExecutePrimitive(GBSymbolIndex index, GBRobot * robot, GBWorl
 		case opArcTangent: NumberToNumberOp(atan); break;
 		case opRandom: temp = Pop(); Push(world->Randoms().InRange(Pop(), temp)); break;
 		case opRandomAngle: Push(world->Randoms().Angle()); break;
-		case opRandomInt: temp = Pop(); Push(world->Randoms().LongInRange(ceil(Pop()), floor(temp))); break;
+		case opRandomInt: temp = Pop(); Push(world->Randoms().IntInRange(ceil(Pop()), floor(temp))); break;
 		case opRandomBoolean: PushBoolean(world->Randoms().Boolean(Pop())); break;
 	// constants
 		case opPi: Push(kPi); break;

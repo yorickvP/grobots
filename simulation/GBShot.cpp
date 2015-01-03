@@ -245,7 +245,7 @@ void GBExplosion::Act(GBWorld * world) {
 		for ( int i = round(max(power * kExplosionSmokesPerPower, kExplosionMinSmokes)); i > 0; i -- )
 			world->AddObjectNew(new GBSmoke(Position() + world->Randoms().Vector(Radius()),
 										world->Randoms().Vector(kSmokeMaxSpeed),
-										world->Randoms().LongInRange(kSmokeMinLifetime, maxLifetime)));
+										world->Randoms().IntInRange(kSmokeMinLifetime, maxLifetime)));
 	}
 }
 

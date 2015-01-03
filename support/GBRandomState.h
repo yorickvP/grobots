@@ -11,14 +11,14 @@
 
 
 class GBRandomState {
-	long seed;
+	int seed;
 public:
 	GBRandomState();
-	GBRandomState(const long newseed);
-	
-	long GenerateLong();
-	short GenerateShort();
-	long LongInRange(const long min, const long max);
+	GBRandomState(const unsigned int newseed);
+private:
+	unsigned int Generate();
+public:
+	int IntInRange(const int min, const int max);
 	GBNumber InRange(const GBNumber min, const GBNumber max);
 	float FloatInRange(const float min, const float max);
 	GBAngle Angle();
@@ -26,10 +26,7 @@ public:
 	GBColor Color();
 	GBColor ColorNear(const GBColor & old, float dist);
 	bool Boolean(const GBNumber probability);
-	bool Boolean(const long num, const long denom);
-	
-	long GetSeed() const;
-	void SetSeed(const long newseed);
+	bool Boolean(const int num, const int denom);
 };
 
 extern GBRandomState gRandoms;

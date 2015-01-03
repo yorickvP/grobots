@@ -568,7 +568,7 @@ void GBGrenadesState::Act(GBRobot * robot, GBWorld * world) {
 			for ( GBEnergy en = FiringCost() * effectiveness; en >= kGrenadesFiringCostPerSmoke; en -= kGrenadesFiringCostPerSmoke ) {
 				GBObject * smoke = new GBSmoke(robot->Position().AddPolar(robot->Radius(), direction),
 					world->Randoms().Vector(kSmokeMaxSpeed),
-					world->Randoms().LongInRange(kSmokeMinLifetime, kSmokeMaxLifetime));
+					world->Randoms().IntInRange(kSmokeMinLifetime, kSmokeMaxLifetime));
 				world->AddObjectNew(smoke);
 			}
 			cooldown = ReloadTime();

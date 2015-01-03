@@ -109,7 +109,7 @@ void GBWorld::PickSeedPositions(GBPosition * positions, long numSeeds) {
 		//the above algorithm is not uniform, in that the first element may have different typical location than the last
 		//to fix this, permute randomly (Knuth Vol 2 page 125)
 		for ( long j = numSeeds - 1; j > 0; j-- ) {  //iteration with j==0 is nop, so skip it
-			long i = Randoms().LongInRange(0, j);
+			long i = Randoms().IntInRange(0, j);
 			GBPosition temp = positions[i];
 			positions[i] = positions[j];
 			positions[j] = temp;
