@@ -24,7 +24,7 @@ GBObject::GBObject(const GBPosition & where, const GBDistance r)
 {}
 
 GBObject::GBObject(const GBPosition & where, const GBDistance r, const GBVelocity & vel)
-	: position(where), velocity(), radius(r), mass(0),
+	: position(where), velocity(vel), radius(r), mass(0),
 	next(nil)
 {}
 
