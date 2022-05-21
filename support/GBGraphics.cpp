@@ -70,15 +70,21 @@ GBGraphics::~GBGraphics() {}
 void GBGraphics::DrawLine(short x1, short y1, short x2, short y2,
 		const GBColor & color, short thickness) {
 	if (renderer == nil) return;
-	lineRGBA(renderer, x1, y1, x2, y2, color.Red() * 255, color.Green() * 255, color.Blue() * 255, 255);
+	thickLineRGBA(renderer, x1, y1, x2, y2, thickness, color.Red() * 255, color.Green() * 255, color.Blue() * 255, 255);
 }
 void GBGraphics::DrawSolidRect(const GBRect & where, const GBColor & color) {
 	if (renderer == nil) return;
-	boxRGBA(renderer, where.left, where.top, where.right, where.bottom, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+  SDL_Rect r1;
+  where.ToRect(r1);
+  SDL_SetRenderDrawColor(renderer, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+  SDL_RenderFillRect(renderer, &r1);
 }
 void GBGraphics::DrawOpenRect(const GBRect & where, const GBColor & color, short thickness) {
 	if (renderer == nil) return;
-	rectangleRGBA(renderer, where.left, where.top, where.right, where.bottom, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+  SDL_Rect r1;
+  where.ToRect(r1);
+  SDL_SetRenderDrawColor(renderer, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+  SDL_RenderDrawRect(renderer, &r1);
 }
 void GBGraphics::DrawSolidOval(const GBRect & r, const GBColor & color) {
 	if (renderer == nil) return;
