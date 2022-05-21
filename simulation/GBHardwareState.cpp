@@ -198,13 +198,14 @@ GBSensorResult & GBSensorResult::operator=(const GBSensorResult & other) {
 	return *this;
 }
 
-GBSensorResult::GBSensorResult() : where(), vel(), radius(0), mass(0), energy(0),
-	dist(), side(nil), type(0), ID(0), shieldFraction(1), bomb(0), reloading(false), flag(0) {}
+GBSensorResult::GBSensorResult() : where(), vel(), dist(), radius(0), mass(0), energy(0),
+	side(nil), type(0), ID(0), shieldFraction(1), bomb(0), reloading(false), flag(0) {}
 
 GBSensorResult::GBSensorResult(const GBObject * obj, const GBDistance dis)
 	: where(obj->Position()), vel(obj->Velocity()), dist(dis),
-	side(obj->Owner()), radius(obj->Radius()),
-	mass(obj->Mass()), energy(obj->Energy()), type(nil), ID(0),
+    radius(obj->Radius()), mass(obj->Mass()),
+    energy(obj->Energy()), side(obj->Owner()),
+    type(nil), ID(0),
 	shieldFraction(1), bomb(0), reloading(false), flag(0)
 {
 	const GBRobot * rob = dynamic_cast<const GBRobot *>(obj);
@@ -226,9 +227,9 @@ GBSensorResult::GBSensorResult(const GBObject * obj, const GBDistance dis)
 }
 
 GBSensorState::GBSensorState(GBSensorSpec * spc)
-	: spec(spc),
+	: spec(spc), owner(nil),
 	firing(false), distance(0), direction(), seesFriendly(spc->Seen() == ocFood), seesEnemy(true),
-	time(-1), found(0), currentResult(0), results(nil), whereOverall(), owner(nil)
+	time(-1), found(0), currentResult(0), results(nil), whereOverall()
 {
 	results = new GBSensorResult[MaxResults()];
 	if ( ! results )

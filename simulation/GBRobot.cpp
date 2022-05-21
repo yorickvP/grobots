@@ -42,8 +42,8 @@ GBRobot::GBRobot(GBRobotType * rtype, const GBPosition & where)
 	type(rtype),
 	brain(rtype->MakeBrain()),
 	id(rtype->Side()->GetNewRobotNumber()), parent(0),
-	lastHit(nil), recentDamage(0),
-	friendlyCollisions(0), enemyCollisions(0), foodCollisions(0), shotCollisions(0), wallCollisions(0),
+  lastHit(nil), recentDamage(0),
+  friendlyCollisions(0), enemyCollisions(0), shotCollisions(0), foodCollisions(0), wallCollisions(0),
 	hardware(&rtype->Hardware()),
 	dead(false),
 	flag(0)
@@ -58,8 +58,8 @@ GBRobot::GBRobot(GBRobotType * rtype, const GBPosition & where, const GBVelocity
 	type(rtype),
 	brain(rtype->MakeBrain()),
 	id(rtype->Side()->GetNewRobotNumber()), parent(parentID),
-	lastHit(nil), recentDamage(0),
-	friendlyCollisions(0), enemyCollisions(0), foodCollisions(0), shotCollisions(0), wallCollisions(0),
+  lastHit(nil), recentDamage(0),
+  friendlyCollisions(0), enemyCollisions(0), shotCollisions(0), foodCollisions(0), wallCollisions(0),
 	hardware(&rtype->Hardware()),
 	dead(false),
 	flag(0)

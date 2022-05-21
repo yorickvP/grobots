@@ -410,8 +410,9 @@ SDL_Surface* CreateCompatibleRGBSurface(Uint32 flags, short width, short height,
 	return SDL_CreateRGBSurface(flags, width, height, fmt.BitsPerPixel, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask);
 }
 GBBitmap::GBBitmap(short width, short height, GBGraphics &g)
-	: bounds(0, 0, width, height),
-	surf(g.surf ? CreateCompatibleRGBSurface(SDL_SWSURFACE, width, height, g.surf) : nil), graphics(surf, g.font_mgr)
+	: 
+	surf(g.surf ? CreateCompatibleRGBSurface(SDL_SWSURFACE, width, height, g.surf) : nil),
+  bounds(0, 0, width, height), graphics(surf, g.font_mgr)
 {}
 
 GBBitmap::~GBBitmap() { if (surf) SDL_FreeSurface(surf); }

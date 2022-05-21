@@ -82,8 +82,7 @@ void GBRobotTypeView::DrawHardwareSummaryLine(const GBRect & box, short base,
 
 GBRobotTypeView::GBRobotTypeView(const GBWorld & targ)
 	: GBListView(),
-	world(targ),
-	lastSideDrawn(nil), typeID(-1), lastDrawn(-1)
+	world(targ), lastDrawn(-1), lastSideDrawn(nil), typeID(-1)
 {}
 
 GBRobotTypeView::~GBRobotTypeView() {}

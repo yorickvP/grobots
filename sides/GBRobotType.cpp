@@ -15,11 +15,12 @@ GBRobotType::GBRobotType() {
 
 GBRobotType::GBRobotType(GBSide * owner)
 	: side(owner),
-	id(0),
-	color(), name(),
-	decoration(rdNone), decorationColor(GBColor::black),
-	hardware(), brain(nil),
-	population(0), biomass(0)
+  name(),
+  id(0),
+  color(),
+  decoration(rdNone), decorationColor(GBColor::black),
+  hardware(), brain(nil),
+  population(0), biomass(0)
 {}
 
 GBRobotType::~GBRobotType() {

@@ -75,15 +75,15 @@ public:
 	GBPosition where;
 	GBVelocity vel;
 	GBDistance dist;
-	const GBSide * side;
 	GBDistance radius;
 	GBMass mass;
 	GBEnergy energy;
+	const GBSide * side;
+	long type;
+	long ID;
 	GBNumber shieldFraction;
 	GBNumber bomb;
 	bool reloading;
-	long type;
-	long ID;
 	GBNumber flag;
 	
 	GBSensorResult & operator=(const GBSensorResult & other);

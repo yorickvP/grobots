@@ -19,22 +19,22 @@ GBObject::GBObject() {
 }
 
 GBObject::GBObject(const GBPosition & where, const GBDistance r)
-	: position(where), radius(r), velocity(), mass(0),
+	: position(where), velocity(), radius(r), mass(0),
 	next(nil)
 {}
 
 GBObject::GBObject(const GBPosition & where, const GBDistance r, const GBVelocity & vel)
-	: position(where), radius(r), velocity(vel), mass(0),
+	: position(where), velocity(), radius(r), mass(0),
 	next(nil)
 {}
 
 GBObject::GBObject(const GBPosition & where, const GBDistance r, const GBMass m)
-	: position(where), radius(r), velocity(), mass(m),
+	: position(where), velocity(), radius(r), mass(m),
 	next(nil)
 {}
 
 GBObject::GBObject(const GBPosition & where, const GBDistance r, const GBVelocity & vel, const GBMass m)
-	: position(where), radius(r), velocity(vel), mass(m),
+	: position(where), velocity(vel), radius(r), mass(m),
 	next(nil)
 {}
 

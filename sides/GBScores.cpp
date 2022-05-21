@@ -119,14 +119,15 @@ GBExpenditureStatistics & GBExpenditureStatistics::operator +=(const GBExpenditu
 // GBScores //
 
 GBScores::GBScores()
-	: rounds(0), sides(0), survived(0), sterile(0), earlyDeaths(0), elimination(0),
+	: sides(0), rounds(0), survived(0), sterile(0), earlyDeaths(0), elimination(0),
 	population(0), populationEver(0),
 	biomass(0), earlyBiomass(0),
 	constructor(0), economyHardware(0), combatHardware(0), totalHardware(0),
 	territory(0),
-	dead(0), killed(0), suicide(0),
+  seeded(0),
+	income(), expenditure(),
+  dead(0), killed(0), suicide(0),
 	damageDone(0), damageTaken(0), friendlyFire(0),
-	income(), expenditure(), seeded(0),
 	biomassFraction(0.0), earlyBiomassFraction(0.0),
 	killedFraction(0.0),
 	biomassFractionSquared(0.0)

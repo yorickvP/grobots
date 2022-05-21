@@ -133,22 +133,23 @@ void GBWorld::AddInitialManna() {
 GBWorld::GBWorld()
 	: GBObjectWorld(),
 	sides(), selectedSide(nil),
-	roundScores(), tournamentScores(),
 	currentFrame(0),
+	previousSidesAlive(0),
+	sidesSeeded(0),
+	random(),
 	followed(nil),
 	mannaLeft(0),
-	random(),
+	mannas(0), corpses(0),
+  mannaValue(0), corpseValue(0), robotValue(0),
+	roundScores(), tournamentScores(),
+
 	running(false),
-	stopOnElimination(true), timeLimit(kDefaultTimeLimit),
+	timeLimit(kDefaultTimeLimit), stopOnElimination(true),
 	tournament(false), tournamentLength(-1),
 	reportErrors(true), reportPrints(false),
 	seedLimit(10), autoReseed(false),
 	mannaSize(kDefaultMannaSize), mannaDensity(kDefaultMannaDensity), mannaRate(kDefaultMannaRate),
-	seedValue(kDefaultSeedValue), seedTypePenalty(kDefaultSeedTypePenalty),
-	previousSidesAlive(0),
-	sidesSeeded(0),
-	mannas(0), corpses(0),
-	mannaValue(0), corpseValue(0), robotValue(0)
+	seedValue(kDefaultSeedValue), seedTypePenalty(kDefaultSeedTypePenalty)
 {
 	AddInitialManna();
 #if GBWORLD_PROFILING && MAC

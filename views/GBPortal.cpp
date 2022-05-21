@@ -167,13 +167,13 @@ GBPortal::GBPortal(GBWorld & newWorld)
 	: world(newWorld),
 	viewpoint(newWorld.Size() / 2), scale(kScale),
 	defaultwidth(400), defaultheight(400),
-	following(false), followPosition(newWorld.Size() / 2), moving(nil),
-	autofollow(false), lastFollow(0),
-	tool(ptScroll),
-	showSensors(false), showDecorations(true), showDetails(true), showSideNames(true),
+  following(false), followPosition(newWorld.Size() / 2), lastFollow(0), moving(nil),
 	worldChanges(-1), selfChanges(-1),
 	lastx(0), lasty(0), lastClick(), lastFrame(newWorld.CurrentFrame()),
-	background(nil)
+  background(nil),
+	autofollow(false),
+	tool(ptScroll),
+	showSensors(false), showDecorations(true), showDetails(true), showSideNames(true)
 {}
 
 GBPortal::~GBPortal() {
