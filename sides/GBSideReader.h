@@ -55,7 +55,7 @@ class GBSideReader {
 	GBElementType state; // what we're in
 	string line; // current line
 	int lineno; // current line number
-	int pos; // where in the line
+	unsigned int pos; // where in the line
 // reading
 	void ProcessLine();
 	void ProcessTag(GBElementType element); // process a tag line

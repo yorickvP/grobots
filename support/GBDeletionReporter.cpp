@@ -23,7 +23,7 @@ GBDeletionReporter::~GBDeletionReporter() {
 }
 
 void GBDeletionReporter::AddDeletionListener(GBDeletionListener * newDL) {
-	int n = listeners ? listeners->size() : 0;
+	unsigned int n = listeners ? listeners->size() : 0;
 	if ( ! listeners )
 		listeners = new std::list<GBDeletionListener *>();
 	if ( find(listeners->begin(), listeners->end(), newDL) != listeners->end() )

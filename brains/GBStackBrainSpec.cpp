@@ -390,7 +390,7 @@ void GBStackBrainSpec::AddVectorVariable(const string & name, GBVector value) {
 }
 
 void GBStackBrainSpec::AddLabel(const string & name) {
-	for ( int i = 0; i < labels.size(); i ++ )
+	for ( uint i = 0; i < labels.size(); i ++ )
 		if ( labels[i].NameEquivalent(name) ) {
 			if ( labels[i].address < 0 ) {
 				labels[i].address = code.size();
@@ -406,63 +406,63 @@ void GBStackBrainSpec::AddForwardLabel(const string & name) {
 }
 
 GBSymbolIndex GBStackBrainSpec::LookupPrimitive(const string & name) const {
-	for ( int i = 0; i < kNumPrimitives; i ++ )
+	for ( uint i = 0; i < kNumPrimitives; i ++ )
 		if ( NamesEquivalent(primitiveNames[i], name) )
 			return i;
 	return -1;
 }
 
 GBSymbolIndex GBStackBrainSpec::LookupCWord(const string & name) const {
-	for ( int i = 0; i < kNumCWords; i ++ )
+	for ( uint i = 0; i < kNumCWords; i ++ )
 		if ( NamesEquivalent(cWordNames[i], name) )
 			return i;
 	return -1;
 }
 
 GBSymbolIndex GBStackBrainSpec::LookupHardwareVariable(const string & name) const {
-	for ( int i = 0; i < kNumHardwareVariables; i ++ )
+	for ( uint i = 0; i < kNumHardwareVariables; i ++ )
 		if ( NamesEquivalent(hardwareVariableNames[i], name) )
 			return i;
 	return -1;
 }
 
 GBSymbolIndex GBStackBrainSpec::LookupHardwareVector(const string & name) const {
-	for ( int i = 0; i < kNumHardwareVectors; i ++ )
+	for ( uint i = 0; i < kNumHardwareVectors; i ++ )
 		if ( NamesEquivalent(hardwareVectorNames[i], name) )
 			return i;
 	return -1;
 }
 
 GBSymbolIndex GBStackBrainSpec::LookupConstant(const string & name) const {
-	for ( int i = 0; i < constants.size(); i ++ )
+	for ( uint i = 0; i < constants.size(); i ++ )
 		if ( constants[i].NameEquivalent(name) )
 			return i;
 	return -1;
 }
 
 GBSymbolIndex GBStackBrainSpec::LookupVariable(const string & name) const {
-	for ( int i = 0; i < variables.size(); i ++ )
+	for ( uint i = 0; i < variables.size(); i ++ )
 		if ( variables[i].NameEquivalent(name) )
 			return i;
 	return -1;
 }
 
 GBSymbolIndex GBStackBrainSpec::LookupVectorVariable(const string & name) const {
-	for ( int i = 0; i < vectorVariables.size(); i ++ )
+	for ( uint i = 0; i < vectorVariables.size(); i ++ )
 		if ( vectorVariables[i].NameEquivalent(name) )
 			return i;
 	return -1;
 }
 
 GBSymbolIndex GBStackBrainSpec::LookupLabel(const string & name) const {
-	for ( int i = 0; i < labels.size(); i ++ )
+	for ( uint i = 0; i < labels.size(); i ++ )
 		if ( ! labels[i].gensym && labels[i].NameEquivalent(name) )
 			return i;
 	return -1;
 }
 
 GBSymbolIndex GBStackBrainSpec::LabelReferenced(const string & name) {
-	for ( int i = 0; i < labels.size(); i ++ )
+	for ( uint i = 0; i < labels.size(); i ++ )
 		if ( labels[i].NameEquivalent(name) )
 			return i;
 	AddForwardLabel(name);
@@ -591,7 +591,7 @@ void GBStackBrainSpec::ParseToken(const string & token, GBLineNumber lineNum) {
 
 void GBStackBrainSpec::ParseLine(const string & line, GBLineNumber lineNum) {
 	string token;
-	int cur = 0;
+	unsigned int cur = 0;
 	while ( ExtractToken(token, line, cur) )
 		ParseToken(token, lineNum);
 }

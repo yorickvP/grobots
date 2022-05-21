@@ -40,8 +40,8 @@ public:
 private:
 	void WriteVariable(const GBSymbolIndex index, const GBStackDatum value);
 	void WriteVectorVariable(const GBSymbolIndex index, const GBVector value);
-	GBStackDatum ReadHardware(const long index, GBRobot * robot, GBWorld * world) const;
-	void WriteHardware(const long index, const GBStackDatum value, GBRobot * robot, GBWorld * world);
+	GBStackDatum ReadHardware(const GBSymbolIndex index, GBRobot * robot, GBWorld * world) const;
+	void WriteHardware(const GBSymbolIndex index, const GBStackDatum value, GBRobot * robot, GBWorld * world);
 	GBVector ReadHardwareVector(const long index, GBRobot * robot, GBWorld * world) const;
 	void WriteHardwareVector(const long index, const GBVector value, GBRobot * robot, GBWorld * world);
 // executing instructions

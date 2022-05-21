@@ -31,7 +31,7 @@ string ToString(int n) {
 	return ToString((long)n);
 }
 
-string ToString(GBNumber n, int digitsAfterDP, bool trailingZeroes) {
+string ToString(GBNumber n, unsigned int digitsAfterDP, bool trailingZeroes) {
 	long scale = 1;
 	for ( int i = digitsAfterDP; i > 0; i -- ) scale *= 10;
 	long actual = floor(abs(n)) * scale + round(fpart(abs(n)) * scale);
@@ -49,29 +49,29 @@ string ToString(GBNumber n, int digitsAfterDP, bool trailingZeroes) {
 	return result;
 }
 
-string ToString(const GBFinePoint & v, int digitsAfterDP, bool trailingZeroes) {
+string ToString(const GBFinePoint & v, unsigned int digitsAfterDP, bool trailingZeroes) {
 	return string("<") + ToString(v.x, digitsAfterDP, trailingZeroes) + ", "
 		+ ToString(v.y, digitsAfterDP, trailingZeroes) + '>';
 }
 
-string ToPercentString(float f, int digitsAfterDP, bool trailingZeroes) {
+string ToPercentString(float f, unsigned int digitsAfterDP, bool trailingZeroes) {
 	return ToString(f * 100.0, digitsAfterDP, trailingZeroes) + '%';
 }
 
 #if USE_GBNUMBER
-string ToPercentString(GBNumber n, int digitsAfterDP, bool trailingZeroes) {
+string ToPercentString(GBNumber n, unsigned int digitsAfterDP, bool trailingZeroes) {
 	return ToString(n * 100, digitsAfterDP, trailingZeroes) + '%';
 }
 #endif
 
-string ToPercentString(long num, long denom, int digitsAfterDP, bool trailingZeroes) {
+string ToPercentString(long num, long denom, unsigned int digitsAfterDP, bool trailingZeroes) {
 	return ToString((float)num / denom * 100, digitsAfterDP, trailingZeroes) + '%';
 }
 
 bool NamesEquivalent(const string & a, const string & b) {
 	if ( a.length() != b.length() )
 		return false;
-	for ( int i = 0; i < a.length(); i ++ )
+	for ( unsigned int i = 0; i < a.length(); i ++ )
 		if ( tolower(a[i]) != tolower(b[i]) )
 			return false;
 	return true;
@@ -94,9 +94,9 @@ float HexDigitsIntensity(char d1, char d2) {
 // return whether this is an integer
 bool ParseInteger(const string & token, long & number) {
 	bool negated = false;
-	short digits = 0; // how many digits have been processed
+	unsigned short digits = 0; // how many digits have been processed
 	number = 0;
-	for ( short i = 0; i < token.length(); ++ i ) {
+	for ( unsigned short i = 0; i < token.length(); ++ i ) {
 		switch ( token[i] ) {
 			case '+':
 				if ( i > 0 ) return false;
@@ -125,7 +125,7 @@ bool ParseNumber(const string & token, GBNumber & number) {
 	short decimal = 0; // how many digits past the radix point the next digit is
 	short digits = 0; // how many digits have been processed
 	number = 0;
-	for ( short i = 0; i < token.length(); ++ i ) {
+	for ( unsigned short i = 0; i < token.length(); ++ i ) {
 		switch ( token[i] ) {
 			case '+':
 				if ( i > 0 ) return false;
@@ -166,7 +166,7 @@ bool ParseNumber(const string & token, GBNumber & number) {
 bool ParseColor(const string & token, GBColor & color) {
 // could do named colors, but not urgent
 // check digits
-	for ( int i = 0; i < token.length(); i ++ )
+	for ( unsigned int i = 0; i < token.length(); i ++ )
 		if ( ! isxdigit((unsigned char)token[i]) )
 			return false;
 // check length
@@ -186,7 +186,7 @@ bool ParseColor(const string & token, GBColor & color) {
 
 // copy the next token in line after cur into token. Advance cur.
 // Recognise semicolon comments. Return whether a token was found.
-bool ExtractToken(string & token, const string & line, int & cur) {
+bool ExtractToken(string & token, const string & line, unsigned int & cur) {
 	bool intoken = false;
 	while ( cur < line.length() && line[cur] != ';' ) {
 		if ( isspace((unsigned char)line[cur]) ) {
@@ -207,7 +207,7 @@ bool ExtractToken(string & token, const string & line, int & cur) {
 // skip whitespace, then copy the rest of line after cur into token. Advance cur.
 // Recognise semicolon comments. Return whether any non-whitespace was found.
 // Minor bug: currently leaves trailing whitespace in.
-bool ExtractRest(string & rest, const string & line, int & cur) {
+bool ExtractRest(string & rest, const string & line, unsigned int & cur) {
 	bool intoken = false;
 	while ( cur < line.length() && line[cur] != ';' && line[cur] != '\r' && line[cur] != '\n' ) {
 		if ( intoken || ! isspace((unsigned char)line[cur]) ) {
