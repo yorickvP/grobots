@@ -10,5 +10,13 @@
       };
 
     devShells.x86_64-linux.default = self.packages.x86_64-linux.default;
+    devShells.x86_64-linux.emcc = with nixpkgs.legacyPackages.x86_64-linux; mkShell {
+      shellHook = ''
+        export EM_PORTS=$PWD/test
+        export EM_CACHE=$PWD/cache
+      '';
+      inputsFrom = [self.packages.x86_64-linux.default];
+      nativeBuildInputs = [ emscripten ];
+    };
   };
 }

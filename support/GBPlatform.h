@@ -31,6 +31,8 @@
 	#if defined _MFC_VER // Microsoft Foundation Classes
 		#define MFCWIN 1
 	#endif
+#elif defined __EMSCRIPTEN__
+  #define LINUX 1
 #else
 	#warning "Can't tell what compiler is being used."
 #endif

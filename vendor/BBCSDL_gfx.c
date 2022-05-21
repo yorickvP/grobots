@@ -34,7 +34,7 @@ Richard Russell -- richard at rtrussell dot co dot uk
 #include <math.h>
 #include <string.h>
 
-#include "SDL2_gfxPrimitives.h"
+#include "SDL2/SDL2_gfxPrimitives.h"
 
 // SDL_RenderDrawLine() is documented as including both end points, but this isn't
 // reliable in Linux so use SDL_RenderDrawPoints() instead, despite being slower.

@@ -65,6 +65,8 @@ public:
 	void OpenScores();
 	void OpenTypeWindow();
 	void OpenTournament();
+
+  static void mainloop(void* arg);
 };
 
 

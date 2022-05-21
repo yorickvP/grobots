@@ -21,6 +21,9 @@
 #include "GBMenu.h"
 #include <sstream>
 #include <vector>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 const short kClickRange = 5;
 const GBMilliseconds kSlowerSpeedLimit = 500;
@@ -36,8 +39,12 @@ const GBMilliseconds kMaxEventInterval = 50;
 GBSDLApplication::GBSDLApplication() 
 	: alive(true), clicks(0), clickx(0), clicky(0), stepPeriod(-1), lastStep(0), fontmanager(),
     dragging(nil), world(), focus(nil), windows() {
+  // TODO: find out which parts to init
+#ifndef __EMSCRIPTEN__
 	if (SDL_Init(SDL_INIT_EVERYTHING) == -1) FatalError("Unable to init SDL");
-	//SDL_EnableUNICODE(SDL_ENABLE);
+#else
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) == -1) FatalError("Unable to init SDL");
+#endif
 	atexit(SDL_Quit);
 	SDL_initFramerate(&stepManager);
 	SetStepPeriod(kNormalSpeedLimit);
@@ -46,7 +53,9 @@ GBSDLApplication::GBSDLApplication()
 	GBView * mainView = portal;
 
 	mainWnd = new GBSDLWindow(mainView, 0, 0, true, this, true, &fontmanager);
+#ifndef __EMSCRIPTEN__
 	windows.push_back(new GBSDLWindow(new GBMenuView(world, *this), 0, 0, true, this, false, &fontmanager));
+#endif
 	focus = mainWnd;
 	windows.push_back(mainWnd);
 	//windows.push_back(menuWnd);
@@ -67,24 +76,33 @@ GBSDLApplication::~GBSDLApplication() {
 	}
 }
 
+void GBSDLApplication::mainloop(void* arg) {
+  GBSDLApplication *app = static_cast<GBSDLApplication*>(arg);
+  app->Process();
+  app->Redraw();
+	SDL_Event event;
+  while (app->alive && SDL_PollEvent(&event)) {
+    switch(event.type) {
+    case SDL_QUIT:
+      app->Quit();
+      return;
+      break;
+    default:
+      app->HandleEvent(&event);
+    }
+  }
+}
+
 void GBSDLApplication::Run() {
 	SDL_Event event;
+  #if __EMSCRIPTEN__
+  emscripten_set_main_loop_arg(GBSDLApplication::mainloop, this, -1, 1);
+  #else
 	do {
-		Process();
-		Redraw();
-		while (alive && SDL_PollEvent(&event)) {
-			switch(event.type) {
-				case SDL_QUIT:
-					Quit();
-					return;
-					break;
-				default:
-					HandleEvent(&event);
-			}
-			//Redraw();
-		}
+    GBSDLApplication::mainloop(this);
 		SDL_framerateDelay(&stepManager);
 	} while (alive);
+  #endif
 }
 
 void GBSDLApplication::SetStepPeriod(int period) {
