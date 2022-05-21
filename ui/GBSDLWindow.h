@@ -14,7 +14,7 @@ class GBSDLWindow {
 	bool visible;
 	GBGraphics * graphics;
 	SDL_Window* sdlwindow;
-	SDL_Surface* surf;
+  SDL_Renderer* renderer;
 	
 	GBRect bounds;
 	

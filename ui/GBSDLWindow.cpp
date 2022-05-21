@@ -13,9 +13,9 @@ GBSDLWindow::GBSDLWindow(GBView * contents, int x, int y, bool vis, GBSDLApplica
 {
     sdlwindow = SDL_CreateWindow(contents->Name().c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                             contents->PreferredWidth(), contents->PreferredHeight(), 
-                                            SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-    surf = SDL_GetWindowSurface(sdlwindow);
-    graphics = new GBGraphics(surf, fontmgr);
+                                 SDL_WINDOW_SHOWN | (contents->Resizable() ? SDL_WINDOW_RESIZABLE : 0));
+    renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
+    graphics = new GBGraphics(renderer, fontmgr);
 	view->SetGraphics(graphics);
 	view->SetSize(view->PreferredWidth(), view->PreferredHeight());
 	windowid = SDL_GetWindowID(sdlwindow);
@@ -31,14 +31,14 @@ GBSDLWindow::~GBSDLWindow() {
 
 void GBSDLWindow::Update(bool) {
 	view->DoDraw();
-	SDL_UpdateWindowSurface(sdlwindow);
+  SDL_RenderPresent(renderer);
 }
 
 bool GBSDLWindow::DrawChanges(bool running) {
 	bool redrawn = visible && view->NeedsRedraw(running);
 	if (redrawn) {
 		view->DoDraw();
-		SDL_UpdateWindowSurface(sdlwindow);
+    SDL_RenderPresent(renderer);
 	}
 	if ( !isMain && visible && view->NeedsResize() ) {
 		redrawn = true;
@@ -58,9 +58,9 @@ void GBSDLWindow::SetSize(short width, short height) {
 	bounds.right = width;
 	bounds.bottom = height;
 	view->SetBounds(bounds);
-	SDL_SetWindowSize(sdlwindow, width, height);
-    surf = SDL_GetWindowSurface(sdlwindow);
-    graphics->setSurface(surf);
+  if (view->NeedsResize()) {
+    SDL_SetWindowSize(sdlwindow, view->PreferredWidth(), view->PreferredHeight());
+  }
 	this->Update(false);
 }
 

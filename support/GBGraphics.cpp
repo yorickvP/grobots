@@ -64,15 +64,9 @@ void GBRect::ToRect(RECT & r) const {
 
 // GBGraphics //
 #ifdef WITH_SDL
-GBGraphics::GBGraphics(SDL_Surface * surf, GBFontManager* font_mgr) : surf(surf), font_mgr(font_mgr) {
-  this->renderer = SDL_CreateSoftwareRenderer(surf);
+GBGraphics::GBGraphics(SDL_Renderer * renderer, GBFontManager* font_mgr) : renderer(renderer), font_mgr(font_mgr) {
 };
 GBGraphics::~GBGraphics() {}
-void GBGraphics::setSurface(SDL_Surface* surf) {
-  if (renderer) SDL_DestroyRenderer(renderer);
-  this->surf = surf;
-  this->renderer = SDL_CreateSoftwareRenderer(surf);
-}
 void GBGraphics::DrawLine(short x1, short y1, short x2, short y2,
 		const GBColor & color, short thickness) {
 	if (renderer == nil) return;
@@ -112,7 +106,9 @@ void GBGraphics::DrawStringLeft(const string & str, short x, short y,
 	destrect.w = text->w;
 	destrect.h = text->h;
 	destrect.y -= text->h;
-	SDL_BlitSurface(text, nil, surf, &destrect);
+  SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, text);
+  SDL_RenderCopy(renderer, t, nil, &destrect);
+  SDL_DestroyTexture(t);
 	SDL_FreeSurface(text);
 	//stringRGBA(renderer, x, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
@@ -125,7 +121,9 @@ void GBGraphics::DrawStringCentered(const string & str, short x, short y,
 	destrect.h = text->h;
 	destrect.x -= text->w / 2;
 	destrect.y -= text->h;
-	SDL_BlitSurface(text, nil, surf, &destrect);
+  SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, text);
+  SDL_RenderCopy(renderer, t, nil, &destrect);
+  SDL_DestroyTexture(t);
 	SDL_FreeSurface(text);
 	//stringRGBA(renderer, x - (str.length() * 4), y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
@@ -138,7 +136,9 @@ void GBGraphics::DrawStringRight(const string & str, short x, short y,
 	destrect.h = text->h;
 	destrect.x -= text->w;
 	destrect.y -= text->h;
-	SDL_BlitSurface(text, nil, surf, &destrect);
+  SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, text);
+  SDL_RenderCopy(renderer, t, nil, &destrect);
+  SDL_DestroyTexture(t);
 	SDL_FreeSurface(text);
 	//stringRGBA(renderer, x - str.length() * 8, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
@@ -146,7 +146,8 @@ void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect
 	SDL_Rect r1, r2;
 	srcRect.ToRect(r1);
 	destRect.ToRect(r2);
-	SDL_BlitSurface(src.surf, &r1, surf, &r2);
+
+  SDL_RenderCopy(renderer, src.texture, &r1, &r2);
 }
 #elif HEADLESS
 GBGraphics::GBGraphics() {}
@@ -405,20 +406,39 @@ const GBGraphics & GBBitmap::Graphics() const {
 	return graphics;}
 	
 #ifdef WITH_SDL
-SDL_Surface* CreateCompatibleRGBSurface(Uint32 flags, short width, short height, SDL_Surface* source) {
-	const SDL_PixelFormat& fmt = *(source->format);
-	return SDL_CreateRGBSurface(flags, width, height, fmt.BitsPerPixel, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask);
+SDL_Surface* CreateCompatibleRGBSurface(Uint32 flags, short width, short height) {
+    Uint32 rmask, gmask, bmask, amask;
+    /* SDL interprets each pixel as a 32-bit number, so our masks must depend
+       on the endianness (byte order) of the machine */
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    rmask = 0xff000000;
+    gmask = 0x00ff0000;
+    bmask = 0x0000ff00;
+    amask = 0x000000ff;
+#else
+    rmask = 0x000000ff;
+    gmask = 0x0000ff00;
+    bmask = 0x00ff0000;
+    amask = 0xff000000;
+#endif
+    //const SDL_PixelFormat& fmt = *(source->format);
+	return SDL_CreateRGBSurface(flags, width, height, 32, rmask, gmask, bmask, amask);
 }
 GBBitmap::GBBitmap(short width, short height, GBGraphics &g)
-	: 
-	surf(g.surf ? CreateCompatibleRGBSurface(SDL_SWSURFACE, width, height, g.surf) : nil),
-  bounds(0, 0, width, height), graphics(surf, g.font_mgr)
+	: // todo: getwindowpixelformat
+  texture(SDL_CreateTexture(g.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height)),
+  renderer(g.renderer),
+  bounds(0, 0, width, height), graphics(renderer, g.font_mgr)
 {}
 
-GBBitmap::~GBBitmap() { if (surf) SDL_FreeSurface(surf); }
+GBBitmap::~GBBitmap() { SDL_DestroyTexture(texture); }
 
-void GBBitmap::StartDrawing() {}
-void GBBitmap::StopDrawing() {}
+void GBBitmap::StartDrawing() {
+  SDL_SetRenderTarget(renderer, texture);
+}
+void GBBitmap::StopDrawing() {
+  SDL_SetRenderTarget(renderer, nil);
+}
 
 #elif HEADLESS
 GBBitmap::GBBitmap(short width, short height, GBGraphics &g)

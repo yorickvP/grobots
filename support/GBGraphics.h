@@ -52,12 +52,10 @@ class GBBitmap;
 
 class GBGraphics {
 #ifdef WITH_SDL
-	SDL_Surface* surf;
-	GBFontManager* font_mgr;
   SDL_Renderer* renderer;
+	GBFontManager* font_mgr;
 public:
-	GBGraphics(SDL_Surface * surf, GBFontManager * font_mgr);
-	void setSurface(SDL_Surface* surf);
+	GBGraphics(SDL_Renderer * renderer, GBFontManager * font_mgr);
 	friend class GBBitmap;
 #elif HEADLESS
 public:
@@ -108,7 +106,8 @@ public:
 class GBBitmap {
 private:
 #ifdef WITH_SDL
-	SDL_Surface* surf;
+  SDL_Texture* texture;
+  SDL_Renderer* renderer;
 	friend class GBGraphics;
 #elif HEADLESS
 #elif MAC
