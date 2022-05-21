@@ -1,5 +1,6 @@
 // GBFontManager.cpp
 
+#ifdef WITH_SDL
 #include "GBFontManager.h"
 #include "GBErrors.h"
 
@@ -41,3 +42,4 @@ SDL_Surface* GBFontManager::renderText_Blended(int ptsize, const char* text, SDL
 	if (textsurface == nil) FatalError("TTF_RenderText_Blended failure: " + string(TTF_GetError()));
 	return textsurface;
 }
+#endif

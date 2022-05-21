@@ -188,9 +188,10 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 				break;
 			case SDL_KEYDOWN:
 				if (focus) {
-					if ((evt->key.keysym.unicode & 0xFF80) == 0) {
-						focus->AcceptKeystroke(evt->key.keysym.unicode & 0x7F);
-					}
+          // FIXME
+					//if ((evt->key.keysym.unicode & 0xFF80) == 0) {
+						//focus->AcceptKeystroke(evt->key.keysym.unicode & 0x7F);
+					//}
 				}
 				break;
 		    case SDL_WINDOWEVENT: {

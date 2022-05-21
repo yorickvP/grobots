@@ -14,7 +14,7 @@
 #include "GBSDLWindow.h"
 #include "GBFontManager.h"
 #include "SDL.h"
-#include "SDL_framerate.h"
+#include "SDL2_framerate.h"
 #include <list>
 
 class GBSDLApplication {

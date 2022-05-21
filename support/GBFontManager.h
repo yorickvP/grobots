@@ -2,7 +2,7 @@
 
 #ifndef _GBFontManager_h
 #define _GBFontManager_h
-
+#ifdef WITH_SDL
 #include "GBPlatform.h"
 
 #include <SDL_ttf.h>
@@ -21,5 +21,5 @@ public:
 	~GBFontManager();
 	SDL_Surface* renderText_Blended(int ptsize, const char* text, SDL_Color fgcol);
 };
-
+#endif
 #endif

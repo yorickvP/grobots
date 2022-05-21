@@ -10,7 +10,7 @@
 
 #ifdef WITH_SDL
   #include <SDL.h>
-  #include <SDL_gfxPrimitives.h>
+  #include <SDL2_gfxPrimitives.h>
   #include "GBFontManager.h"
 #elif HEADLESS
 	//nothing
@@ -54,6 +54,7 @@ class GBGraphics {
 #ifdef WITH_SDL
 	SDL_Surface* surf;
 	GBFontManager* font_mgr;
+  SDL_Renderer* renderer;
 public:
 	GBGraphics(SDL_Surface * surf, GBFontManager * font_mgr);
 	void setSurface(SDL_Surface* surf);
