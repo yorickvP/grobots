@@ -169,6 +169,16 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 					if (focus == wnd) focus = mainWnd;
 				}
 				break;
+    case SDL_MOUSEWHEEL: {
+      GBSDLWindow* wnd = FindWndFromID(evt->wheel.windowID);
+      if (wnd == nil) break;
+      if (evt->wheel.y > 0) {
+        wnd->AcceptKeystroke('+');
+      } else if (evt->wheel.y < 0) {
+        wnd->AcceptKeystroke('-');
+      }
+      // todo: smooth zooming using preciseY
+    } break;
 			case SDL_MOUSEBUTTONUP:
 				if (evt->button.button == SDL_BUTTON_LEFT) {
 					if ( dragging ) {
@@ -187,13 +197,11 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 				break;
 			case SDL_KEYDOWN:
 				if (focus) {
-          // FIXME
-					//if ((evt->key.keysym.unicode & 0xFF80) == 0) {
-						//focus->AcceptKeystroke(evt->key.keysym.unicode & 0x7F);
-					//}
+          // FIXME: deal with modifiers
+          focus->AcceptKeystroke(evt->key.keysym.sym);
 				}
 				break;
-		    case SDL_WINDOWEVENT: {
+    case SDL_WINDOWEVENT: {
 		        GBSDLWindow* wnd = FindWndFromID(evt->window.windowID);
 				if (wnd == nil) break;
 				switch (evt->window.event) {
