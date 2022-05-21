@@ -10,16 +10,19 @@
 
 class GBFontManager {
 	struct GBTTFFont {
+    GBTTFFont(uint8_t ptsize, bool bold);
+    ~GBTTFFont();
 		TTF_Font* font;
-		int ptsize;
+		uint8_t ptsize;
+    bool bold;
 	};
 	std::list<GBTTFFont> fontlist;
-	TTF_Font* loadFont(int ptsize);
-	TTF_Font* findFont(int ptsize);
+	TTF_Font* loadFont(uint8_t ptsize, bool bold);
+	TTF_Font* findFont(uint8_t ptsize, bool bold);
 public:
 	GBFontManager();
 	~GBFontManager();
-	SDL_Surface* renderText_Blended(int ptsize, const char* text, SDL_Color fgcol);
+	SDL_Surface* renderText_Blended(uint8_t ptsize, bool bold, const char* text, SDL_Color fgcol);
 };
 #endif
 #endif
