@@ -28,7 +28,7 @@ GBFontManager::GBTTFFont::~GBTTFFont() {
 }
 
 TTF_Font* GBFontManager::loadFont(uint8_t ptsize, bool bold) {
-	return fontlist.emplace_back(GBTTFFont(ptsize, bold)).font;
+	return fontlist.emplace_back(ptsize, bold).font;
 }
 TTF_Font* GBFontManager::findFont(uint8_t ptsize, bool bold) {
   for (auto const& font : fontlist) {

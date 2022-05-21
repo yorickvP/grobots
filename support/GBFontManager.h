@@ -11,6 +11,7 @@
 class GBFontManager {
 	struct GBTTFFont {
     GBTTFFont(uint8_t ptsize, bool bold);
+    GBTTFFont(GBTTFFont&) = delete;
     ~GBTTFFont();
 		TTF_Font* font;
 		uint8_t ptsize;

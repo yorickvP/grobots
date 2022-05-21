@@ -1,6 +1,6 @@
 project('grobots', 'cpp',
   version : '0.1',
-  default_options : ['warning_level=3', 'cpp_std=c++14'])
+  default_options : ['warning_level=3', 'cpp_std=c++17'])
 
 src = [
   'brains/GBBrain.cpp',
@@ -65,12 +65,12 @@ sdl_gfx = dependency('SDL2_gfx', version : '>=1.0')
 executable('grobots',
            src + ['GBHeadless.cpp'],
            include_directories : ['brains', 'sides', 'simulation', 'support', 'views'],
-           cpp_args: '-DHEADLESS',
+           cpp_args: ['-DHEADLESS', '-Wno-sign-compare'],
            install : true)
 
 executable('grobots_sdl',
            src + ui,
            include_directories : ['brains', 'sides', 'simulation', 'support', 'ui', 'views'],
-           cpp_args: '-DWITH_SDL',
+           cpp_args: ['-DWITH_SDL', '-Wno-sign-compare'],
            dependencies : [sdl, sdl_ttf, sdl_gfx],
            install : true)
