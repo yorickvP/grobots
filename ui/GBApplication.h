@@ -1,3 +1,4 @@
+#ifndef WITH_SDL
 // GBApplication.h
 // Top-level interface class.
 // Grobots (c) 2002-2004 Devon and Warren Schudy
@@ -59,4 +60,5 @@ public:
 	void Quit();
 };
 
+#endif
 #endif

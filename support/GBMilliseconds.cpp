@@ -5,11 +5,17 @@
 #include "GBPlatform.h"
 #include "GBMilliseconds.h"
 
-#if UNIX || WINDOWS
-	#include <time.h>
+#ifdef WITH_SDL
+	#include "SDL.h"
+#elif UNIX || WINDOWS
+  #include <time.h>
 #endif
 
-#if MAC
+#ifdef WITH_SDL
+GBMilliseconds Milliseconds() {
+	return (GBMilliseconds)(SDL_GetTicks());
+}
+#elif MAC
 GBMilliseconds Milliseconds() {
 	return (GBMilliseconds)(TickCount()) * 1000 / 60;
 }

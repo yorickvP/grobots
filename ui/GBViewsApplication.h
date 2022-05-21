@@ -1,3 +1,4 @@
+#ifndef WITH_SDL
 // GBViewsApplication.h
 // Abstract top-level interface class.
 // Grobots (c) 2002-2004 Devon and Warren Schudy
@@ -94,4 +95,5 @@ public: // more to override
 	virtual void Quit();
 };
 
+#endif
 #endif

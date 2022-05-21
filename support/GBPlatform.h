@@ -21,6 +21,9 @@
 	#ifndef UNIX
 		#define UNIX 1
 	#endif
+	#if defined __linux__ && !defined LINUX
+		#define LINUX 1
+	#endif
 #elif defined __MINGW32__
 	#define WINDOWS 1
 #elif defined _MSC_VER // MS Visual C++

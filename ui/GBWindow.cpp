@@ -1,3 +1,4 @@
+#ifndef WITH_SDL
 // GBWindow.cpp
 // code for the Mac window class
 // Grobots (c) 2002-2004 Devon and Warren Schudy
@@ -264,3 +265,4 @@ void GBWindow::ZoomOut() {
 	ResizeSelf();
 }
 #endif //Mac resizing
+#endif

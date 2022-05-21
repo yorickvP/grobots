@@ -21,6 +21,8 @@ void GBAboutBox::Draw() {
 			" for Mac (Carbon)"
 		#elif WINDOWS
 			" for Win32"
+		#elif LINUX
+			" for Linux"
 		#endif
 		, Width() / 2, 95, 10, GBColor::magenta);
 	DrawStringLeft("Additional contributors:", 15, 115, 10, GBColor::white);

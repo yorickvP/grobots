@@ -1,3 +1,4 @@
+#ifndef WITH_SDL
 // GBViewsApplication.cpp
 // Grobots (c) 2002-2004 Devon and Warren Schudy
 // Distributed under the GNU General Public License.
@@ -530,3 +531,4 @@ void GBViewsApplication::Quit() {
 	// override if you want to do anything different
 	alive = false;
 }
+#endif

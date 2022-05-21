@@ -9,9 +9,10 @@
 #include "GBPlatform.h"
 
 #ifdef WITH_SDL
-  #include <SDL/SDL.h>
+  #include <SDL.h>
   #include <SDL_gfxPrimitives.h>
-#if HEADLESS
+  #include "GBFontManager.h"
+#elif HEADLESS
 	//nothing
 #elif MAC
 	#include <Carbon/Carbon.h>
@@ -35,6 +36,7 @@ public:
 	short CenterX() const;
 	short CenterY() const;
 	void Shrink(short step);
+	void Clip(const GBRect & r);
 #ifdef WITH_SDL
 	void ToRect(SDL_Rect & r) const;
 	GBRect(SDL_Rect & r);
@@ -51,8 +53,9 @@ class GBBitmap;
 class GBGraphics {
 #ifdef WITH_SDL
 	SDL_Surface* surf;
+	GBFontManager* font_mgr;
 public:
-	GBGraphics(SDL_Surface * surf);
+	GBGraphics(SDL_Surface * surf, GBFontManager * font_mgr);
 	void setSurface(SDL_Surface* surf);
 	friend class GBBitmap;
 #elif HEADLESS

@@ -1,3 +1,4 @@
+#ifndef WITH_SDL
 // GBApplication.cpp
 // Grobots (c) 2002-2004 Devon and Warren Schudy
 // Distributed under the GNU General Public License.
@@ -842,3 +843,4 @@ void GBApplication::Quit() {
 		|| Confirm("Do you really want to quit during a tournament?", "Quit") )
 		alive = false;
 }
+#endif

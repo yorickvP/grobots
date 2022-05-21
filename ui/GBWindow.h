@@ -1,3 +1,4 @@
+#ifndef WITH_SDL
 // GBWindow.h
 // cross-platform window class for GBView/GBViewsApplication
 // Grobots (c) 2002-2004 Devon and Warren Schudy
@@ -80,4 +81,5 @@ public:
 	// some sort of list of extant windows? (for Window menu)
 };
 
+#endif
 #endif
