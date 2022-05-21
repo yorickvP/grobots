@@ -432,7 +432,7 @@ void GBStackBrain::ExecutePrimitive(GBSymbolIndex index, GBRobot * robot, GBWorl
 		case opAnd: temp = Pop(); temp2 = Pop(); PushBoolean(temp && temp2); break;
 		case opOr: temp = Pop(); temp2 = Pop(); PushBoolean(temp || temp2); break;
 		case opXor: temp = Pop(); temp2 = Pop();
-			PushBoolean(temp && ! temp2 || ! temp && temp2); break;
+			PushBoolean((temp && ! temp2) || (! temp && temp2)); break;
 		case opNand: temp = Pop(); temp2 = Pop(); PushBoolean(! (temp && temp2)); break;
 		case opNor: temp = Pop(); temp2 = Pop(); PushBoolean(! (temp || temp2)); break;
 		case opValueConditional: temp = Pop(); temp2 = Pop();
@@ -602,7 +602,7 @@ void GBStackBrain::ExecutePrimitive(GBSymbolIndex index, GBRobot * robot, GBWorl
 }
 
 //pos and vel are relative to ourself
-static GBPosition LeadShot(const GBPosition & pos, const GBPosition & vel, GBSpeed shotSpeed, GBDistance r) {
+static GBPosition LeadShot(const GBPosition & pos, const GBPosition & vel, GBSpeed shotSpeed, GBDistance /* r */) {
 #if 1
 	GBNumber dt = (pos + vel * (pos.Norm() / shotSpeed)).Norm() / shotSpeed; //two plies for accuracy with radially moving targets
 	return pos + vel * dt;

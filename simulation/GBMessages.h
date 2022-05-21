@@ -39,7 +39,7 @@ public:
 	~GBMessageQueue();
 	void AddMessage(const GBMessage & newMess);
 	const GBMessage * GetMessage(const GBMessageNumber num) const;
-	const GBMessageNumber NextMessageNumber() const;
+	GBMessageNumber NextMessageNumber() const;
 	int MessagesWaiting(const GBMessageNumber next) const;
 	void Reset();
 };

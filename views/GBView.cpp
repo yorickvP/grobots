@@ -193,10 +193,10 @@ void GBView::Draw() {}
 bool GBView::NeedsRedraw(bool running) const {
 	GBMilliseconds interval = RedrawInterval();
 	if ( interval < 0 )
-		return InstantChanges() || ! running && DelayedChanges();
+		return InstantChanges() || (! running && DelayedChanges());
 	return InstantChanges() ||
-		(! running || Milliseconds() >= lastDrawn + interval)
-			&& DelayedChanges();
+		((! running || Milliseconds() >= lastDrawn + interval)
+     && DelayedChanges());
 }
 
 bool GBView::NeedsResize() const {

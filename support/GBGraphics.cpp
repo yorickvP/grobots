@@ -107,9 +107,8 @@ void GBGraphics::DrawArc(const GBRect & where, short startAngle, short length,
 void GBGraphics::DrawStringLeft(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
-	SDL_Color fgcol = {color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF};
 	SDL_Rect destrect = {x, y, 0, 0};
-	SDL_Surface* text = font_mgr->renderText_Blended(size, str.c_str(), fgcol);
+	SDL_Surface* text = font_mgr->renderText_Blended(size, str.c_str(), (SDL_Color)color);
 	destrect.w = text->w;
 	destrect.h = text->h;
 	destrect.y -= text->h;
@@ -120,9 +119,8 @@ void GBGraphics::DrawStringLeft(const string & str, short x, short y,
 void GBGraphics::DrawStringCentered(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
-	SDL_Color fgcol = {color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF};
 	SDL_Rect destrect = {x, y, 0, 0};
-	SDL_Surface* text = font_mgr->renderText_Blended(size, str.c_str(), fgcol);
+	SDL_Surface* text = font_mgr->renderText_Blended(size, str.c_str(), (SDL_Color)color);
 	destrect.w = text->w;
 	destrect.h = text->h;
 	destrect.x -= text->w / 2;
@@ -134,9 +132,8 @@ void GBGraphics::DrawStringCentered(const string & str, short x, short y,
 void GBGraphics::DrawStringRight(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
-	SDL_Color fgcol = {color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF};
 	SDL_Rect destrect = {x, y, 0, 0};
-	SDL_Surface* text = font_mgr->renderText_Blended(size, str.c_str(), fgcol);
+	SDL_Surface* text = font_mgr->renderText_Blended(size, str.c_str(), (SDL_Color)color);
 	destrect.w = text->w;
 	destrect.h = text->h;
 	destrect.x -= text->w;

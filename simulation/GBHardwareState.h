@@ -110,7 +110,7 @@ public:
 	~GBSensorState();
 // accessors
 	GBDistance MaxRange() const;
-	const int MaxResults() const;
+	int MaxResults() const;
 	GBEnergy FiringCost() const;
 	GBObjectClass Seen() const;
 	bool Firing() const;

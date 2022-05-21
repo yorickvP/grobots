@@ -30,7 +30,7 @@ public:
 	GBObjectClass Class() const;
 // accessors for views
 	const GBRobot * Firer() const;
-	const GBObjectClass Seen() const;
+	GBObjectClass Seen() const;
 	GBSide * Owner() const;
 	string Description() const;
 // drawing

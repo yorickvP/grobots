@@ -227,7 +227,7 @@ GBMilliseconds GBRobotTypeView::RedrawInterval() const {
 
 bool GBRobotTypeView::InstantChanges() const {
 	const GBSide * side = world.SelectedSide();
-	return lastSideDrawn != side || side && typeID != side->SelectedTypeID();
+	return lastSideDrawn != side || (side && typeID != side->SelectedTypeID());
 }
 
 bool GBRobotTypeView::DelayedChanges() const {

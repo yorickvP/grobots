@@ -149,8 +149,8 @@ void GBDebuggerView::DrawHardwareBox(const GBRect & box) {
 		DrawStringPair("flag:", ToString(target->flag, 2), box, 271, 10);
 }
 
-void GBDebuggerView::DrawProfileBox(const GBRect & box) {
 #if GBWORLD_PROFILING
+void GBDebuggerView::DrawProfileBox(const GBRect & box) {
 	DrawBox(box);
 	DrawStringLeft("Profile:", box.left + 3, box.top + 13, 10, GBColor::black, true);
 	DrawStringPair("Simulation:", ToString(world.SimulationTime()) + " ms", box, 23, 10);
@@ -162,6 +162,8 @@ void GBDebuggerView::DrawProfileBox(const GBRect & box) {
 	DrawStringPair("Statistics:", ToPercentString(world.StatisticsTime(), 0), box.left + 15, box.right - 5, box.top + 83, 10);
 	DrawStringPair("Total time:", ToString(world.TotalTime()) + " ms", box, 93, 10);
 	world.ResetTimes();
+#else
+void GBDebuggerView::DrawProfileBox(const GBRect &) {
 #endif
 }
 

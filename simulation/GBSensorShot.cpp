@@ -64,7 +64,7 @@ const GBRobot * GBSensorShot::Firer() const {
 	return owner;
 }
 
-const GBObjectClass GBSensorShot::Seen() const {
+GBObjectClass GBSensorShot::Seen() const {
 	return age == 0 ? seen : ocDead;
 }
 

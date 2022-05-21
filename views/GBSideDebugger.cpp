@@ -12,7 +12,7 @@
 
 GBSideDebuggerView::GBSideDebuggerView(const GBWorld & wrld)
 	: GBView(), world(wrld),
-	worldChanges(-1), pane(0), lastDrawnPane(-1), lastSideDrawn(nil)
+  worldChanges(-1), lastSideDrawn(nil), pane(0), lastDrawnPane(-1)
 {}
 
 GBSideDebuggerView::~GBSideDebuggerView() {}

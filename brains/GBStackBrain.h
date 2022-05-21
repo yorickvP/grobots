@@ -30,8 +30,8 @@ class GBStackBrain : public GBBrain {
 	long returnStackHeight;
 	GBStackDatum * memory;
 // status
-	GBInstructionCount remaining;
 	GBInstructionCount used;
+	GBInstructionCount remaining;
 	string * lastPrint;
 // accessing variables
 public:

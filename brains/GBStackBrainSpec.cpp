@@ -378,15 +378,15 @@ void GBStackBrainSpec::AddImmediate(const string & name, GBStackDatum value, GBL
 }
 
 void GBStackBrainSpec::AddConstant(const string & name, GBStackDatum value) {
-	constants.push_back(GBConstant(name, value));
+	constants.emplace_back(GBConstant(name, value));
 }
 
 void GBStackBrainSpec::AddVariable(const string & name, GBStackDatum value) {
-	variables.push_back(GBConstant(name, value));
+	variables.emplace_back(GBConstant(name, value));
 }
 
 void GBStackBrainSpec::AddVectorVariable(const string & name, GBVector value) {
-	vectorVariables.push_back(GBVectorSymbol(name, value));
+	vectorVariables.emplace_back(GBVectorSymbol(name, value));
 }
 
 void GBStackBrainSpec::AddLabel(const string & name) {
@@ -398,11 +398,11 @@ void GBStackBrainSpec::AddLabel(const string & name) {
 			} else
 				throw GBDuplicateSymbolError(labels[i].name);
 		}
-	labels.push_back(GBLabel(name, code.size()));
+	labels.emplace_back(GBLabel(name, code.size()));
 }
 
 void GBStackBrainSpec::AddForwardLabel(const string & name) {
-	labels.push_back(GBLabel(name, -1));
+	labels.emplace_back(GBLabel(name, -1));
 }
 
 GBSymbolIndex GBStackBrainSpec::LookupPrimitive(const string & name) const {

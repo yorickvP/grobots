@@ -6,6 +6,9 @@
 #ifndef GBColor_h
 #define GBColor_h
 
+#ifdef WITH_SDL
+#include "SDL2/SDL_pixels.h"
+#endif
 
 class GBColor {
 	float r, g, b;
@@ -20,7 +23,7 @@ public:
 	float Lightness() const;
 // computations
 	const GBColor Mix(const float fraction, const GBColor & other) const;
-	const float Contrast(const GBColor & other) const;
+	float Contrast(const GBColor & other) const;
 	const GBColor EnsureContrastWithBlack(const float minimum) const;
 	const GBColor ChooseContrasting(const GBColor & primary, const GBColor & secondary, const float cutoff) const;
 	const GBColor ContrastingTextColor() const;
@@ -44,6 +47,11 @@ public:
 	static const GBColor purple;	
 	static const GBColor darkGreen;
 	static const GBColor darkRed;
+#ifdef WITH_SDL
+  explicit operator SDL_Color() const {
+    return {(Uint8)(r*0xFF), (Uint8)(g*0xFF), (Uint8)(b*0xFF), 0xFF};
+  }
+#endif
 };
 
 // implementation //

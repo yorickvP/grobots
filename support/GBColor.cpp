@@ -37,7 +37,7 @@ const GBColor GBColor::Mix(const float fraction, const GBColor & other) const {
 	return *this * fraction + other * (1.0f - fraction);
 }
 
-const float GBColor::Contrast(const GBColor & other) const {
+float GBColor::Contrast(const GBColor & other) const {
 	return sqrt((r - other.r) * (r - other.r) * kRedWeight +
 			(g - other.g) * (g - other.g) * kGreenWeight +
 			(b - other.b) * (b - other.b) * kBlueWeight);

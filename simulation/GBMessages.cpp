@@ -79,7 +79,7 @@ const GBMessage * GBMessageQueue::GetMessage(const GBMessageNumber num) const {
 	return nil; // should not be reached
 }
 
-const GBMessageNumber GBMessageQueue::NextMessageNumber() const {
+GBMessageNumber GBMessageQueue::NextMessageNumber() const {
 	return nextNumber;
 }
 

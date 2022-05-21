@@ -303,7 +303,7 @@ void GBPortal::AcceptDrag(short x, short y) {
 		GBDistance dist = (spot - lastClick).Norm();
 		GBFrames frames = world.CurrentFrame() - lastFrame;
 		if ( dist >= kToolSpacings[tool] && kToolSpacings[tool]
-				|| frames >= kToolIntervals[tool] && kToolIntervals[tool] ) {
+         || (frames >= kToolIntervals[tool] && kToolIntervals[tool]) ) {
 			DoTool(spot);
 			lastx = x; lasty = y;
 			lastClick = spot;

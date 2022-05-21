@@ -242,7 +242,7 @@ GBDistance GBSensorState::MaxRange() const {
 
 // FIXME: calling SensorSpec->Set() on a spec that has a state will cause pointer
 //  problems, since maxResults is not cached locally.
-const int GBSensorState::MaxResults() const {
+int GBSensorState::MaxResults() const {
 	return spec->NumResults();}
 
 GBEnergy GBSensorState::FiringCost() const {

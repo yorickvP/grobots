@@ -34,9 +34,8 @@ const int kMaxFasterSteps = 3;
 const GBMilliseconds kMaxEventInterval = 50;
 
 GBSDLApplication::GBSDLApplication() 
-	: alive(true), clicks(0), fontmanager(),
-	clickx(0), clicky(0), world(), dragging(nil), windows(), focus(nil),
-	stepPeriod(-1), lastStep(0) {
+	: alive(true), clicks(0), clickx(0), clicky(0), stepPeriod(-1), lastStep(0), fontmanager(),
+    dragging(nil), world(), focus(nil), windows() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == -1) FatalError("Unable to init SDL");
 	//SDL_EnableUNICODE(SDL_ENABLE);
 	atexit(SDL_Quit);
@@ -108,7 +107,7 @@ void GBSDLApplication::Process() {
 		do {
 			world.AdvanceFrame();
 			++steps;
-		} while ( world.running && (stepPeriod <= 0 || stepPeriod <= 10 && steps < kMaxFasterSteps)
+		} while ( world.running && (stepPeriod <= 0 || (stepPeriod <= 10 && steps < kMaxFasterSteps))
 			&& Milliseconds() <= lastStep + kMaxEventInterval );
 	} catch ( GBError & err ) {
 		NonfatalError("Error simulating: " + err.ToString());

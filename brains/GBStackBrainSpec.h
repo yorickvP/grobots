@@ -23,6 +23,7 @@ public:
 	string name;
 	GBSymbol();
 	GBSymbol(const string & n);
+  GBSymbol(const GBSymbol &) = delete;
 	~GBSymbol();
 	GBSymbol & operator=(const GBSymbol & arg);
 	bool NameEquivalent(const string & other) const;
@@ -31,6 +32,7 @@ public:
 class GBConstant : public GBSymbol {
 public:
 	GBConstant();
+  GBConstant(const GBConstant &o) : GBSymbol(o.name), value(o.value){};
 	GBConstant(const string & n, GBStackDatum v);
 	~GBConstant();
 	GBConstant & operator=(const GBConstant & arg);
@@ -41,6 +43,8 @@ class GBVectorSymbol : public GBSymbol {
 public:
 	GBVectorSymbol();
 	GBVectorSymbol(const string & n, const GBVector & v);
+  GBVectorSymbol(const GBVectorSymbol &o)
+    : GBSymbol(o.name), value(o.value) {};
 	~GBVectorSymbol();
 	GBVectorSymbol & operator=(const GBVectorSymbol & arg);
 	GBVector value;
@@ -50,6 +54,8 @@ class GBLabel : public GBSymbol {
 public:
 	GBLabel();
 	GBLabel(const string & n, GBStackAddress v, bool g = false);
+  GBLabel(const GBLabel & o)
+    : GBSymbol(o.name), address(o.address), gensym(o.gensym) {};
 	~GBLabel();
 	GBLabel & operator=(const GBLabel & arg);
 	bool NameEquivalent(const string & other) const;

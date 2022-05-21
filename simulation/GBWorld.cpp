@@ -366,8 +366,8 @@ GBFrames GBWorld::CurrentFrame() const {
 }
 
 bool GBWorld::RoundOver() const {
-	return stopOnElimination && previousSidesAlive > SidesAlive() && SidesAlive() <= 1
-		|| timeLimit > 0 && CurrentFrame() % timeLimit == 0;
+	return (stopOnElimination && previousSidesAlive > SidesAlive() && SidesAlive() <= 1)
+		|| (timeLimit > 0 && CurrentFrame() % timeLimit == 0);
 }
 
 GBRandomState & GBWorld::Randoms() {

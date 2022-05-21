@@ -12,11 +12,10 @@
 const float kSideCopyColorDistance = 0.3f;
 
 GBSide::GBSide()
-	: selected(nil),
-	id(0),
-	seedIDs(),
-	color(), name(), author(),
-	scores(), cScores(), center(), groupPosition()
+	: types(nil), selected(nil),
+    name(), author(), id(0), color(),
+    scores(), cScores(), groupPosition(), seedIDs(),
+    center()
 {
 	int i;
 	for ( i = 0; i < kSharedMemorySize; i ++ )
@@ -260,7 +259,7 @@ void GBSide::SendMessage(const GBMessage & msg, const int channel) {
 	msgQueues[channel - 1]->AddMessage(msg);
 }
 
-const GBMessageNumber GBSide::NextMessageNumber(const int channel) const {
+GBMessageNumber GBSide::NextMessageNumber(const int channel) const {
 	if ( channel < 1 || channel > kNumMessageChannels )
 		throw GBIndexOutOfRangeError();
 	if ( ! msgQueues[channel - 1] )

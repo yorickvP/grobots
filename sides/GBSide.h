@@ -46,7 +46,7 @@ class GBSide : public GBModel {
 	std::vector<long> seedIDs;
 public:
 	GBFilename filename;
-    GBPosition center;
+  GBPosition center;
 public:
 	GBSide();
 	~GBSide();
@@ -97,7 +97,7 @@ public:
 	void WriteSharedMemory(GBNumber value, int addr);
 	const GBMessage * ReceiveMessage(const int channel, const GBMessageNumber desiredMessageNum) const;
 	void SendMessage(const GBMessage & value, const int channel);
-	const GBMessageNumber NextMessageNumber(const int channel) const;
+	GBMessageNumber NextMessageNumber(const int channel) const;
 	int MessagesWaiting(const int channel, const GBMessageNumber next) const;
 
 	static bool Better(const GBSide *a, const GBSide *b);

@@ -22,7 +22,7 @@ public:
 class GBDeletionListener {
 public:
 	GBDeletionListener();
-	~GBDeletionListener();
+	virtual ~GBDeletionListener();
 	virtual void ReportDeletion(const GBDeletionReporter * deleted);
 };
 
