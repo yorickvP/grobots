@@ -96,56 +96,47 @@ void GBGraphics::DrawOpenOval(const GBRect & r, const GBColor & color, short thi
 	if (renderer == nil) return;
 	SDL_Rect r1;
 	r.ToRect(r1);
-	aaellipseRGBA(renderer, r1.x + (r1.w/2), r1.y + (r1.h/2), r1.w/2, r1.h/2, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+	thickEllipseRGBA(renderer, r1.x + (r1.w/2), r1.y + (r1.h/2), r1.w/2, r1.h/2, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255, thickness);
 }
 //startAngle: degrees clockwise from up
 //length: degrees
 void GBGraphics::DrawArc(const GBRect & where, short startAngle, short length,
 		const GBColor & color, short thickness) {
-	arcRGBA(renderer, where.CenterX(), where.CenterY(), where.Width()/2, startAngle, startAngle + length, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+  thickArcRGBA(renderer, where.CenterX(), where.CenterY(), where.Width()/2, startAngle, startAngle + length, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255, thickness);
 }
 void GBGraphics::DrawStringLeft(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
 	SDL_Rect destrect = {x, y, 0, 0};
-	SDL_Surface* text = font_mgr->renderText_Blended(size, useBold, str.c_str(), (SDL_Color)color);
-	destrect.w = text->w;
-	destrect.h = text->h;
-	destrect.y -= text->h;
-  SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, text);
-  SDL_RenderCopy(renderer, t, nil, &destrect);
-  SDL_DestroyTexture(t);
-	SDL_FreeSurface(text);
+	GBRenderedText text = font_mgr->renderText_Blended(renderer, size, useBold, str, (SDL_Color)color);
+	destrect.w = text.w;
+	destrect.h = text.h;
+	destrect.y -= text.h;
+  text.draw(renderer, nil, &destrect);
 	//stringRGBA(renderer, x, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 void GBGraphics::DrawStringCentered(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
 	SDL_Rect destrect = {x, y, 0, 0};
-	SDL_Surface* text = font_mgr->renderText_Blended(size, useBold, str.c_str(), (SDL_Color)color);
-	destrect.w = text->w;
-	destrect.h = text->h;
-	destrect.x -= text->w / 2;
-	destrect.y -= text->h;
-  SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, text);
-  SDL_RenderCopy(renderer, t, nil, &destrect);
-  SDL_DestroyTexture(t);
-	SDL_FreeSurface(text);
+	GBRenderedText text = font_mgr->renderText_Blended(renderer, size, useBold, str, (SDL_Color)color);
+	destrect.w = text.w;
+	destrect.h = text.h;
+	destrect.x -= text.w / 2;
+	destrect.y -= text.h;
+  text.draw(renderer, nil, &destrect);
 	//stringRGBA(renderer, x - (str.length() * 4), y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 void GBGraphics::DrawStringRight(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
 	SDL_Rect destrect = {x, y, 0, 0};
-	SDL_Surface* text = font_mgr->renderText_Blended(size, useBold, str.c_str(), (SDL_Color)color);
-	destrect.w = text->w;
-	destrect.h = text->h;
-	destrect.x -= text->w;
-	destrect.y -= text->h;
-  SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, text);
-  SDL_RenderCopy(renderer, t, nil, &destrect);
-  SDL_DestroyTexture(t);
-	SDL_FreeSurface(text);
+	GBRenderedText text = font_mgr->renderText_Blended(renderer, size, useBold, str, (SDL_Color)color);
+	destrect.w = text.w;
+	destrect.h = text.h;
+	destrect.x -= text.w;
+	destrect.y -= text.h;
+  text.draw(renderer, nil, &destrect);
 	//stringRGBA(renderer, x - str.length() * 8, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect) {

@@ -37,9 +37,18 @@ TTF_Font* GBFontManager::findFont(uint8_t ptsize, bool bold) {
 	return loadFont(ptsize, bold); // else load it
 }
 
-SDL_Surface* GBFontManager::renderText_Blended(uint8_t ptsize, bool bold, const char* text, SDL_Color fgcol) {
-	SDL_Surface* textsurface = TTF_RenderText_Blended(findFont(ptsize, bold), text, fgcol);
+void GBRenderedText::draw(SDL_Renderer* r, const SDL_Rect* src, const SDL_Rect* dst) {
+  SDL_RenderCopy(r, t, src, dst);
+}
+
+GBRenderedText GBFontManager::renderText_Blended(SDL_Renderer* renderer, uint8_t ptsize, bool bold, const std::string & text, SDL_Color fgcol) {
+	SDL_Surface* textsurface = TTF_RenderText_Blended(findFont(ptsize, bold), text.c_str(), fgcol);
 	if (textsurface == nil) FatalError("TTF_RenderText_Blended failure: " + string(TTF_GetError()));
-	return textsurface;
+
+  SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, textsurface);
+  uint16_t w = textsurface->w;
+  uint16_t h = textsurface->h;
+	SDL_FreeSurface(textsurface);
+  return GBRenderedText(w, h, t);
 }
 #endif
