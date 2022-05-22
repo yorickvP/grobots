@@ -28,7 +28,7 @@ public:
                            v.PreferredHeight() + kTitleBarHeight + kFrameSize);
     v.SetBounds(bounds);
     DrawFrame();
-    Draw(true);
+    Draw(true, false);
   };
   GBCompositedWindow(const GBCompositedWindow&) = delete;
   ~GBCompositedWindow() {
@@ -45,7 +45,7 @@ public:
     texture->SetPosition(oldBounds.left, oldBounds.top);
     v.SetSize(newWidth, newHeight);
     DrawFrame();
-    Draw(true);
+    Draw(true, false);
   }
   void DrawFrame() {
     texture->StartDrawing();
@@ -61,14 +61,14 @@ public:
     g.DrawStringCentered(v.Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
     texture->StopDrawing();
   };
-  void Draw(bool force) {
+  void Draw(bool force, bool running) {
     if (v.NeedsResize()) return Resize();
     // todo: clip
-    if (force || v.NeedsRedraw(false)) {
+    if (force || v.NeedsRedraw(running)) {
       v.SetGraphics(&texture->Graphics());
       texture->StartDrawing();
       texture->SetClip(&v.Bounds());
-      v.DoDraw();
+      v.DoDraw(running);
       texture->SetClip(nil);
       texture->StopDrawing();
     }
@@ -112,10 +112,13 @@ public:
   bool NeedsResize() const {
     return v.NeedsResize();
   }
+  const GBView& View() const {
+    return v;
+  }
 };
 
 GBMultiView::GBMultiView(GBView* const bg)
-	: GBWrapperView(bg), children(), dragging(nil)
+	: GBWrapperView(bg), children(), dragging(nil), changed(true)
 {}
 
 GBMultiView::~GBMultiView() {
@@ -123,14 +126,25 @@ GBMultiView::~GBMultiView() {
     delete i;
   }
 }
-// todo: needsredraw
-void GBMultiView::Draw() {
+
+void GBMultiView::Draw_(bool running) {
   content->SetGraphics(&Graphics());
   content->Draw();
   for (auto const & childView : children) {
-    childView->Draw(false);
+    childView->Draw(false, running);
     childView->Blit(Graphics());
   }
+  if (changed) changed = false;
+}
+
+bool GBMultiView::NeedsRedraw(bool running) const {
+  if (changed) return true;
+  if (content->NeedsRedraw(running)) return true;
+  for (auto const & childView : children) {
+    if (childView->View().NeedsRedraw(running)) return true;
+    if (childView->View().NeedsResize()) return true;
+  }
+  return false;
 }
 
 GBCompositedWindow* GBMultiView::WindowFromXY(short x, short y) {
@@ -157,9 +171,11 @@ void GBMultiView::AcceptUnclick(short x, short y, int clicksBefore) {
 void GBMultiView::AcceptDrag(short x, short y) {
   if (dragging) dragging->DoDrag(x, y);
   else content->DoDrag(x, y);
+  changed = true;
 }
 
 void GBMultiView::Add(GBView& v, short x, short y) {
+  changed = true;
   // hack to prevent duplicate windows
   for (const GBCompositedWindow* childView : children) {
     if (childView->Matches(v.Name())) {
@@ -176,6 +192,7 @@ void GBMultiView::RightClick(short x, short y) {
     if (childView == children.front()) return;
     children.remove(childView);
     delete childView;
+    changed = true;
   }
 }
 
@@ -183,10 +200,3 @@ void GBMultiView::RightClick(short x, short y) {
 // 	return "Grobots";
 // }
 
-// TODO
-bool GBMultiView::InstantChanges() const {
-  return true;
-}
-bool GBMultiView::DelayedChanges() const {
-  return true;
-}

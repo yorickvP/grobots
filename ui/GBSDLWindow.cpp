@@ -36,15 +36,15 @@ GBSDLWindow::~GBSDLWindow() {
 	if (sdlwindow) SDL_DestroyWindow(sdlwindow);
 }
 
-void GBSDLWindow::Update(bool) {
-	view->DoDraw();
+void GBSDLWindow::Update(bool running) {
+	view->DoDraw(running);
   SDL_RenderPresent(renderer);
 }
 
 bool GBSDLWindow::DrawChanges(bool running) {
 	bool redrawn = visible && view->NeedsRedraw(running);
 	if (redrawn) {
-		view->DoDraw();
+		view->DoDraw(running);
     SDL_RenderPresent(renderer);
 	}
 	if ( !isMain && visible && view->NeedsResize() ) {

@@ -86,13 +86,14 @@ public:
 	GBGraphics & Graphics() const;
 	void SetGraphics(GBGraphics * g);
 	virtual void Draw();
-	bool NeedsRedraw(bool running) const;
+	virtual void Draw_(bool) { return Draw(); };
+	virtual bool NeedsRedraw(bool running) const;
 	bool NeedsResize() const;
 	virtual GBMilliseconds RedrawInterval() const;
 	virtual bool InstantChanges() const;
 	virtual bool DelayedChanges() const;
 // for owner to call
-	void DoDraw();
+	void DoDraw(bool running);
 	void DoClick(short x, short y, int clicksBefore);
 	void DoDrag(short x, short y);
 	void DoUnclick(short x, short y, int clicksBefore);

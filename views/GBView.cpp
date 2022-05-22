@@ -216,10 +216,10 @@ bool GBView::DelayedChanges() const {
 	return false;
 }
 
-void GBView::DoDraw() {
+void GBView::DoDraw(bool running) {
 	if ( ! graphics ) throw GBNilPointerError();
 	try {
-		Draw();
+		Draw_(running);
 	} catch ( GBError & err ) {
 		NonfatalError("Error drawing: " + err.ToString());
 	} catch ( GBAbort & ) {}
