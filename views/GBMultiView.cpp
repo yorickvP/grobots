@@ -8,6 +8,10 @@
 #include "GBStringUtilities.h"
 #include "GBTypes.h"
 #include "GBMultiView.h"
+#include <ranges>
+
+const short kTitleBarHeight = 16;
+const short kFrameSize = 1;
 
 class GBCompositedWindow {
   GBView& v;
@@ -16,8 +20,13 @@ class GBCompositedWindow {
   short lastX, lastY;
 public:
   GBCompositedWindow(GBView& v, GBGraphics& parent) :
-    v(v), parent(parent), texture(*new GBBitmap(v.PreferredWidth(), v.PreferredHeight(), parent)), lastX(-1), lastY(-1) {
-    v.SetSize(texture.Bounds().Width(), texture.Bounds().Height());
+    v(v), parent(parent), texture(*new GBBitmap(v.PreferredWidth() + kFrameSize * 2, v.PreferredHeight() + kTitleBarHeight + 2 * kFrameSize, parent)), lastX(-1), lastY(-1) {
+    GBRect bounds = GBRect(
+                           kFrameSize,
+                           kTitleBarHeight + kFrameSize,
+                           v.PreferredWidth() + kFrameSize,
+                           v.PreferredHeight() + kTitleBarHeight + kFrameSize);
+    v.SetBounds(bounds);
     Draw(true);
   };
   GBCompositedWindow(const GBCompositedWindow&) = delete;
@@ -30,7 +39,15 @@ public:
     if (force || v.NeedsRedraw(false)) {
       v.SetGraphics(&texture.Graphics());
       texture.StartDrawing();
+      texture.Graphics().DrawOpenRect(texture.Bounds(), GBColor::white);
+      GBRect size = texture.Bounds();
+      size.SetXY(0, 0);
+      GBRect titlebar = GBRect(kFrameSize, kFrameSize, kFrameSize + v.PreferredWidth(), kFrameSize + kTitleBarHeight);
+      texture.Graphics().DrawSolidRect(titlebar, GBColor::black);
+      texture.Graphics().DrawLine(kFrameSize, kTitleBarHeight, size.right - kFrameSize, kTitleBarHeight, GBColor::white);
+
       v.DoDraw();
+      texture.Graphics().DrawStringCentered(v.Name(), size.CenterX(), kTitleBarHeight + 1, 14, GBColor::white, true);
       texture.StopDrawing();
     }
   };
@@ -44,9 +61,10 @@ public:
   };
   void DoClick(short x, short y, int clicksBefore) {
     const GBRect& dst = texture.Bounds();
-    v.DoClick(x - dst.left, y - dst.top, clicksBefore);
     lastX = x;
     lastY = y;
+    if (y - dst.top < v.Bounds().top) return;
+    v.DoClick(x - dst.left, y - dst.top, clicksBefore);
   };
   void DoUnclick(short x, short y, int clicksBefore) {
     const GBRect& dst = texture.Bounds();
@@ -56,7 +74,9 @@ public:
   };
   void DoDrag(short x, short y) {
     const GBRect& dst = texture.Bounds();
-    v.DoDrag(x - dst.left, y - dst.top);
+    if (y - dst.top > v.Bounds().top) {
+      v.DoDrag(x - dst.left, y - dst.top);
+    }
     texture.SetPosition(dst.left + (x - lastX), dst.top + (y - lastY));
     lastX = x;
     lastY = y;
@@ -83,7 +103,7 @@ void GBMultiView::Draw() {
 }
 
 void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
-  for (auto const & childView : children) {
+  for (auto const & childView : children | std::views::reverse) {
     if (childView->HasPoint(x, y)) {
       dragging = childView;
       childView->DoClick(x, y, clicksBefore);

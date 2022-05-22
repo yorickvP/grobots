@@ -38,6 +38,7 @@ public:
 	void Shrink(short step);
 	void Clip(const GBRect & r);
   bool HasPoint(short x, short y) const;
+  void SetXY(const short x, const short y);
 #ifdef WITH_SDL
 	void ToRect(SDL_Rect & r) const;
 	GBRect(SDL_Rect & r);

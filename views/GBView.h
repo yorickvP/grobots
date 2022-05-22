@@ -81,6 +81,7 @@ public:
 	short CenterY() const;
 	virtual void SetSize(short width, short height);
 	virtual void SetBounds(const GBRect & newbounds);
+  const GBRect& Bounds() const { return bounds; };
 // drawing
 	GBGraphics & Graphics() const;
 	void SetGraphics(GBGraphics * g);

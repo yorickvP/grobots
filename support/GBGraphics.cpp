@@ -38,6 +38,13 @@ void GBRect::Clip(const GBRect & r) {
 bool GBRect::HasPoint(short x, short y) const {
   return left <= x && x <= right && top <= y && y <= bottom;
 }
+
+void GBRect::SetXY(const short x, const short y) {
+  right -= left - x;
+  bottom -= top - y;
+  left = x;
+  top = y;
+}
 #ifdef WITH_SDL
 void GBRect::ToRect(SDL_Rect & r) const {
 	r.x = left;
