@@ -34,6 +34,7 @@ void GBAboutBox::Draw() {
 	DrawStringLeft("Eugen Zagorodniy", 35, 158, 10, GBColor::white);
 	DrawStringLeft("Rick Manning", 35, 168, 10, GBColor::white);
 	DrawStringLeft("Mike Anderson", 35, 178, 10, GBColor::white);
+	DrawStringLeft("Yorick van Pelt", 35, 188, 10, GBColor::white);
 	DrawStringCentered("http://grobots.sourceforge.net/", Width() / 2, 205, 10, GBColor(0, 0.7f, 1));
 	DrawStringLeft("Grobots comes with ABSOLUTELY NO WARRANTY.", 10, 228, 10, GBColor::white);
     DrawStringLeft("This is free software, and you are welcome to", 10, 240, 10, GBColor::white);
