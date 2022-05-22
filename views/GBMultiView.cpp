@@ -13,9 +13,10 @@ class GBCompositedWindow {
   GBView& v;
   GBGraphics& parent;
   GBBitmap& texture;
+  short lastX, lastY;
 public:
   GBCompositedWindow(GBView& v, GBGraphics& parent) :
-    v(v), parent(parent), texture(*new GBBitmap(v.PreferredWidth(), v.PreferredHeight(), parent)) {
+    v(v), parent(parent), texture(*new GBBitmap(v.PreferredWidth(), v.PreferredHeight(), parent)), lastX(-1), lastY(-1) {
     v.SetSize(texture.Bounds().Width(), texture.Bounds().Height());
     Draw(true);
   };
@@ -25,10 +26,11 @@ public:
     delete &texture;
   };
   void Draw(bool force) {
+    // todo: clip and decoration
     if (force || v.NeedsRedraw(false)) {
       v.SetGraphics(&texture.Graphics());
       texture.StartDrawing();
-      v.Draw();
+      v.DoDraw();
       texture.StopDrawing();
     }
   };
@@ -43,19 +45,26 @@ public:
   void DoClick(short x, short y, int clicksBefore) {
     const GBRect& dst = texture.Bounds();
     v.DoClick(x - dst.left, y - dst.top, clicksBefore);
+    lastX = x;
+    lastY = y;
   };
   void DoUnclick(short x, short y, int clicksBefore) {
     const GBRect& dst = texture.Bounds();
     v.DoUnclick(x - dst.left, y - dst.top, clicksBefore);
+    lastX = -1;
+    lastY = -1;
   };
   void DoDrag(short x, short y) {
     const GBRect& dst = texture.Bounds();
     v.DoDrag(x - dst.left, y - dst.top);
+    texture.SetPosition(dst.left + (x - lastX), dst.top + (y - lastY));
+    lastX = x;
+    lastY = y;
   };
 };
 
 GBMultiView::GBMultiView(GBView* const bg)
-	: GBWrapperView(bg), children()
+	: GBWrapperView(bg), children(), dragging(nil)
 {}
 
 GBMultiView::~GBMultiView() {
@@ -63,7 +72,7 @@ GBMultiView::~GBMultiView() {
     delete i;
   }
 }
-
+// todo: needsredraw
 void GBMultiView::Draw() {
   content->SetGraphics(&Graphics());
   content->Draw();
@@ -76,6 +85,7 @@ void GBMultiView::Draw() {
 void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
   for (auto const & childView : children) {
     if (childView->HasPoint(x, y)) {
+      dragging = childView;
       childView->DoClick(x, y, clicksBefore);
       return;
     }
@@ -83,6 +93,7 @@ void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
   content->DoClick(x, y, clicksBefore);
 }
 void GBMultiView::AcceptUnclick(short x, short y, int clicksBefore) {
+  dragging = nil;
   for (auto const & childView : children) {
     if (childView->HasPoint(x, y)) {
       childView->DoUnclick(x, y, clicksBefore);
@@ -92,13 +103,8 @@ void GBMultiView::AcceptUnclick(short x, short y, int clicksBefore) {
   content->DoUnclick(x, y, clicksBefore);
 }
 void GBMultiView::AcceptDrag(short x, short y) {
-  for (auto const & childView : children) {
-    if (childView->HasPoint(x, y)) {
-      childView->DoDrag(x, y);
-      return;
-    }
-  }
-  content->DoDrag(x, y);
+  if (dragging) dragging->DoDrag(x, y);
+  else content->DoDrag(x, y);
 }
 
 void GBMultiView::Add(GBView& v) {
@@ -108,3 +114,11 @@ void GBMultiView::Add(GBView& v) {
 // const string GBMultiView::Name() const {
 // 	return "Grobots";
 // }
+
+// TODO
+bool GBMultiView::InstantChanges() const {
+  return true;
+}
+bool GBMultiView::DelayedChanges() const {
+  return true;
+}

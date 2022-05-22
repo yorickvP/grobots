@@ -138,6 +138,7 @@ public:
 //  to allow saving and restoring state :(
 	void StartDrawing();
 	void StopDrawing();
+  void SetPosition(short x, short y);
 };
 
 #endif // GBGraphics_h

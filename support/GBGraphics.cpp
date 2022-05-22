@@ -407,6 +407,15 @@ GBGraphics & GBBitmap::Graphics() {
 
 const GBGraphics & GBBitmap::Graphics() const {
 	return graphics;}
+
+void GBBitmap::SetPosition(short x, short y) {
+  short width = bounds.Width();
+  short height = bounds.Height();
+  bounds.left = x;
+  bounds.top = y;
+  bounds.right = x + width;
+  bounds.bottom = y + height;
+}
 	
 #ifdef WITH_SDL
 SDL_Surface* CreateCompatibleRGBSurface(Uint32 flags, short width, short height) {

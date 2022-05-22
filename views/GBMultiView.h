@@ -11,6 +11,7 @@ class GBCompositedWindow;
 class GBMultiView : public GBWrapperView {
  private:
   std::list<GBCompositedWindow*> children;
+  GBCompositedWindow* dragging;
  public:
 	GBMultiView(GBView* const bg);
 	~GBMultiView();
@@ -19,6 +20,8 @@ class GBMultiView : public GBWrapperView {
 	virtual void AcceptClick(short x, short y, int clicksBefore) override;
 	virtual void AcceptDrag(short x, short y) override;
 	virtual void AcceptUnclick(short x, short y, int clicksBefore) override;
+  virtual bool InstantChanges() const override;
+  virtual bool DelayedChanges() const override;
 };
 
 #endif
