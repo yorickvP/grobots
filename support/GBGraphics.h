@@ -37,6 +37,7 @@ public:
 	short CenterY() const;
 	void Shrink(short step);
 	void Clip(const GBRect & r);
+  bool HasPoint(short x, short y) const;
 #ifdef WITH_SDL
 	void ToRect(SDL_Rect & r) const;
 	GBRect(SDL_Rect & r);
@@ -108,6 +109,7 @@ private:
 #ifdef WITH_SDL
   SDL_Texture* texture;
   SDL_Renderer* renderer;
+  SDL_Texture* saveTexture;
 	friend class GBGraphics;
 #elif HEADLESS
 #elif MAC
@@ -127,6 +129,7 @@ private:
 	GBGraphics graphics;
 public:
 	GBBitmap(short width, short height, GBGraphics & parent);
+  GBBitmap(const GBBitmap&) = delete;
 	~GBBitmap();
 	const GBRect & Bounds() const;
 	GBGraphics & Graphics();

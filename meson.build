@@ -48,6 +48,7 @@ src = [
   'views/GBTournamentView.cpp',
   'views/GBView.cpp',
   'views/GBMenu.cpp',
+  'views/GBMultiView.cpp',
 ]
 ui = [
   'ui/GBApplication.cpp',

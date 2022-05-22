@@ -17,6 +17,7 @@
 #include "GBDebugger.h"
 #include "GBSideDebugger.h"
 #include "GBTournamentView.h"
+#include "GBMultiView.h"
 
 #include "GBMenu.h"
 #include <sstream>
@@ -50,12 +51,13 @@ GBSDLApplication::GBSDLApplication()
 	SetStepPeriod(kNormalSpeedLimit);
 	
 	portal = new GBPortal(world);
-	GBView * mainView = portal;
+	mainView = new GBMultiView(portal);
 
 	mainWnd = new GBSDLWindow(mainView, 0, 0, true, this, true, &fontmanager);
-#ifndef __EMSCRIPTEN__
-	windows.push_back(new GBSDLWindow(new GBMenuView(world, *this), 0, 0, true, this, false, &fontmanager));
-#endif
+  mainView->Add(*(new GBMenuView(world, *this)));
+// #ifndef __EMSCRIPTEN__
+// 	windows.push_back(new GBSDLWindow(new GBMenuView(world, *this), 0, 0, true, this, false, &fontmanager));
+// #endif
 	focus = mainWnd;
 	windows.push_back(mainWnd);
 	//windows.push_back(menuWnd);
@@ -94,7 +96,6 @@ void GBSDLApplication::mainloop(void* arg) {
 }
 
 void GBSDLApplication::Run() {
-	SDL_Event event;
   #if __EMSCRIPTEN__
   emscripten_set_main_loop_arg(GBSDLApplication::mainloop, this, -1, 1);
   #else
@@ -259,28 +260,28 @@ void GBSDLApplication::CloseWindow(GBSDLWindow* window) {
 	windows.remove(window);
 }
 void GBSDLApplication::OpenMinimap() {
-	windows.push_back(new GBSDLWindow(new GBMiniMapView(world, *portal), 0, 0, true, this, false, &fontmanager));
+	mainView->Add(*new GBMiniMapView(world, *portal));
 }
 void GBSDLApplication::OpenDebugger() {
-	windows.push_back(new GBSDLWindow(new GBDebuggerView(world), 0, 0, true, this, false, &fontmanager));
+	mainView->Add(*new GBDebuggerView(world));
 }
 void GBSDLApplication::OpenAbout() {
-	windows.push_back(new GBSDLWindow(new GBAboutBox(), 0, 0, true, this, false, &fontmanager));
+	mainView->Add(*new GBAboutBox());
 }
 void GBSDLApplication::OpenSideDebugger() {
-	windows.push_back(new GBSDLWindow(new GBSideDebuggerView(world), 0, 0, true, this, false, &fontmanager));
+	mainView->Add(*new GBSideDebuggerView(world));
 }
 void GBSDLApplication::OpenRoster() {
-	windows.push_back(new GBSDLWindow(new GBRosterView(world), 0, 0, true, this, false, &fontmanager));
+	mainView->Add(*new GBRosterView(world));
 }
 void GBSDLApplication::OpenScores() {
-	windows.push_back(new GBSDLWindow(new GBScoresView(world), 0, 0, true, this, false, &fontmanager));
+	mainView->Add(*new GBScoresView(world));
 }
 void GBSDLApplication::OpenTypeWindow() {
-	windows.push_back(new GBSDLWindow(new GBRobotTypeView(world), 0, 0, true, this, false, &fontmanager));
+	mainView->Add(*new GBRobotTypeView(world));
 }
 void GBSDLApplication::OpenTournament() {
-	windows.push_back(new GBSDLWindow(new GBTournamentView(world), 0, 0, true, this, false, &fontmanager));
+	mainView->Add(*new GBTournamentView(world));
 }
 
 #endif

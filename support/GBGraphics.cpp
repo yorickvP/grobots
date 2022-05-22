@@ -34,6 +34,10 @@ void GBRect::Clip(const GBRect & r) {
 	right = min(right, r.right);
 	bottom = min(bottom, r.bottom);
 }
+
+bool GBRect::HasPoint(short x, short y) const {
+  return left <= x && x <= right && top <= y && y <= bottom;
+}
 #ifdef WITH_SDL
 void GBRect::ToRect(SDL_Rect & r) const {
 	r.x = left;
@@ -433,10 +437,12 @@ GBBitmap::GBBitmap(short width, short height, GBGraphics &g)
 GBBitmap::~GBBitmap() { SDL_DestroyTexture(texture); }
 
 void GBBitmap::StartDrawing() {
+  saveTexture = SDL_GetRenderTarget(renderer);
   SDL_SetRenderTarget(renderer, texture);
 }
 void GBBitmap::StopDrawing() {
-  SDL_SetRenderTarget(renderer, nil);
+  SDL_SetRenderTarget(renderer, saveTexture);
+  saveTexture = nil;
 }
 
 #elif HEADLESS

@@ -65,6 +65,7 @@ protected:
 	void BlitAll(const GBBitmap & src, const GBRect & srcRect) const;
 public:
 	GBView();
+  GBView(const GBView&) = delete;
 	virtual ~GBView();
 // sizing
 	virtual bool Resizable() const;

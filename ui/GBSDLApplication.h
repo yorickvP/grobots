@@ -13,6 +13,7 @@
 #include "GBPortal.h"
 #include "GBSDLWindow.h"
 #include "GBFontManager.h"
+#include "GBMultiView.h"
 #include "SDL.h"
 #include "SDL2_framerate.h"
 #include <list>
@@ -49,6 +50,7 @@ class GBSDLApplication {
 	std::list<GBSDLWindow*> windows;
 	
 	void CloseWindow(GBSDLWindow* window);
+  GBMultiView * mainView;
 public:
 	GBSDLApplication();
 	~GBSDLApplication();
