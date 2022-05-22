@@ -152,12 +152,20 @@ void GBGraphics::DrawStringRight(const string & str, short x, short y,
   text.draw(renderer, nil, &destrect);
 	//stringRGBA(renderer, x - str.length() * 8, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
-void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect) {
+void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char alpha) {
 	SDL_Rect r1, r2;
 	srcRect.ToRect(r1);
 	destRect.ToRect(r2);
 
-  SDL_RenderCopy(renderer, src.texture, &r1, &r2);
+  if (alpha != 255) {
+    SDL_SetTextureBlendMode(src.texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(src.texture, alpha);
+    SDL_RenderCopy(renderer, src.texture, &r1, &r2);
+    SDL_SetTextureBlendMode(src.texture, SDL_BLENDMODE_NONE);
+    //SDL_SetTextureAlphaMod(src.texture, 255);
+  } else {
+    SDL_RenderCopy(renderer, src.texture, &r1, &r2);
+  }
 }
 #elif HEADLESS
 GBGraphics::GBGraphics() {}

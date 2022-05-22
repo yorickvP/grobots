@@ -102,7 +102,7 @@ public:
 		short left, short right, short y, short size, const GBColor & color, bool useBold);
 
 // blitter
-	void Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect);
+	void Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char alpha=255);
 };
 
 class GBBitmap {
