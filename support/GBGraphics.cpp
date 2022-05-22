@@ -182,7 +182,7 @@ void GBGraphics::DrawStringLeft(const string &, short, short, short, const GBCol
 void GBGraphics::DrawStringRight(const string &, short, short, short, const GBColor &, bool) {}
 void GBGraphics::DrawStringCentered(const string &, short, short, short, const GBColor &, bool) {}
 
-void GBGraphics::Blit(const GBBitmap &, const GBRect &, const GBRect &) {}
+void GBGraphics::Blit(const GBBitmap &, const GBRect &, const GBRect &, const unsigned char) {}
 #endif
 #if HEADLESS || defined(WITH_SDL)
 
@@ -482,6 +482,7 @@ GBBitmap::~GBBitmap() {}
 
 void GBBitmap::StartDrawing() {}
 void GBBitmap::StopDrawing() {}
+void GBBitmap::SetClip(const GBRect*) {}
 
 #elif MAC
 GBBitmap::GBBitmap(short width, short height, GBGraphics &)
