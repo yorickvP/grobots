@@ -424,12 +424,7 @@ const GBGraphics & GBBitmap::Graphics() const {
 	return graphics;}
 
 void GBBitmap::SetPosition(short x, short y) {
-  short width = bounds.Width();
-  short height = bounds.Height();
-  bounds.left = x;
-  bounds.top = y;
-  bounds.right = x + width;
-  bounds.bottom = y + height;
+  bounds.SetXY(x, y);
 }
 	
 #ifdef WITH_SDL
@@ -467,6 +462,15 @@ void GBBitmap::StartDrawing() {
 void GBBitmap::StopDrawing() {
   SDL_SetRenderTarget(renderer, saveTexture);
   saveTexture = nil;
+}
+void GBBitmap::SetClip(const GBRect* clip) {
+  if (clip) {
+    SDL_Rect t;
+    clip->ToRect(t);
+    SDL_RenderSetClipRect(renderer, &t);
+  } else {
+    SDL_RenderSetClipRect(renderer, nil);
+  }
 }
 
 #elif HEADLESS

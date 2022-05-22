@@ -35,31 +35,40 @@ public:
   };
   void Resize() {
     GBRect oldBounds = texture->Bounds();
-    texture.reset(new GBBitmap(v.PreferredWidth() + kFrameSize * 2, v.PreferredHeight() + kTitleBarHeight + 2 * kFrameSize, parent));
+    const short newHeight = v.PreferredHeight();
+    const short newWidth = v.PreferredWidth();
+    texture.reset(new GBBitmap(newWidth + kFrameSize * 2, newHeight + kTitleBarHeight + 2 * kFrameSize, parent));
     texture->SetPosition(oldBounds.left, oldBounds.top);
-    GBRect bounds = GBRect(kFrameSize,
-                           kTitleBarHeight + kFrameSize,
-                           v.PreferredWidth() + kFrameSize,
-                           v.PreferredHeight() + kTitleBarHeight + kFrameSize);
-    v.SetBounds(bounds);
-    v.SetGraphics(&texture->Graphics());
+    // GBRect innerBounds = GBRect(kFrameSize,
+    //                        kTitleBarHeight + kFrameSize,
+    //                        newWidth + kFrameSize,
+    //                        newHeight + kTitleBarHeight + kFrameSize);
+    v.SetSize(newWidth, newHeight);
+    // v.SetBounds(innerBounds);
     Draw(true);
   }
+  void DrawFrame() {
+    //texture->StartDrawing();
+    GBGraphics& g = texture->Graphics();
+    short width = texture->Bounds().Width();
+    //short height = texture->Bounds().Height();
+    // frame
+    g.DrawOpenRect(texture->Bounds(), GBColor::white);
+    GBRect titlebar = GBRect(0, 0, width, kTitleBarHeight+1);
+    // titlebar bg // todo: alpha?
+    g.DrawSolidRect(titlebar, GBColor::black);
+    g.DrawOpenRect(titlebar, GBColor::white);
+    g.DrawStringCentered(v.Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
+  };
   void Draw(bool force) {
     if (v.NeedsResize()) return Resize();
     // todo: clip
     if (force || v.NeedsRedraw(false)) {
       v.SetGraphics(&texture->Graphics());
       texture->StartDrawing();
-      texture->Graphics().DrawOpenRect(texture->Bounds(), GBColor::white);
-      GBRect size = texture->Bounds();
-      size.SetXY(0, 0);
-      GBRect titlebar = GBRect(kFrameSize, kFrameSize, kFrameSize + v.PreferredWidth(), kFrameSize + kTitleBarHeight);
-      texture->Graphics().DrawSolidRect(titlebar, GBColor::black);
-      texture->Graphics().DrawLine(kFrameSize, kTitleBarHeight, size.right - kFrameSize, kTitleBarHeight, GBColor::white);
-
+      DrawFrame();
+      texture->SetClip(&v.Bounds());
       v.DoDraw();
-      texture->Graphics().DrawStringCentered(v.Name(), size.CenterX(), kTitleBarHeight + 1, 14, GBColor::white, true);
       texture->StopDrawing();
     }
   };

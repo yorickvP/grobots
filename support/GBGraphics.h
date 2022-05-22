@@ -140,6 +140,7 @@ public:
 	void StartDrawing();
 	void StopDrawing();
   void SetPosition(short x, short y);
+  void SetClip(const GBRect* clip);
 };
 
 #endif // GBGraphics_h
