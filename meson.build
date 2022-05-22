@@ -72,11 +72,12 @@ executable('grobots',
 
 # todo: only on emscripten
 if meson.is_cross_build()
+  # todo: -fwasm-exceptions
   executable('grobots_wasm',
              src + ui,
              include_directories : ['brains', 'sides', 'simulation', 'support', 'ui', 'views', 'vendor'],
-             cpp_args: ['-DWITH_SDL', '-Wno-sign-compare', '-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2'],
-             link_args: ['-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-sEXIT_RUNTIME=1', '--embed-file=../Vera.ttf@Vera.ttf', '--embed-file=../commune-plus-2.gb@commune-plus-2.gb', '--embed-file=../the-lunacy.gb@the-lunacy.gb', '--embed-file=../VeraBd.ttf@VeraBd.ttf', '--embed-file=../the-horde.gb@the-horde.gb'],
+             cpp_args: ['-DWITH_SDL', '-Wno-sign-compare', '-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-fexceptions'],
+             link_args: ['-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-sEXIT_RUNTIME=1', '--embed-file=../Vera.ttf@Vera.ttf', '--embed-file=../commune-plus-2.gb@commune-plus-2.gb', '--embed-file=../the-lunacy.gb@the-lunacy.gb', '--embed-file=../VeraBd.ttf@VeraBd.ttf', '--embed-file=../the-horde.gb@the-horde.gb', '-fexceptions'],
              name_suffix: 'html',
              install : true)
 else

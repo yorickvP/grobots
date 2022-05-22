@@ -17,7 +17,14 @@ GBSDLWindow::GBSDLWindow(GBView * contents, int x, int y, bool vis, GBSDLApplica
     renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
     graphics = new GBGraphics(renderer, fontmgr);
 	view->SetGraphics(graphics);
-	view->SetSize(view->PreferredWidth(), view->PreferredHeight());
+  #ifdef __EMSCRIPTEN__
+  SDL_Rect r;
+  SDL_GetDisplayUsableBounds(0, &r);
+	view->SetSize(r.w - 1, r.h - 84);
+  SDL_SetWindowSize(sdlwindow, r.w - 1, r.h - 84);
+  #else
+  view->SetSize(v->PreferredWidth(), v->PreferredHeight());
+  #endif
 	windowid = SDL_GetWindowID(sdlwindow);
 	if (visible && !isMain) Show();
 	else  Update(false);
