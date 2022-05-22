@@ -21,6 +21,8 @@ void GBAboutBox::Draw() {
 			" for Mac (Carbon)"
 		#elif WINDOWS
 			" for Win32"
+    #elif __EMSCRIPTEN__
+      " for WebAssembly"
 		#elif LINUX
 			" for Linux"
 		#endif

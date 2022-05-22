@@ -8,7 +8,6 @@
 #include "GBStringUtilities.h"
 #include "GBTypes.h"
 #include "GBMultiView.h"
-#include <ranges>
 #include <memory>
 
 const short kTitleBarHeight = 16;
@@ -124,8 +123,8 @@ void GBMultiView::Draw() {
 }
 
 GBCompositedWindow* GBMultiView::WindowFromXY(short x, short y) {
-  for (auto const & childView : children | std::views::reverse)
-    if (childView->HasPoint(x, y)) return childView;
+  for (auto rit = children.rbegin(); rit != children.rend(); ++rit)
+    if ((*rit)->HasPoint(x, y)) return *rit;
   return nil;
 }
 void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
