@@ -27,6 +27,7 @@ public:
                            v.PreferredWidth() + kFrameSize,
                            v.PreferredHeight() + kTitleBarHeight + kFrameSize);
     v.SetBounds(bounds);
+    DrawFrame();
     Draw(true);
   };
   GBCompositedWindow(const GBCompositedWindow&) = delete;
@@ -39,16 +40,12 @@ public:
     const short newWidth = v.PreferredWidth();
     texture.reset(new GBBitmap(newWidth + kFrameSize * 2, newHeight + kTitleBarHeight + 2 * kFrameSize, parent));
     texture->SetPosition(oldBounds.left, oldBounds.top);
-    // GBRect innerBounds = GBRect(kFrameSize,
-    //                        kTitleBarHeight + kFrameSize,
-    //                        newWidth + kFrameSize,
-    //                        newHeight + kTitleBarHeight + kFrameSize);
     v.SetSize(newWidth, newHeight);
-    // v.SetBounds(innerBounds);
+    DrawFrame();
     Draw(true);
   }
   void DrawFrame() {
-    //texture->StartDrawing();
+    texture->StartDrawing();
     GBGraphics& g = texture->Graphics();
     short width = texture->Bounds().Width();
     //short height = texture->Bounds().Height();
@@ -59,6 +56,7 @@ public:
     g.DrawSolidRect(titlebar, GBColor::black);
     g.DrawOpenRect(titlebar, GBColor::white);
     g.DrawStringCentered(v.Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
+    texture->StopDrawing();
   };
   void Draw(bool force) {
     if (v.NeedsResize()) return Resize();
@@ -66,7 +64,6 @@ public:
     if (force || v.NeedsRedraw(false)) {
       v.SetGraphics(&texture->Graphics());
       texture->StartDrawing();
-      DrawFrame();
       texture->SetClip(&v.Bounds());
       v.DoDraw();
       texture->StopDrawing();
