@@ -182,6 +182,9 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 				}
 				if (evt->button.button == SDL_BUTTON_RIGHT) {
 					GBSDLWindow* wnd = FindWndFromID(evt->button.windowID);
+          if (wnd == mainWnd) {
+            mainView->RightClick(evt->button.x, evt->button.y);
+          }
 					if (wnd == nil || wnd == mainWnd) break;
 					CloseWindow(wnd);
 					if (dragging == wnd) dragging = nil;

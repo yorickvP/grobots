@@ -102,23 +102,24 @@ void GBMultiView::Draw() {
   }
 }
 
+GBCompositedWindow* GBMultiView::WindowFromXY(short x, short y) {
+  for (auto const & childView : children | std::views::reverse)
+    if (childView->HasPoint(x, y)) return childView;
+  return nil;
+}
 void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
-  for (auto const & childView : children | std::views::reverse) {
-    if (childView->HasPoint(x, y)) {
-      dragging = childView;
-      childView->DoClick(x, y, clicksBefore);
-      return;
-    }
+  if (GBCompositedWindow* childView = WindowFromXY(x, y)) {
+    dragging = childView;
+    childView->DoClick(x, y, clicksBefore);
+    return;
   }
   content->DoClick(x, y, clicksBefore);
 }
 void GBMultiView::AcceptUnclick(short x, short y, int clicksBefore) {
   dragging = nil;
-  for (auto const & childView : children) {
-    if (childView->HasPoint(x, y)) {
-      childView->DoUnclick(x, y, clicksBefore);
-      return;
-    }
+  if (GBCompositedWindow* childView = WindowFromXY(x, y)) {
+    childView->DoUnclick(x, y, clicksBefore);
+    return;
   }
   content->DoUnclick(x, y, clicksBefore);
 }
@@ -129,6 +130,15 @@ void GBMultiView::AcceptDrag(short x, short y) {
 
 void GBMultiView::Add(GBView& v) {
   children.push_back(new GBCompositedWindow(v, Graphics()));
+}
+
+void GBMultiView::RightClick(short x, short y) {
+  if (GBCompositedWindow* childView = WindowFromXY(x, y)) {
+    // prevent closing menu
+    if (childView == children.front()) return;
+    children.remove(childView);
+    delete childView;
+  }
 }
 
 // const string GBMultiView::Name() const {
