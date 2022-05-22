@@ -6,7 +6,7 @@
 #include "GBStringUtilities.h"
 #include "GBSDLApplication.h"
 
-GBSDLWindow::GBSDLWindow(GBView * contents, int x, int y, bool vis, GBSDLApplication * _app, bool is_main, GBFontManager* fontmgr)
+GBSDLWindow::GBSDLWindow(GBView * contents, bool vis, GBSDLApplication * _app, bool is_main, GBFontManager* fontmgr)
 	: view(contents), visible(vis), bounds(0, 0, view->PreferredWidth(), view->PreferredHeight())
 	, isMain(is_main)
 	, app(_app)

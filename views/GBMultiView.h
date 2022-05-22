@@ -17,7 +17,7 @@ class GBMultiView : public GBWrapperView {
 	GBMultiView(GBView* const bg);
 	~GBMultiView();
   virtual void Draw() override;
-  void Add(GBView& v);
+  void Add(GBView& v, short x, short y);
 	virtual void AcceptClick(short x, short y, int clicksBefore) override;
 	virtual void AcceptDrag(short x, short y) override;
 	virtual void AcceptUnclick(short x, short y, int clicksBefore) override;

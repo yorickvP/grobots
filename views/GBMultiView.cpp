@@ -19,8 +19,9 @@ class GBCompositedWindow {
   std::unique_ptr<GBBitmap> texture;
   short lastX, lastY;
 public:
-  GBCompositedWindow(GBView& v, GBGraphics& parent) :
+  GBCompositedWindow(GBView& v, GBGraphics& parent, short x, short y) :
     v(v), parent(parent), texture(new GBBitmap(v.PreferredWidth() + kFrameSize * 2, v.PreferredHeight() + kTitleBarHeight + 2 * kFrameSize, parent)), lastX(-1), lastY(-1) {
+    texture->SetPosition(x, y);
     GBRect bounds = GBRect(kFrameSize,
                            kTitleBarHeight + kFrameSize,
                            v.PreferredWidth() + kFrameSize,
@@ -32,6 +33,9 @@ public:
   GBCompositedWindow(const GBCompositedWindow&) = delete;
   ~GBCompositedWindow() {
     delete &v;
+  };
+  bool Matches(const string & name) const {
+    return v.Name().compare(name) == 0;
   };
   void Resize() {
     GBRect oldBounds = texture->Bounds();
@@ -47,9 +51,9 @@ public:
     texture->StartDrawing();
     GBGraphics& g = texture->Graphics();
     short width = texture->Bounds().Width();
-    //short height = texture->Bounds().Height();
+    short height = texture->Bounds().Height();
     // frame
-    g.DrawOpenRect(texture->Bounds(), GBColor::white);
+    g.DrawOpenRect(GBRect(0, 0, width, height), GBColor::white);
     GBRect titlebar = GBRect(0, 0, width, kTitleBarHeight+1);
     // titlebar bg // todo: alpha?
     g.DrawSolidRect(titlebar, GBColor::black);
@@ -65,6 +69,7 @@ public:
       texture->StartDrawing();
       texture->SetClip(&v.Bounds());
       v.DoDraw();
+      texture->SetClip(nil);
       texture->StopDrawing();
     }
   };
@@ -148,8 +153,15 @@ void GBMultiView::AcceptDrag(short x, short y) {
   else content->DoDrag(x, y);
 }
 
-void GBMultiView::Add(GBView& v) {
-  children.push_back(new GBCompositedWindow(v, Graphics()));
+void GBMultiView::Add(GBView& v, short x, short y) {
+  // hack to prevent duplicate windows
+  for (const GBCompositedWindow* childView : children) {
+    if (childView->Matches(v.Name())) {
+      delete &v;
+      return;
+    }
+  }
+  children.push_back(new GBCompositedWindow(v, Graphics(), x, y));
 }
 
 void GBMultiView::RightClick(short x, short y) {

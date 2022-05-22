@@ -53,13 +53,15 @@ GBSDLApplication::GBSDLApplication()
 	portal = new GBPortal(world);
 	mainView = new GBMultiView(portal);
 
-	mainWnd = new GBSDLWindow(mainView, 0, 0, true, this, true, &fontmanager);
-  mainView->Add(*(new GBMenuView(world, *this)));
+	mainWnd = new GBSDLWindow(mainView, true, this, true, &fontmanager);
+  mainView->Add(*(new GBMenuView(world, *this)), 0, -17);
 // #ifndef __EMSCRIPTEN__
-// 	windows.push_back(new GBSDLWindow(new GBMenuView(world, *this), 0, 0, true, this, false, &fontmanager));
+// 	windows.push_back(new GBSDLWindow(new GBMenuView(world, *this), true, this, false, &fontmanager));
 // #endif
 	focus = mainWnd;
 	windows.push_back(mainWnd);
+  OpenMinimap();
+  OpenRoster();
 	//windows.push_back(menuWnd);
 	
 	GBSide * side = GBSideReader::Load("the-lunacy.gb");
@@ -263,28 +265,31 @@ void GBSDLApplication::CloseWindow(GBSDLWindow* window) {
 	windows.remove(window);
 }
 void GBSDLApplication::OpenMinimap() {
-	mainView->Add(*new GBMiniMapView(world, *portal));
+    mainView->Add(*new GBMiniMapView(world, *portal), 7, mainView->Bounds().bottom - 200);
 }
 void GBSDLApplication::OpenDebugger() {
-	mainView->Add(*new GBDebuggerView(world));
+	mainView->Add(*new GBDebuggerView(world), 616, 43);
 }
 void GBSDLApplication::OpenAbout() {
-	mainView->Add(*new GBAboutBox());
+  // TODO: center
+  short x = mainView->Bounds().CenterX()-131;
+  short y = mainView->Bounds().CenterY() - 118;
+	mainView->Add(*new GBAboutBox(), x, y);
 }
 void GBSDLApplication::OpenSideDebugger() {
-	mainView->Add(*new GBSideDebuggerView(world));
+	mainView->Add(*new GBSideDebuggerView(world), 200, 400);
 }
 void GBSDLApplication::OpenRoster() {
-	mainView->Add(*new GBRosterView(world));
+	mainView->Add(*new GBRosterView(world), 7, 43);
 }
 void GBSDLApplication::OpenScores() {
-	mainView->Add(*new GBScoresView(world));
+	mainView->Add(*new GBScoresView(world), 291, 384);
 }
 void GBSDLApplication::OpenTypeWindow() {
-	mainView->Add(*new GBRobotTypeView(world));
+	mainView->Add(*new GBRobotTypeView(world), 616, 270);
 }
 void GBSDLApplication::OpenTournament() {
-	mainView->Add(*new GBTournamentView(world));
+	mainView->Add(*new GBTournamentView(world), 100, 100);
 }
 
 #endif

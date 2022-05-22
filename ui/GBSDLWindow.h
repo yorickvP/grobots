@@ -23,7 +23,7 @@ public:
 	bool isMain;
 	GBSDLApplication * app;
 public:
-	GBSDLWindow(GBView * contents, int x, int y, bool vis, GBSDLApplication * _app, bool is_main, GBFontManager* fontmgr);
+	GBSDLWindow(GBView * contents, bool vis, GBSDLApplication * _app, bool is_main, GBFontManager* fontmgr);
 	~GBSDLWindow();
 	
 // window operations

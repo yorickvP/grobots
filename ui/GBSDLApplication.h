@@ -36,12 +36,9 @@ class GBSDLApplication {
 	
 	GBFontManager fontmanager;
 	
-	SDL_Surface* main_screen;
-	
 	GBSDLWindow * dragging;
 
 	GBWorld world;
-	GBGraphics * mainGrf;
 	
 	GBPortal * portal;
 	GBSDLWindow * mainWnd;
