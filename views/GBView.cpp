@@ -18,7 +18,7 @@ GBRect GBView::CalcExternalRect(const GBRect & r) const {
 
 void GBView::DrawLine(short x1, short y1, short x2, short y2,
 		const GBColor & color, short thickness) const {
-	graphics->DrawLine(x1, y1, x2, y2, color, thickness);
+	graphics->DrawLine(x1 + bounds.left, y1 + bounds.top, x2 + bounds.left, y2 + bounds.top, color, thickness);
 }
 
 void GBView::DrawSolidRect(const GBRect & where, const GBColor & color) const {

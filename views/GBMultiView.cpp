@@ -83,9 +83,13 @@ public:
   };
   void DoClick(short x, short y, int clicksBefore) {
     const GBRect& dst = texture->Bounds();
-    lastX = x;
-    lastY = y;
-    if (y - dst.top < v.Bounds().top) return;
+    if (y - dst.top < v.Bounds().top) {
+      lastX = x;
+      lastY = y;
+      return;
+      // todo: move by drag on unused client space
+      // possibly by returning bool from DoClick
+    }
     v.DoClick(x - dst.left, y - dst.top, clicksBefore);
   };
   void DoUnclick(short x, short y, int clicksBefore) {
@@ -99,9 +103,11 @@ public:
     if (y - dst.top > v.Bounds().top) {
       v.DoDrag(x - dst.left, y - dst.top);
     }
-    texture->SetPosition(dst.left + (x - lastX), dst.top + (y - lastY));
-    lastX = x;
-    lastY = y;
+    if (lastX != -1 && lastY != -1) {
+      texture->SetPosition(dst.left + (x - lastX), dst.top + (y - lastY));
+      lastX = x;
+      lastY = y;
+    }
   };
   bool NeedsResize() const {
     return v.NeedsResize();
