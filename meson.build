@@ -64,6 +64,10 @@ sdl = dependency('sdl2', version : '>=2.0')
 sdl_ttf = dependency('SDL2_ttf', version : '>=2.0')
 sdl_gfx = dependency('SDL2_gfx', version : '>=1.0')
 
+if get_option('optimization') == '3'
+   add_project_arguments('-flto', language: 'cpp')
+endif
+
 executable('grobots',
            src + ['GBHeadless.cpp'],
            include_directories : ['brains', 'sides', 'simulation', 'support', 'views'],
