@@ -78,8 +78,24 @@ void GBPortal::DrawOneTile(const GBRect & b, GBGraphics & g) {
 		g.DrawLine(b.left, y, b.right, y, fineColor);
 	}
 // coarse grid
-	g.DrawLine(b.left, b.top, b.left, b.bottom, coarseColor, coarseThickness);
-	g.DrawLine(b.left, b.top, b.right, b.top, coarseColor, coarseThickness);
+  if (b.left - (coarseThickness/2) < 0) {
+    short sidea = (coarseThickness/2) - b.left;
+    short sideb = coarseThickness - sidea;
+    // wrap!
+    g.DrawLine(0, b.top, 0, b.bottom, coarseColor, sidea);
+    g.DrawLine(b.right - (sideb/2), b.top, b.right - (sideb/2), b.bottom, coarseColor, sideb);
+  } else {
+    g.DrawLine(b.left, b.top, b.left, b.bottom, coarseColor, coarseThickness);
+  }
+  if (b.top - (coarseThickness/2) < 0) {
+    short sidea = (coarseThickness/2) - b.top;
+    short sideb = coarseThickness - sidea;
+    // wrap
+    g.DrawLine(b.left, 0, b.right, 0, coarseColor, sidea);
+    g.DrawLine(b.left, b.bottom - (sideb/2), b.right, b.bottom - (sideb/2), coarseColor, sideb);
+  } else {
+    g.DrawLine(b.left, b.top, b.right, b.top, coarseColor, coarseThickness);
+  }
 }
 
 void GBPortal::InitBackground() {

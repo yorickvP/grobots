@@ -7,5 +7,4 @@
 - wasm framerate management / multi-threaded rendering
 - keyboard focus for windows
 - drag windows using dead client area
-- background is missing some lines on some zoom levels
 - string cache -- drawing text takes 40% of the time?!
