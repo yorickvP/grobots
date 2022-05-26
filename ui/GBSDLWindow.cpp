@@ -23,7 +23,7 @@ GBSDLWindow::GBSDLWindow(GBView * contents, bool vis, GBSDLApplication * _app, b
 	view->SetSize(r.w - 1, r.h - 84);
   SDL_SetWindowSize(sdlwindow, r.w - 1, r.h - 84);
   #else
-  view->SetSize(v->PreferredWidth(), v->PreferredHeight());
+  view->SetSize(contents->PreferredWidth(), contents->PreferredHeight());
   #endif
 	windowid = SDL_GetWindowID(sdlwindow);
 	if (visible && !isMain) Show();
