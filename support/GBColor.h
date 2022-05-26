@@ -9,11 +9,21 @@
 #ifdef WITH_SDL
 #include "SDL2/SDL_pixels.h"
 #endif
+#include <functional>
 
 class GBColor {
 	float r, g, b;
 public:
 	GBColor();
+  inline std::size_t hash() const {
+    std::size_t seed = 0;
+    std::hash<float> hasher;
+    seed ^= hasher(r) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+    seed ^= hasher(g) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+    seed ^= hasher(b) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+    return seed;
+  };
+  bool operator==(const GBColor& other) const = default;
 	explicit GBColor(const float grey);
 	GBColor(const float red, const float green, const float blue);
 	float Red() const { return r; }
@@ -59,5 +69,13 @@ public:
 inline GBColor::GBColor()
 	: r(1.0), g(1.0), b(1.0)
 {}
+
+namespace std {
+  template<> struct hash<GBColor> {
+    std::size_t operator()(const GBColor &t) const {
+      return t.hash();
+    };
+  };
+};
 
 #endif

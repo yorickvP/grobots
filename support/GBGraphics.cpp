@@ -121,35 +121,35 @@ void GBGraphics::DrawStringLeft(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
 	SDL_Rect destrect = {x, y, 0, 0};
-	GBRenderedText text = font_mgr->renderText_Blended(renderer, size, useBold, str, (SDL_Color)color);
-	destrect.w = text.w;
-	destrect.h = text.h;
-	destrect.y -= text.h;
-  text.draw(renderer, nil, &destrect);
+  GBFontManager::Text text = font_mgr->renderText_Blended(renderer, size, useBold, str, color);
+	destrect.w = text->w;
+	destrect.h = text->h;
+	destrect.y -= text->h;
+  text->draw(renderer, nil, &destrect);
 	//stringRGBA(renderer, x, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 void GBGraphics::DrawStringCentered(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
 	SDL_Rect destrect = {x, y, 0, 0};
-	GBRenderedText text = font_mgr->renderText_Blended(renderer, size, useBold, str, (SDL_Color)color);
-	destrect.w = text.w;
-	destrect.h = text.h;
-	destrect.x -= text.w / 2;
-	destrect.y -= text.h;
-  text.draw(renderer, nil, &destrect);
+  GBFontManager::Text text = font_mgr->renderText_Blended(renderer, size, useBold, str, color);
+	destrect.w = text->w;
+	destrect.h = text->h;
+	destrect.x -= text->w / 2;
+	destrect.y -= text->h;
+  text->draw(renderer, nil, &destrect);
 	//stringRGBA(renderer, x - (str.length() * 4), y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 void GBGraphics::DrawStringRight(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
 	SDL_Rect destrect = {x, y, 0, 0};
-	GBRenderedText text = font_mgr->renderText_Blended(renderer, size, useBold, str, (SDL_Color)color);
-	destrect.w = text.w;
-	destrect.h = text.h;
-	destrect.x -= text.w;
-	destrect.y -= text.h;
-  text.draw(renderer, nil, &destrect);
+  GBFontManager::Text text = font_mgr->renderText_Blended(renderer, size, useBold, str, color);
+	destrect.w = text->w;
+	destrect.h = text->h;
+	destrect.x -= text->w;
+	destrect.y -= text->h;
+  text->draw(renderer, nil, &destrect);
 	//stringRGBA(renderer, x - str.length() * 8, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char alpha) {
