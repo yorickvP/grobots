@@ -56,18 +56,16 @@ void GBMiniMapView::DrawObjectListFixed(const GBObject * list, const short size)
 	}
 }
 
-void GBMiniMapView::DrawObjectListTrails(const GBObject * list, const short minSize) const {
-	trails->StartDrawing();
+void GBMiniMapView::DrawObjectListTrails(GBGraphicsWrapper& w, const GBObject * list, const short minSize) const {
 	for ( const GBObject * cur = list; cur != nil; cur = cur->next ) {
 		GBRect where;
 		where.left = ToScreenX(cur->Left());
 		where.top = ToScreenY(cur->Top());
 		where.right = where.left + round(max(cur->Radius() * 2 * scalex, minSize));
 		where.bottom = where.top + round(max(cur->Radius() * 2 * scaley, minSize));
-		trails->Graphics().DrawSolidRect(CalcExternalRect(where),
+		w->DrawSolidRect(CalcExternalRect(where),
 			cur->Color() * kTrailIntensity);
 	}
-	trails->StopDrawing();
 }
 
 void GBMiniMapView::RecalculateScales() {
@@ -104,9 +102,7 @@ void GBMiniMapView::Draw() {
 		newTrails = true;
 	}
 	if ( newTrails || frameLastDrawn > world.CurrentFrame() ) {
-		trails->StartDrawing();
-		trails->Graphics().DrawSolidRect(trails->Bounds(), GBColor::black);
-		trails->StopDrawing();
+		trails->Graphics()->DrawSolidRect(trails->Bounds(), GBColor::black);
 	}
 // draw background and grid
 	if ( showTrails ) BlitAll(*trails, trails->Bounds());
@@ -126,13 +122,21 @@ void GBMiniMapView::Draw() {
 	if ( showFood ) DrawLayerFixed(ocFood, 1);
 	DrawLayer(ocArea, 2);
 	//robots are special because they leave trails
-	for ( ty = world.ForegroundTilesY() - 1; ty >= 0; ty -- )
-		for ( tx = world.ForegroundTilesX() - 1; tx >= 0; tx -- ) {
-			if ( showRobots ) DrawObjectList(world.GetObjects(tx, ty, ocRobot), 2);
-			DrawObjectListTrails(world.GetObjects(tx, ty, ocRobot), 2);
-		}
-	if ( showRobots ) DrawObjectList(world.GetLargeObjects(ocRobot), 2);
-	DrawObjectListTrails(world.GetLargeObjects(ocRobot), 2);
+  if (showRobots) {
+    for ( ty = world.ForegroundTilesY() - 1; ty >= 0; ty -- )
+      for ( tx = world.ForegroundTilesX() - 1; tx >= 0; tx -- )
+        DrawObjectList(world.GetObjects(tx, ty, ocRobot), 2);
+    DrawObjectList(world.GetLargeObjects(ocRobot), 2);
+  }
+
+  {
+    GBGraphicsWrapper w = trails->Graphics();
+    for ( ty = world.ForegroundTilesY() - 1; ty >= 0; ty -- )
+      for ( tx = world.ForegroundTilesX() - 1; tx >= 0; tx -- )
+        DrawObjectListTrails(w, world.GetObjects(tx, ty, ocRobot), 2);
+
+    DrawObjectListTrails(w, world.GetLargeObjects(ocRobot), 2);
+  }
 	DrawLayer(ocShot, 1);
 	if ( showSensors ) DrawLayer(ocSensorShot, 4);
 	if ( showDecorations ) DrawLayer(ocDecoration, 1);

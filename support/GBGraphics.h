@@ -104,8 +104,9 @@ public:
 // blitter
 	void Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char alpha=255);
 };
-
+class GBGraphicsWrapper;
 class GBBitmap {
+  friend class GBGraphicsWrapper;
 private:
 #ifdef WITH_SDL
   SDL_Texture* texture;
@@ -128,19 +129,35 @@ public:
 private:
 	GBRect bounds;
 	GBGraphics graphics;
+protected:
+// must call StartDrawing and StopDrawing around any drawing to the bitmap,
+//  to allow saving and restoring state :(
+	void StartDrawing();
+	void StopDrawing();
 public:
 	GBBitmap(short width, short height, GBGraphics & parent);
   GBBitmap(const GBBitmap&) = delete;
 	~GBBitmap();
 	const GBRect & Bounds() const;
-	GBGraphics & Graphics();
-	const GBGraphics & Graphics() const;
-// must call StartDrawing and StopDrawing around any drawing to the bitmap,
-//  to allow saving and restoring state :(
-	void StartDrawing();
-	void StopDrawing();
+  GBGraphicsWrapper Graphics();
   void SetPosition(short x, short y);
   void SetClip(const GBRect* clip);
+};
+
+class GBGraphicsWrapper {
+  GBBitmap& b;
+  GBGraphics& g;
+public:
+  GBGraphicsWrapper(GBBitmap& b, GBGraphics& g) : b(b), g(g) {
+    b.StartDrawing();
+  }
+  GBGraphicsWrapper(const GBGraphicsWrapper&) = delete;
+  ~GBGraphicsWrapper() {
+    b.StopDrawing();
+  }
+  GBGraphics* operator->() { return &g; };
+  // todo: evil
+  GBGraphics* operator*() { return &g; };
 };
 
 #endif // GBGraphics_h

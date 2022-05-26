@@ -417,11 +417,8 @@ void GBGraphics::DrawStringPair(const string & str1, const string & str2,
 const GBRect & GBBitmap::Bounds() const {
 	return bounds;}
 
-GBGraphics & GBBitmap::Graphics() {
-	return graphics;}
-
-const GBGraphics & GBBitmap::Graphics() const {
-	return graphics;}
+GBGraphicsWrapper GBBitmap::Graphics() {
+	return GBGraphicsWrapper(*this, graphics);}
 
 void GBBitmap::SetPosition(short x, short y) {
   bounds.SetXY(x, y);

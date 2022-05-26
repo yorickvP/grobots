@@ -53,7 +53,7 @@ private:
 // drawing internals
 	void DrawBackground();
 	void DrawBackgroundTile(long ix, long iy);
-	void DrawOneTile(const GBRect & b, GBGraphics & g);
+	void DrawOneTile(const GBRect & b, GBGraphicsWrapper & g);
 	void InitBackground();
 	void DrawLayer(GBObjectClass cl, long minTileX, long minTileY, long maxTileX, long maxTileY, GBDrawingLayer);
 	void DrawObjects();

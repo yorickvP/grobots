@@ -391,14 +391,13 @@ void GBDoubleBufferedView::Draw() {
 	bool newWorld = false;
 	if ( ! offscreen ) {
 		offscreen = new GBBitmap(Width(), Height(), Graphics());
-		content->SetGraphics(&(offscreen->Graphics()));
 		newWorld = true;
 	}
 // draw offscreen
 	if ( draw && (NeedsRedraw(false) || newWorld) ) {
-		offscreen->StartDrawing();
+    GBGraphicsWrapper w = offscreen->Graphics();
+    content->SetGraphics(*w);
 		content->Draw();
-		offscreen->StopDrawing();
 	}
 // draw onscreen
 	if ( flip )

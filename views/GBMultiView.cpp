@@ -47,29 +47,26 @@ public:
     Draw(true, false);
   }
   void DrawFrame() {
-    texture->StartDrawing();
-    GBGraphics& g = texture->Graphics();
+    GBGraphicsWrapper g = texture->Graphics();
     short width = texture->Bounds().Width();
     short height = texture->Bounds().Height();
     // frame
-    g.DrawOpenRect(GBRect(0, 0, width, height), GBColor::white);
+    g->DrawOpenRect(GBRect(0, 0, width, height), GBColor::white);
     GBRect titlebar = GBRect(0, 0, width, kTitleBarHeight+1);
     // titlebar bg // todo: alpha?
-    g.DrawSolidRect(titlebar, GBColor::black);
-    g.DrawOpenRect(titlebar, GBColor::white);
-    g.DrawStringCentered(v->Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
-    texture->StopDrawing();
+    g->DrawSolidRect(titlebar, GBColor::black);
+    g->DrawOpenRect(titlebar, GBColor::white);
+    g->DrawStringCentered(v->Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
   };
   void Draw(bool force, bool running) {
     if (v->NeedsResize()) return Resize();
     // todo: clip
     if (force || v->NeedsRedraw(running)) {
-      v->SetGraphics(&texture->Graphics());
-      texture->StartDrawing();
+      GBGraphicsWrapper g = texture->Graphics();
+      v->SetGraphics(*g);
       texture->SetClip(&v->Bounds());
       v->DoDraw(running);
       texture->SetClip(nil);
-      texture->StopDrawing();
     }
   };
   void Blit(GBGraphics& dest) {

@@ -63,9 +63,9 @@ void GBPortal::DrawBackgroundTile(long xi, long yi) {
 		DrawSolidRect(tile, GBColor::lightGray);
 }
 
-void GBPortal::DrawOneTile(const GBRect & b, GBGraphics & g) {
+void GBPortal::DrawOneTile(const GBRect & b, GBGraphicsWrapper & g) {
 // black background
-	g.DrawSolidRect(b, GBColor::black);
+	g->DrawSolidRect(b, GBColor::black);
 // fine grid
 	GBColor fineColor(min(0.4f + 0.04f * scale / kScale,  0.15f + 0.25f * scale / kScale));
 	short coarseThickness = 1 + scale / 20;
@@ -74,36 +74,35 @@ void GBPortal::DrawOneTile(const GBRect & b, GBGraphics & g) {
 	for ( int i = 1; i < kBackgroundTileSize; i ++ ) {
 		short x = b.left + i * scale;
 		short y = b.top + i * scale;
-		g.DrawLine(x, b.top, x, b.bottom, fineColor);
-		g.DrawLine(b.left, y, b.right, y, fineColor);
+		g->DrawLine(x, b.top, x, b.bottom, fineColor);
+		g->DrawLine(b.left, y, b.right, y, fineColor);
 	}
 // coarse grid
   if (b.left - (coarseThickness/2) < 0) {
     short sidea = (coarseThickness/2) - b.left;
     short sideb = coarseThickness - sidea;
     // wrap!
-    g.DrawLine(0, b.top, 0, b.bottom, coarseColor, sidea);
-    g.DrawLine(b.right - (sideb/2), b.top, b.right - (sideb/2), b.bottom, coarseColor, sideb);
+    g->DrawLine(0, b.top, 0, b.bottom, coarseColor, sidea);
+    g->DrawLine(b.right - (sideb/2), b.top, b.right - (sideb/2), b.bottom, coarseColor, sideb);
   } else {
-    g.DrawLine(b.left, b.top, b.left, b.bottom, coarseColor, coarseThickness);
+    g->DrawLine(b.left, b.top, b.left, b.bottom, coarseColor, coarseThickness);
   }
   if (b.top - (coarseThickness/2) < 0) {
     short sidea = (coarseThickness/2) - b.top;
     short sideb = coarseThickness - sidea;
     // wrap
-    g.DrawLine(b.left, 0, b.right, 0, coarseColor, sidea);
-    g.DrawLine(b.left, b.bottom - (sideb/2), b.right, b.bottom - (sideb/2), coarseColor, sideb);
+    g->DrawLine(b.left, 0, b.right, 0, coarseColor, sidea);
+    g->DrawLine(b.left, b.bottom - (sideb/2), b.right, b.bottom - (sideb/2), coarseColor, sideb);
   } else {
-    g.DrawLine(b.left, b.top, b.right, b.top, coarseColor, coarseThickness);
+    g->DrawLine(b.left, b.top, b.right, b.top, coarseColor, coarseThickness);
   }
 }
 
 void GBPortal::InitBackground() {
 	if (background) delete background;
 	background = new GBBitmap(scale * kBackgroundTileSize, scale * kBackgroundTileSize, Graphics());
-	background->StartDrawing();
-	DrawOneTile(background->Bounds(), background->Graphics());
-	background->StopDrawing();
+  GBGraphicsWrapper w = background->Graphics();
+	DrawOneTile(background->Bounds(), w);
 }
 
 void GBPortal::DrawLayer(GBObjectClass cl, long minTileX, long minTileY, long maxTileX, long maxTileY, GBDrawingLayer layer) {

@@ -27,7 +27,7 @@ private:
 	void DrawLayerFixed(const GBObjectClass layer, const short size) const;
 	void DrawObjectList(const GBObject * list, const short minSize) const;
 	void DrawObjectListFixed(const GBObject * list, const short size) const;
-	void DrawObjectListTrails(const GBObject * list, const short minSize) const;
+	void DrawObjectListTrails(GBGraphicsWrapper &w, const GBObject * list, const short minSize) const;
 // coordinate conversions
 	void RecalculateScales();
 	short ToScreenX(const GBCoordinate x) const;
