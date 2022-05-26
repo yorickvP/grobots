@@ -17,6 +17,9 @@
 #include "SDL.h"
 #include "SDL2_framerate.h"
 #include <list>
+#include <memory>
+
+template <class T> using Ref = std::shared_ptr<T>;
 
 class GBSDLApplication {
 	bool alive;
@@ -28,26 +31,26 @@ class GBSDLApplication {
 	void ExpireClicks(int x, int y);
 	void Process(); // do periodic processing
 	void Redraw();
-	GBSDLWindow* FindWndAtPos(short x, short y);
-    GBSDLWindow* FindWndFromID(Uint32 id);
+  Ref<GBSDLWindow> FindWndAtPos(short x, short y);
+  Ref<GBSDLWindow> FindWndFromID(Uint32 id);
 	
 	GBMilliseconds stepPeriod;
 	GBMilliseconds lastStep;
 	
 	GBFontManager fontmanager;
 	
-	GBSDLWindow * dragging;
+  std::weak_ptr<GBSDLWindow> dragging;
 
 	GBWorld world;
 	
 	GBPortal * portal;
-	GBSDLWindow * mainWnd;
-	GBSDLWindow * menuWnd;
-	GBSDLWindow * focus;
-	std::list<GBSDLWindow*> windows;
+  Ref<GBSDLWindow> mainWnd;
+	Ref<GBSDLWindow> menuWnd;
+  std::weak_ptr<GBSDLWindow> focus;
+	std::list<Ref<GBSDLWindow>> windows;
 	
-	void CloseWindow(GBSDLWindow* window);
-  GBMultiView * mainView;
+	void CloseWindow(Ref<GBSDLWindow> window);
+  Ref<GBMultiView> mainView;
 public:
 	GBSDLApplication();
 	~GBSDLApplication();

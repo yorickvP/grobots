@@ -9,41 +9,40 @@
 #include "GBTypes.h"
 #include "GBMultiView.h"
 #include <memory>
+#include <optional>
 
 const short kTitleBarHeight = 16;
 const short kFrameSize = 1;
 
 class GBCompositedWindow {
-  GBView& v;
+  std::shared_ptr<GBView> v;
   GBGraphics& parent;
   std::unique_ptr<GBBitmap> texture;
   short lastX, lastY;
 public:
-  GBCompositedWindow(GBView& v, GBGraphics& parent, short x, short y) :
-    v(v), parent(parent), texture(new GBBitmap(v.PreferredWidth() + kFrameSize * 2, v.PreferredHeight() + kTitleBarHeight + 2 * kFrameSize, parent)), lastX(-1), lastY(-1) {
+  GBCompositedWindow(std::shared_ptr<GBView> v, GBGraphics& parent, short x, short y) :
+    v(v), parent(parent), texture(std::make_unique<GBBitmap>(v->PreferredWidth() + kFrameSize * 2, v->PreferredHeight() + kTitleBarHeight + 2 * kFrameSize, parent)), lastX(-1), lastY(-1) {
     texture->SetPosition(x, y);
     GBRect bounds = GBRect(kFrameSize,
                            kTitleBarHeight + kFrameSize,
-                           v.PreferredWidth() + kFrameSize,
-                           v.PreferredHeight() + kTitleBarHeight + kFrameSize);
-    v.SetBounds(bounds);
+                           v->PreferredWidth() + kFrameSize,
+                           v->PreferredHeight() + kTitleBarHeight + kFrameSize);
+    v->SetBounds(bounds);
     DrawFrame();
     Draw(true, false);
   };
   GBCompositedWindow(const GBCompositedWindow&) = delete;
-  ~GBCompositedWindow() {
-    delete &v;
-  };
+  ~GBCompositedWindow() {};
   bool Matches(const string & name) const {
-    return v.Name().compare(name) == 0;
+    return v->Name().compare(name) == 0;
   };
   void Resize() {
     GBRect oldBounds = texture->Bounds();
-    const short newHeight = v.PreferredHeight();
-    const short newWidth = v.PreferredWidth();
-    texture.reset(new GBBitmap(newWidth + kFrameSize * 2, newHeight + kTitleBarHeight + 2 * kFrameSize, parent));
+    const short newHeight = v->PreferredHeight();
+    const short newWidth = v->PreferredWidth();
+    texture = std::make_unique<GBBitmap>(newWidth + kFrameSize * 2, newHeight + kTitleBarHeight + 2 * kFrameSize, parent);
     texture->SetPosition(oldBounds.left, oldBounds.top);
-    v.SetSize(newWidth, newHeight);
+    v->SetSize(newWidth, newHeight);
     DrawFrame();
     Draw(true, false);
   }
@@ -58,17 +57,17 @@ public:
     // titlebar bg // todo: alpha?
     g.DrawSolidRect(titlebar, GBColor::black);
     g.DrawOpenRect(titlebar, GBColor::white);
-    g.DrawStringCentered(v.Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
+    g.DrawStringCentered(v->Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
     texture->StopDrawing();
   };
   void Draw(bool force, bool running) {
-    if (v.NeedsResize()) return Resize();
+    if (v->NeedsResize()) return Resize();
     // todo: clip
-    if (force || v.NeedsRedraw(running)) {
-      v.SetGraphics(&texture->Graphics());
+    if (force || v->NeedsRedraw(running)) {
+      v->SetGraphics(&texture->Graphics());
       texture->StartDrawing();
-      texture->SetClip(&v.Bounds());
-      v.DoDraw(running);
+      texture->SetClip(&v->Bounds());
+      v->DoDraw(running);
       texture->SetClip(nil);
       texture->StopDrawing();
     }
@@ -83,25 +82,25 @@ public:
   };
   void DoClick(short x, short y, int clicksBefore) {
     const GBRect& dst = texture->Bounds();
-    if (y - dst.top < v.Bounds().top) {
+    if (y - dst.top < v->Bounds().top) {
       lastX = x;
       lastY = y;
       return;
       // todo: move by drag on unused client space
       // possibly by returning bool from DoClick
     }
-    v.DoClick(x - dst.left, y - dst.top, clicksBefore);
+    v->DoClick(x - dst.left, y - dst.top, clicksBefore);
   };
   void DoUnclick(short x, short y, int clicksBefore) {
     const GBRect& dst = texture->Bounds();
-    v.DoUnclick(x - dst.left, y - dst.top, clicksBefore);
+    v->DoUnclick(x - dst.left, y - dst.top, clicksBefore);
     lastX = -1;
     lastY = -1;
   };
   void DoDrag(short x, short y) {
     const GBRect& dst = texture->Bounds();
-    if (y - dst.top > v.Bounds().top) {
-      v.DoDrag(x - dst.left, y - dst.top);
+    if (y - dst.top > v->Bounds().top) {
+      v->DoDrag(x - dst.left, y - dst.top);
     }
     if (lastX != -1 && lastY != -1) {
       texture->SetPosition(dst.left + (x - lastX), dst.top + (y - lastY));
@@ -109,23 +108,19 @@ public:
       lastY = y;
     }
   };
-  bool NeedsResize() const {
-    return v.NeedsResize();
+  bool NeedsRedraw(bool running) const {
+    return v->NeedsRedraw(running);
   }
-  const GBView& View() const {
-    return v;
+  bool NeedsResize() const {
+    return v->NeedsResize();
   }
 };
 
 GBMultiView::GBMultiView(GBView* const bg)
-	: GBWrapperView(bg), children(), dragging(nil), changed(true)
+	: GBWrapperView(bg), children(), dragging(), changed(true)
 {}
 
-GBMultiView::~GBMultiView() {
-  for (auto const& i : children) {
-    delete i;
-  }
-}
+GBMultiView::~GBMultiView() {}
 
 void GBMultiView::Draw_(bool running) {
   content->SetGraphics(&Graphics());
@@ -141,57 +136,56 @@ bool GBMultiView::NeedsRedraw(bool running) const {
   if (changed) return true;
   if (content->NeedsRedraw(running)) return true;
   for (auto const & childView : children) {
-    if (childView->View().NeedsRedraw(running)) return true;
-    if (childView->View().NeedsResize()) return true;
+    if (childView->NeedsRedraw(running)) return true;
+    if (childView->NeedsResize()) return true;
   }
   return false;
 }
 
-GBCompositedWindow* GBMultiView::WindowFromXY(short x, short y) {
+std::shared_ptr<GBCompositedWindow> GBMultiView::WindowFromXY(short x, short y) {
   for (auto rit = children.rbegin(); rit != children.rend(); ++rit)
     if ((*rit)->HasPoint(x, y)) return *rit;
-  return nil;
+  return {};
 }
 void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
-  if (GBCompositedWindow* childView = WindowFromXY(x, y)) {
+  if (auto childView = WindowFromXY(x, y)) {
     dragging = childView;
-    childView->DoClick(x, y, clicksBefore);
+    (*childView).DoClick(x, y, clicksBefore);
     return;
   }
   content->DoClick(x, y, clicksBefore);
 }
 void GBMultiView::AcceptUnclick(short x, short y, int clicksBefore) {
-  dragging = nil;
-  if (GBCompositedWindow* childView = WindowFromXY(x, y)) {
-    childView->DoUnclick(x, y, clicksBefore);
+  dragging = {};
+  if (auto childView = WindowFromXY(x, y)) {
+    (*childView).DoUnclick(x, y, clicksBefore);
     return;
   }
   content->DoUnclick(x, y, clicksBefore);
 }
 void GBMultiView::AcceptDrag(short x, short y) {
-  if (dragging) dragging->DoDrag(x, y);
+  // todo: was dragging, but target disappeared
+  if (auto d = dragging.lock()) d->DoDrag(x, y);
   else content->DoDrag(x, y);
   changed = true;
 }
 
-void GBMultiView::Add(GBView& v, short x, short y) {
+void GBMultiView::Add(std::shared_ptr<GBView> v, short x, short y) {
   changed = true;
   // hack to prevent duplicate windows
-  for (const GBCompositedWindow* childView : children) {
-    if (childView->Matches(v.Name())) {
-      delete &v;
+  for (const auto &childView : children) {
+    if (childView->Matches(v->Name())) {
       return;
     }
   }
-  children.push_back(new GBCompositedWindow(v, Graphics(), x, y));
+  children.push_back(std::make_shared<GBCompositedWindow>(v, Graphics(), x, y));
 }
 
 void GBMultiView::RightClick(short x, short y) {
-  if (GBCompositedWindow* childView = WindowFromXY(x, y)) {
+  if (auto childView = WindowFromXY(x, y)) {
     // prevent closing menu
     if (childView == children.front()) return;
     children.remove(childView);
-    delete childView;
     changed = true;
   }
 }

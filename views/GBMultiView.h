@@ -7,18 +7,20 @@
 
 #include "GBView.h"
 #include <list>
+#include <optional>
+#include <memory>
 class GBCompositedWindow;
 class GBMultiView : public GBWrapperView {
  private:
-  std::list<GBCompositedWindow*> children;
-  GBCompositedWindow* dragging;
-  GBCompositedWindow* WindowFromXY(short x, short y);
+  std::list<std::shared_ptr<GBCompositedWindow>> children;
+  std::weak_ptr<GBCompositedWindow> dragging;
+  std::shared_ptr<GBCompositedWindow> WindowFromXY(short x, short y);
   bool changed;
  public:
 	GBMultiView(GBView* const bg);
 	~GBMultiView();
   virtual void Draw_(bool) override;
-  void Add(GBView& v, short x, short y);
+  void Add(std::shared_ptr<GBView> v, short x, short y);
 	virtual void AcceptClick(short x, short y, int clicksBefore) override;
 	virtual void AcceptDrag(short x, short y) override;
 	virtual void AcceptUnclick(short x, short y, int clicksBefore) override;

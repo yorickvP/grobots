@@ -8,9 +8,9 @@
 #include "GBTypes.h"
 #include "GBView.h"
 #include "SDL.h"
-class GBSDLApplication;
+#include <memory>
 class GBSDLWindow {
-	GBView * view;
+  std::shared_ptr<GBView> view;
 	bool visible;
 	GBGraphics * graphics;
 	SDL_Window* sdlwindow;
@@ -21,9 +21,8 @@ class GBSDLWindow {
 	Uint32 windowid;
 public:
 	bool isMain;
-	GBSDLApplication * app;
 public:
-	GBSDLWindow(GBView * contents, bool vis, GBSDLApplication * _app, bool is_main, GBFontManager* fontmgr);
+	GBSDLWindow(std::shared_ptr<GBView> contents, bool vis, bool is_main, GBFontManager& fontmgr);
 	~GBSDLWindow();
 	
 // window operations

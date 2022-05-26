@@ -6,16 +6,15 @@
 #include "GBStringUtilities.h"
 #include "GBSDLApplication.h"
 
-GBSDLWindow::GBSDLWindow(GBView * contents, bool vis, GBSDLApplication * _app, bool is_main, GBFontManager* fontmgr)
+GBSDLWindow::GBSDLWindow(std::shared_ptr<GBView> contents, bool vis, bool is_main, GBFontManager& fontmgr)
 	: view(contents), visible(vis), bounds(0, 0, view->PreferredWidth(), view->PreferredHeight())
 	, isMain(is_main)
-	, app(_app)
 {
     sdlwindow = SDL_CreateWindow(contents->Name().c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                             contents->PreferredWidth(), contents->PreferredHeight(), 
                                  SDL_WINDOW_SHOWN | (contents->Resizable() ? SDL_WINDOW_RESIZABLE : 0));
     renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
-    graphics = new GBGraphics(renderer, fontmgr);
+    graphics = new GBGraphics(renderer, &fontmgr);
 	view->SetGraphics(graphics);
   #ifdef __EMSCRIPTEN__
   SDL_Rect r;
@@ -31,7 +30,7 @@ GBSDLWindow::GBSDLWindow(GBView * contents, bool vis, GBSDLApplication * _app, b
 }
 
 GBSDLWindow::~GBSDLWindow() {
-	if (view) delete view;
+  view = {};
 	if (graphics) delete graphics;
 	if (sdlwindow) SDL_DestroyWindow(sdlwindow);
 }

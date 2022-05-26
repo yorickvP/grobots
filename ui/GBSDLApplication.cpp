@@ -39,7 +39,7 @@ const GBMilliseconds kMaxEventInterval = 50;
 
 GBSDLApplication::GBSDLApplication() 
 	: alive(true), clicks(0), clickx(0), clicky(0), stepPeriod(-1), lastStep(0), fontmanager(),
-    dragging(nil), world(), focus(nil), windows() {
+    dragging(), world(), focus(), windows() {
   // TODO: find out which parts to init
 #ifndef __EMSCRIPTEN__
 	if (SDL_Init(SDL_INIT_EVERYTHING) == -1) FatalError("Unable to init SDL");
@@ -51,12 +51,12 @@ GBSDLApplication::GBSDLApplication()
 	SetStepPeriod(kNormalSpeedLimit);
 	
 	portal = new GBPortal(world);
-	mainView = new GBMultiView(portal);
+	mainView = std::make_shared<GBMultiView>(portal);
 
-	mainWnd = new GBSDLWindow(mainView, true, this, true, &fontmanager);
-  mainView->Add(*(new GBMenuView(world, *this)), 0, -17);
+	mainWnd = std::make_shared<GBSDLWindow>(mainView, true, true, fontmanager);
+  mainView->Add(std::make_shared<GBMenuView>(world, *this), 0, -17);
 // #ifndef __EMSCRIPTEN__
-// 	windows.push_back(new GBSDLWindow(new GBMenuView(world, *this), true, this, false, &fontmanager));
+// 	windows.push_back(std::make_shared<GBSDLWindow>(new GBMenuView(world, *this), true, this, false, &fontmanager));
 // #endif
 	focus = mainWnd;
 	windows.push_back(mainWnd);
@@ -73,12 +73,7 @@ GBSDLApplication::GBSDLApplication()
 	world.AddSeeds();
 	world.running = true;
 }
-GBSDLApplication::~GBSDLApplication() {
-	while (!windows.empty()) {
-		delete windows.back();
-		windows.pop_back();
-	}
-}
+GBSDLApplication::~GBSDLApplication() {}
 
 void GBSDLApplication::mainloop(void* arg) {
   GBSDLApplication *app = static_cast<GBSDLApplication*>(arg);
@@ -137,14 +132,14 @@ void GBSDLApplication::Process() {
 	}
 }
 void GBSDLApplication::Redraw() {
-	for (std::list<GBSDLWindow*>::iterator it = windows.begin(); it != windows.end(); ++it) {
+	for (auto it = windows.begin(); it != windows.end(); ++it) {
 		if (!(*it)->Visible()) continue;
 		(*it)->DrawChanges(world.running);
 	}
 }
 
-GBSDLWindow* GBSDLApplication::FindWndAtPos(short x, short y) {
-	for (std::list<GBSDLWindow*>::reverse_iterator it = windows.rbegin(); it != windows.rend(); ++it) {
+Ref<GBSDLWindow> GBSDLApplication::FindWndAtPos(short x, short y) {
+	for (auto it = windows.rbegin(); it != windows.rend(); ++it) {
 		if (!(*it)->Visible()) continue;
 		const GBRect &r = (*it)->Bounds();
 		if (r.left <= x && r.right >= x && r.top <= y && r.bottom >= y) return *it;
@@ -152,12 +147,12 @@ GBSDLWindow* GBSDLApplication::FindWndAtPos(short x, short y) {
 	return nil;
 }
 
-GBSDLWindow* GBSDLApplication::FindWndFromID(Uint32 id) {
-	for (std::list<GBSDLWindow*>::reverse_iterator it = windows.rbegin(); it != windows.rend(); ++it) {
+Ref<GBSDLWindow> GBSDLApplication::FindWndFromID(Uint32 id) {
+	for (auto it = windows.rbegin(); it != windows.rend(); ++it) {
 		if (!(*it)->Visible()) continue;
 		if (id == (*it)->WindowID()) return *it;
 	}
-	return nil;
+	return {};
 }
 void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 	try {
@@ -167,9 +162,9 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 					ExpireClicks(evt->button.x, evt->button.y);
 					clickTime = Milliseconds();
 					clickx = evt->button.x; clicky = evt->button.y;
-					GBSDLWindow* wnd = FindWndFromID(evt->button.windowID);
-					if (wnd == nil) break;
-					if (focus != wnd && wnd != menuWnd) { // stop the menu window from getting focus (it doesn't need that)
+					Ref<GBSDLWindow> wnd = FindWndFromID(evt->button.windowID);
+					if (!wnd) break;
+					if (focus.lock() != wnd && wnd != menuWnd) { // stop the menu window from getting focus (it doesn't need that)
 						focus = wnd;
 						//if (!wnd->GetFrontClicks()) break;
 					}
@@ -178,24 +173,25 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 					++clicks;
 				}
 				if (evt->button.button == SDL_BUTTON_MIDDLE) {
-					GBSDLWindow* wnd = FindWndFromID(evt->button.windowID);
-					if (wnd == nil || wnd == mainWnd) break;
+					Ref<GBSDLWindow> wnd = FindWndFromID(evt->button.windowID);
+					if (!wnd || wnd == mainWnd) break;
 					dragging = wnd;
 				}
 				if (evt->button.button == SDL_BUTTON_RIGHT) {
-					GBSDLWindow* wnd = FindWndFromID(evt->button.windowID);
+					Ref<GBSDLWindow> wnd = FindWndFromID(evt->button.windowID);
+          if (!wnd) break;
           if (wnd == mainWnd) {
             mainView->RightClick(evt->button.x, evt->button.y);
+            break;
           }
-					if (wnd == nil || wnd == mainWnd) break;
 					CloseWindow(wnd);
-					if (dragging == wnd) dragging = nil;
-					if (focus == wnd) focus = mainWnd;
+					if (dragging.lock() == wnd) dragging = {};
+					if (focus.lock() == wnd) focus = {};
 				}
 				break;
     case SDL_MOUSEWHEEL: {
-      GBSDLWindow* wnd = FindWndFromID(evt->wheel.windowID);
-      if (wnd == nil) break;
+      Ref<GBSDLWindow> wnd = FindWndFromID(evt->wheel.windowID);
+      if (!wnd) break;
       if (evt->wheel.y > 0) {
         wnd->AcceptKeystroke('+');
       } else if (evt->wheel.y < 0) {
@@ -205,29 +201,29 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
     } break;
 			case SDL_MOUSEBUTTONUP:
 				if (evt->button.button == SDL_BUTTON_LEFT) {
-					if ( dragging ) {
+					if ( auto d = dragging.lock() ) {
 						ExpireClicks(evt->button.x, evt->button.y);
-						dragging->AcceptUnclick(evt->button.x, evt->button.y, clicks);
-						dragging = nil;
+						d->AcceptUnclick(evt->button.x, evt->button.y, clicks);
+						dragging = {};
 					}
 				}
 				break;
 			case SDL_MOUSEMOTION:
 				if (evt->motion.state & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-					if ( dragging ) {
-						dragging->AcceptDrag(evt->motion.x, evt->motion.y);
+					if (auto d = dragging.lock() ) {
+						d->AcceptDrag(evt->motion.x, evt->motion.y);
 					}
 				}
 				break;
 			case SDL_KEYDOWN:
-				if (focus) {
+				if (auto f = focus.lock()) {
           // FIXME: deal with modifiers
-          focus->AcceptKeystroke(evt->key.keysym.sym);
+          f->AcceptKeystroke(evt->key.keysym.sym);
 				}
 				break;
     case SDL_WINDOWEVENT: {
-		        GBSDLWindow* wnd = FindWndFromID(evt->window.windowID);
-				if (wnd == nil) break;
+		        Ref<GBSDLWindow> wnd = FindWndFromID(evt->window.windowID);
+				if (!wnd) break;
 				switch (evt->window.event) {
 				    case SDL_WINDOWEVENT_SHOWN:
 				    case SDL_WINDOWEVENT_EXPOSED:
@@ -259,37 +255,36 @@ void GBSDLApplication::ExpireClicks(int x, int y) {
 			|| abs(y - clicky) > kClickRange) )
 		clicks = 0;
 }
-void GBSDLApplication::CloseWindow(GBSDLWindow* window) {
+void GBSDLApplication::CloseWindow(Ref<GBSDLWindow> window) {
 	window->Hide();
-	delete window;
 	windows.remove(window);
 }
 void GBSDLApplication::OpenMinimap() {
-    mainView->Add(*new GBMiniMapView(world, *portal), 7, mainView->Bounds().bottom - 200);
+  mainView->Add(std::make_shared<GBMiniMapView>(world, *portal), 7, mainView->Bounds().bottom - 200);
 }
 void GBSDLApplication::OpenDebugger() {
-	mainView->Add(*new GBDebuggerView(world), 616, 43);
+	mainView->Add(std::make_shared<GBDebuggerView>(world), 616, 43);
 }
 void GBSDLApplication::OpenAbout() {
   // TODO: center
   short x = mainView->Bounds().CenterX()-131;
   short y = mainView->Bounds().CenterY() - 118;
-	mainView->Add(*new GBAboutBox(), x, y);
+	mainView->Add(std::make_shared<GBAboutBox>(), x, y);
 }
 void GBSDLApplication::OpenSideDebugger() {
-	mainView->Add(*new GBSideDebuggerView(world), 200, 400);
+	mainView->Add(std::make_shared<GBSideDebuggerView>(world), 200, 400);
 }
 void GBSDLApplication::OpenRoster() {
-	mainView->Add(*new GBRosterView(world), 7, 43);
+	mainView->Add(std::make_shared<GBRosterView>(world), 7, 43);
 }
 void GBSDLApplication::OpenScores() {
-	mainView->Add(*new GBScoresView(world), 291, 384);
+	mainView->Add(std::make_shared<GBScoresView>(world), 291, 384);
 }
 void GBSDLApplication::OpenTypeWindow() {
-	mainView->Add(*new GBRobotTypeView(world), 616, 270);
+	mainView->Add(std::make_shared<GBRobotTypeView>(world), 616, 270);
 }
 void GBSDLApplication::OpenTournament() {
-	mainView->Add(*new GBTournamentView(world), 100, 100);
+	mainView->Add(std::make_shared<GBTournamentView>(world), 100, 100);
 }
 
 #endif
