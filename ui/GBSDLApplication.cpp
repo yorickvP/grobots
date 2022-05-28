@@ -6,6 +6,7 @@
 #ifdef WITH_SDL
 #include "GBPlatform.h"
 #include "GBSDLApplication.h"
+#include "GBSDLWindow.h"
 #include "GBErrors.h"
 #include "GBAboutBox.h"
 #include "GBMiniMap.h"
@@ -50,7 +51,7 @@ GBSDLApplication::GBSDLApplication()
 	SDL_initFramerate(&stepManager);
 	SetStepPeriod(kNormalSpeedLimit);
 	
-	portal = new GBPortal(world);
+	portal = std::make_shared<GBPortal>(world);
 	mainView = std::make_shared<GBMultiView>(portal);
 
 	mainWnd = std::make_shared<GBSDLWindow>(mainView, true, true, fontmanager);

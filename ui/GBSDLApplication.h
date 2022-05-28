@@ -11,15 +11,15 @@
 #include "GBView.h"
 #include "GBSide.h"
 #include "GBPortal.h"
-#include "GBSDLWindow.h"
 #include "GBFontManager.h"
 #include "GBMultiView.h"
-#include "SDL.h"
 #include "SDL2_framerate.h"
 #include <list>
 #include <memory>
 
 template <class T> using Ref = std::shared_ptr<T>;
+union SDL_Event;
+class GBSDLWindow;
 
 class GBSDLApplication {
 	bool alive;
@@ -43,7 +43,7 @@ class GBSDLApplication {
 
 	GBWorld world;
 	
-	GBPortal * portal;
+	Ref<GBPortal> portal;
   Ref<GBSDLWindow> mainWnd;
 	Ref<GBSDLWindow> menuWnd;
   std::weak_ptr<GBSDLWindow> focus;
@@ -53,6 +53,7 @@ class GBSDLApplication {
   Ref<GBMultiView> mainView;
 public:
 	GBSDLApplication();
+  GBSDLApplication(const GBSDLApplication&) = delete;
 	~GBSDLApplication();
 	void Run();
 	void Quit();

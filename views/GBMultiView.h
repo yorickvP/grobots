@@ -16,8 +16,10 @@ class GBMultiView : public GBWrapperView {
   std::weak_ptr<GBCompositedWindow> dragging;
   std::shared_ptr<GBCompositedWindow> WindowFromXY(short x, short y);
   bool changed;
+  // todo: move shared ref to GBWrapperView
+  std::shared_ptr<GBView> background;
  public:
-	GBMultiView(GBView* const bg);
+	GBMultiView(std::shared_ptr<GBView> bg);
 	~GBMultiView();
   virtual void Draw_(bool) override;
   void Add(std::shared_ptr<GBView> v, short x, short y);

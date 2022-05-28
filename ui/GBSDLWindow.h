@@ -7,22 +7,23 @@
 
 #include "GBTypes.h"
 #include "GBView.h"
-#include "SDL.h"
+#include "SDL.hpp"
 #include <memory>
 class GBSDLWindow {
-  std::shared_ptr<GBView> view;
 	bool visible;
-	GBGraphics * graphics;
-	SDL_Window* sdlwindow;
-  SDL_Renderer* renderer;
 	
 	GBRect bounds;
 	
 	Uint32 windowid;
+  SDL::Window sdlwindow;
+  SDL::Renderer renderer;
+  GBGraphics graphics;
+  std::shared_ptr<GBView> view;
 public:
 	bool isMain;
 public:
 	GBSDLWindow(std::shared_ptr<GBView> contents, bool vis, bool is_main, GBFontManager& fontmgr);
+  GBSDLWindow(const GBSDLWindow&) = delete;
 	~GBSDLWindow();
 	
 // window operations

@@ -7,43 +7,38 @@
 #include "GBSDLApplication.h"
 
 GBSDLWindow::GBSDLWindow(std::shared_ptr<GBView> contents, bool vis, bool is_main, GBFontManager& fontmgr)
-	: view(contents), visible(vis), bounds(0, 0, view->PreferredWidth(), view->PreferredHeight())
+	: visible(vis)
+  , bounds(0, 0, contents->PreferredWidth(), contents->PreferredHeight())
+  , sdlwindow(contents->Name(), SDL::WindowPosUndefined, SDL::WindowPosUndefined, contents->PreferredWidth(), contents->PreferredHeight(), SDL::Window::Shown | (contents->Resizable() ? SDL::Window::Resizable : 0))
+  , renderer(sdlwindow, -1, 0)
+  , graphics(renderer.renderer, &fontmgr)
+  , view(contents)
 	, isMain(is_main)
 {
-    sdlwindow = SDL_CreateWindow(contents->Name().c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                            contents->PreferredWidth(), contents->PreferredHeight(), 
-                                 SDL_WINDOW_SHOWN | (contents->Resizable() ? SDL_WINDOW_RESIZABLE : 0));
-    renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
-    graphics = new GBGraphics(renderer, &fontmgr);
   #ifdef __EMSCRIPTEN__
-  SDL_Rect r;
-  SDL_GetDisplayUsableBounds(0, &r);
+  SDL_Rect r = SDL::GetDisplayUsableBounds(0);
 	view->SetSize(r.w - 1, r.h - 84);
-  SDL_SetWindowSize(sdlwindow, r.w - 1, r.h - 84);
+  sdlwindow.SetSize(r.w - 1, r.h - 84);
   #else
   view->SetSize(contents->PreferredWidth(), contents->PreferredHeight());
   #endif
-	windowid = SDL_GetWindowID(sdlwindow);
+	windowid = sdlwindow.GetID();
 	if (visible && !isMain) Show();
 	else  Update(false);
 }
 
-GBSDLWindow::~GBSDLWindow() {
-  view = {};
-	if (graphics) delete graphics;
-	if (sdlwindow) SDL_DestroyWindow(sdlwindow);
-}
+GBSDLWindow::~GBSDLWindow() {}
 
 void GBSDLWindow::Update(bool running) {
-	view->DoDraw(*graphics, running);
-  SDL_RenderPresent(renderer);
+	view->DoDraw(graphics, running);
+  renderer.Present();
 }
 
 bool GBSDLWindow::DrawChanges(bool running) {
 	bool redrawn = visible && view->NeedsRedraw(running);
 	if (redrawn) {
-		view->DoDraw(*graphics, running);
-    SDL_RenderPresent(renderer);
+		view->DoDraw(graphics, running);
+    renderer.Present();
 	}
 	if ( !isMain && visible && view->NeedsResize() ) {
 		redrawn = true;
@@ -64,7 +59,7 @@ void GBSDLWindow::SetSize(short width, short height) {
 	bounds.bottom = height;
 	view->SetBounds(bounds);
   if (view->NeedsResize()) {
-    SDL_SetWindowSize(sdlwindow, view->PreferredWidth(), view->PreferredHeight());
+    sdlwindow.SetSize(view->PreferredWidth(), view->PreferredHeight());
   }
 	this->Update(false);
 }

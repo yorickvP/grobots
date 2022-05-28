@@ -112,8 +112,8 @@ public:
   }
 };
 
-GBMultiView::GBMultiView(GBView* const bg)
-	: GBWrapperView(bg), children(), dragging(), changed(true)
+GBMultiView::GBMultiView(std::shared_ptr<GBView> bg)
+	: GBWrapperView(bg.get()), children(), dragging(), changed(true), background(bg)
 {}
 
 GBMultiView::~GBMultiView() {}
