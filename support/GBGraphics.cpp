@@ -152,6 +152,11 @@ void GBGraphics::DrawStringRight(const string & str, short x, short y,
   text->draw(renderer, nil, &destrect);
 	//stringRGBA(renderer, x - str.length() * 8, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
+
+GBRect GBGraphics::MeasureText(const string & str, short size, const GBColor & color, bool useBold) {
+  GBFontManager::Text text = font_mgr->renderText_Blended(renderer, size, useBold, str, color);
+  return GBRect(0, 0, text->w, text->h);
+}
 void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char alpha) {
 	SDL_Rect r1, r2;
 	srcRect.ToRect(r1);

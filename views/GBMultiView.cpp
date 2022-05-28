@@ -63,9 +63,8 @@ public:
     // todo: clip
     if (force || v->NeedsRedraw(running)) {
       GBGraphicsWrapper g = texture->Graphics();
-      v->SetGraphics(*g);
       texture->SetClip(&v->Bounds());
-      v->DoDraw(running);
+      v->DoDraw(**g, running);
       texture->SetClip(nil);
     }
   };
@@ -120,8 +119,7 @@ GBMultiView::GBMultiView(GBView* const bg)
 GBMultiView::~GBMultiView() {}
 
 void GBMultiView::Draw_(bool running) {
-  content->SetGraphics(&Graphics());
-  content->Draw();
+  content->DoDraw(Graphics(), running);
   for (auto const & childView : children) {
     childView->Draw(false, running);
     childView->Blit(Graphics());

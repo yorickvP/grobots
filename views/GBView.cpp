@@ -183,11 +183,6 @@ GBGraphics & GBView::Graphics() const {
 	return *graphics;
 }
 
-void GBView::SetGraphics(GBGraphics * g) {
-	if ( ! g ) throw GBNilPointerError();
-	graphics = g;
-}
-
 void GBView::Draw() {}
 
 bool GBView::NeedsRedraw(bool running) const {
@@ -216,8 +211,8 @@ bool GBView::DelayedChanges() const {
 	return false;
 }
 
-void GBView::DoDraw(bool running) {
-	if ( ! graphics ) throw GBNilPointerError();
+void GBView::DoDraw(GBGraphics& g, bool running) {
+  graphics = &g;
 	try {
 		Draw_(running);
 	} catch ( GBError & err ) {
@@ -396,8 +391,7 @@ void GBDoubleBufferedView::Draw() {
 // draw offscreen
 	if ( draw && (NeedsRedraw(false) || newWorld) ) {
     GBGraphicsWrapper w = offscreen->Graphics();
-    content->SetGraphics(*w);
-		content->Draw();
+    content->DoDraw(**w, false);
 	}
 // draw onscreen
 	if ( flip )

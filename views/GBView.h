@@ -84,7 +84,6 @@ public:
   const GBRect& Bounds() const { return bounds; };
 // drawing
 	GBGraphics & Graphics() const;
-	void SetGraphics(GBGraphics * g);
 	virtual void Draw();
 	virtual void Draw_(bool) { return Draw(); };
 	virtual bool NeedsRedraw(bool running) const;
@@ -93,7 +92,7 @@ public:
 	virtual bool InstantChanges() const;
 	virtual bool DelayedChanges() const;
 // for owner to call
-	void DoDraw(bool running);
+	void DoDraw(GBGraphics& g, bool running);
 	void DoClick(short x, short y, int clicksBefore);
 	void DoDrag(short x, short y);
 	void DoUnclick(short x, short y, int clicksBefore);

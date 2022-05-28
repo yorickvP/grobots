@@ -15,7 +15,6 @@ GBSDLWindow::GBSDLWindow(std::shared_ptr<GBView> contents, bool vis, bool is_mai
                                  SDL_WINDOW_SHOWN | (contents->Resizable() ? SDL_WINDOW_RESIZABLE : 0));
     renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
     graphics = new GBGraphics(renderer, &fontmgr);
-	view->SetGraphics(graphics);
   #ifdef __EMSCRIPTEN__
   SDL_Rect r;
   SDL_GetDisplayUsableBounds(0, &r);
@@ -36,14 +35,14 @@ GBSDLWindow::~GBSDLWindow() {
 }
 
 void GBSDLWindow::Update(bool running) {
-	view->DoDraw(running);
+	view->DoDraw(*graphics, running);
   SDL_RenderPresent(renderer);
 }
 
 bool GBSDLWindow::DrawChanges(bool running) {
 	bool redrawn = visible && view->NeedsRedraw(running);
 	if (redrawn) {
-		view->DoDraw(running);
+		view->DoDraw(*graphics, running);
     SDL_RenderPresent(renderer);
 	}
 	if ( !isMain && visible && view->NeedsResize() ) {

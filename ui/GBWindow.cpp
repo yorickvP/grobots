@@ -38,7 +38,6 @@ GBWindow::GBWindow(GBView * contents, short left, short top, bool vis)
 	SetWTitle(window, s);
 	SetWRefCon(window, (long)this);
 	SetWindowKind(window, kMacWindowKind);
-	view->SetGraphics(&graphics);
 	if ( vis )
 		ShowWindow(window);
 }
@@ -98,11 +97,11 @@ void GBWindow::Update(bool running) {
 		BeginUpdate(window);
 		EndUpdate(window);
 		if ( showGrowBox ) DrawGrowIcon(window);
-		view->DoDraw();
+		view->DoDraw(graphics);
 	} else {
 		BeginUpdate(window);
 		if ( showGrowBox ) DrawGrowIcon(window);
-		view->DoDraw();
+		view->DoDraw(graphics);
 		EndUpdate(window);
 	}
 	SetPort(savePort);
@@ -110,8 +109,7 @@ void GBWindow::Update(bool running) {
 	PAINTSTRUCT paint;
 	HDC dc = BeginPaint(win, &paint);
 	GBGraphics graphics(dc);
-	view->SetGraphics(&graphics);
-	view->DoDraw();
+	view->DoDraw(graphics);
 	EndPaint(win, &paint);
 #endif
 }
@@ -129,8 +127,7 @@ void GBWindow::DrawChanges(bool running) {
 #elif WINDOWS
 		HDC dc = GetDC(win);
 		GBGraphics graphics(dc);
-		view->SetGraphics(&graphics);
-		view->DoDraw();
+		view->DoDraw(graphics);
 		ReleaseDC(win, dc);
 #endif
 	}

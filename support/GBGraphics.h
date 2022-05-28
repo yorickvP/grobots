@@ -101,6 +101,8 @@ public:
 	void DrawStringPair(const string & str1, const string & str2,
 		short left, short right, short y, short size, const GBColor & color, bool useBold);
 
+  GBRect MeasureText(const string & str, short size, const GBColor & color = GBColor::black, bool bold = false);
+
 // blitter
 	void Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char alpha=255);
 };
