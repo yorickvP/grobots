@@ -96,7 +96,7 @@ void GBRadioState::SkipMessages(long channel, long skip, GBSide * side) {
 		nextMessage[channel - 1] = side->NextMessageNumber(channel);
 }
 
-void GBRadioState::Act(GBRobot * robot, GBWorld * world) {
+void GBRadioState::Act(GBRobot * /*robot*/, GBWorld * /*world*/) {
 	for ( int i = kRadioHistory - 1; i > 0; -- i ) {
 		sent[i] = sent[i - 1];
 		writes[i] = writes[i - 1];
@@ -399,11 +399,11 @@ void GBSensorState::SetSeesEnemy(bool value) {
 void GBSensorState::Fire() {
 	firing = true;}
 
-void GBSensorState::Report(const GBSensorResult find) {
+void GBSensorState::Report(const GBSensorResult& find) {
 	// check for same robot is in SensorShot::CollideWith(). Check for wrong type of object is in GBWorld.
 	if ( ! ((find.side == owner) ? seesFriendly : seesEnemy) )
 		return;
-	GBSensorResult temp, current = find;
+	GBSensorResult current = find;
 	// insert find in results
 	for ( int i = 0; i < MaxResults(); i++ ) {
 		if ( i >= found ) { // beyond end of filled part of array
@@ -411,9 +411,7 @@ void GBSensorState::Report(const GBSensorResult find) {
 			break;
 		}
 		if ( current.dist < results[i].dist ) {
-			temp = results[i]; // swap current and results[i]
-			results[i] = current;
-			current = temp;
+      std::swap(results[i], current);
 		} else {}
 	}
 	found ++;

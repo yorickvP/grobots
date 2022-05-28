@@ -202,7 +202,7 @@ const GBColor GBGrenade::Color() const {
 	return GBColor::yellow;
 }
 
-void GBGrenade::Draw(GBGraphics & g, const GBProjection & proj, const GBRect & where, bool /*detailed*/) const {
+void GBGrenade::Draw(GBGraphics & g, const GBProjection & /*proj*/, const GBRect & where, bool /*detailed*/) const {
 	if (where.Width() <= 3)
 		g.DrawSolidRect(where,Color());
 	else

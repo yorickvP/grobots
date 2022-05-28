@@ -301,7 +301,7 @@ void GBRobot::DrawUnderlay(GBGraphics & g, const GBProjection & proj, const GBRe
 //sensor results?
 }
 
-void GBRobot::Draw(GBGraphics & g, const GBProjection & proj, const GBRect & where, bool detailed) const {
+void GBRobot::Draw(GBGraphics & g, const GBProjection & /*proj*/, const GBRect & where, bool detailed) const {
 	if(where.Width() <= 5) {
 		DrawMini(g,where);
 		return;

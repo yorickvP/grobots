@@ -259,8 +259,8 @@ void GBObject::Draw(GBGraphics & g, const GBProjection &, const GBRect & where, 
 	g.DrawOpenOval(where, Color());
 }
 
-void GBObject::DrawUnderlay(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {}
-void GBObject::DrawOverlay(GBGraphics & g, const GBProjection &, const GBRect & where, bool /*detailed*/) const {}
+void GBObject::DrawUnderlay(GBGraphics & /*g*/, const GBProjection &, const GBRect & /*where*/, bool /*detailed*/) const {}
+void GBObject::DrawOverlay(GBGraphics & /*g*/, const GBProjection &, const GBRect & /*where*/, bool /*detailed*/) const {}
 
 void GBObject::DrawMini(GBGraphics & g, const GBRect & where) const {
 	if ( where.Width() < kMaxSquareMiniSize )

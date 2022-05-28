@@ -89,6 +89,9 @@ public:
 	GBSensorResult & operator=(const GBSensorResult & other);
 	GBSensorResult();
 	GBSensorResult(const GBObject * obj, const GBDistance dis);
+  GBSensorResult(const GBSensorResult& other) {
+    *this = other;
+  };
 };
 
 class GBSensorState {
@@ -143,7 +146,7 @@ public:
 	void SetSeesFriendly(bool value);
 	void SetSeesEnemy(bool value);
 	void Fire();
-	void Report(const GBSensorResult find); // called repeatedly by GBSensorShot to report sightings
+	void Report(const GBSensorResult& find); // called repeatedly by GBSensorShot to report sightings
 // automation
 	void Act(GBRobot * robot, GBWorld * world);
 };
