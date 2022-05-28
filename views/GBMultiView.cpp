@@ -17,17 +17,18 @@ const short kFrameSize = 1;
 class GBCompositedWindow {
   std::shared_ptr<GBView> v;
   GBGraphics& parent;
+  const bool hasTitlebar;
   std::unique_ptr<GBBitmap> texture;
   short lastX, lastY;
   bool focus;
 public:
   GBCompositedWindow(std::shared_ptr<GBView> v, GBGraphics& parent, short x, short y) :
-    v(v), parent(parent), texture(std::make_unique<GBBitmap>(v->PreferredWidth() + kFrameSize * 2, v->PreferredHeight() + kTitleBarHeight + 2 * kFrameSize, parent)), lastX(-1), lastY(-1), focus(false) {
+    v(v), parent(parent), hasTitlebar(!v->Name().empty()), texture(std::make_unique<GBBitmap>(v->PreferredWidth() + kFrameSize * 2, v->PreferredHeight() + (hasTitlebar ? kTitleBarHeight : 0) + 2 * kFrameSize, parent)), lastX(-1), lastY(-1), focus(false) {
     texture->SetPosition(x, y);
     GBRect bounds = GBRect(kFrameSize,
-                           kTitleBarHeight + kFrameSize,
+                           (hasTitlebar ? kTitleBarHeight : 0) + kFrameSize,
                            v->PreferredWidth() + kFrameSize,
-                           v->PreferredHeight() + kTitleBarHeight + kFrameSize);
+                           v->PreferredHeight() + (hasTitlebar ? kTitleBarHeight : 0) + kFrameSize);
     v->SetBounds(bounds);
     DrawFrame();
     Draw(true, false);
@@ -41,26 +42,26 @@ public:
     GBRect oldBounds = texture->Bounds();
     const short newHeight = v->PreferredHeight();
     const short newWidth = v->PreferredWidth();
-    texture = std::make_unique<GBBitmap>(newWidth + kFrameSize * 2, newHeight + kTitleBarHeight + 2 * kFrameSize, parent);
+    texture = std::make_unique<GBBitmap>(newWidth + kFrameSize * 2, newHeight + (hasTitlebar ? kTitleBarHeight : 0) + 2 * kFrameSize, parent);
     texture->SetPosition(oldBounds.left, oldBounds.top);
     v->SetSize(newWidth, newHeight);
     DrawFrame();
     Draw(true, false);
   }
   void DrawFrame() {
-    // TODO: frameless windows
     GBGraphicsWrapper g = texture->Graphics();
     GBColor frameColor = focus ? GBColor::white : GBColor::gray;
     short width = texture->Bounds().Width();
     short height = texture->Bounds().Height();
     // frame
     g->DrawOpenRect(GBRect(0, 0, width, height), frameColor);
-    GBRect titlebar = GBRect(0, 0, width, kTitleBarHeight+1);
-    // titlebar bg // todo: alpha?
-    g->DrawSolidRect(titlebar, GBColor::black);
-    g->DrawOpenRect(titlebar, frameColor);
-    if (!v->Name().empty())
+    if (hasTitlebar) {
+      GBRect titlebar = GBRect(0, 0, width, kTitleBarHeight+1);
+      // titlebar bg // todo: alpha?
+      g->DrawSolidRect(titlebar, GBColor::black);
+      g->DrawOpenRect(titlebar, frameColor);
       g->DrawStringCentered(v->Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
+    }
   };
   void Draw(bool force, bool running) {
     if (v->NeedsResize()) return Resize();

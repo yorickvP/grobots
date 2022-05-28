@@ -92,7 +92,7 @@ GBSDLApplication::GBSDLApplication()
 	mainView = std::make_shared<GBMultiView>(portal);
 
 	mainWnd = std::make_shared<GBSDLWindow>(mainView, true, true, fontmanager);
-  mainView->Add(std::make_shared<GBMenuView>(*this, fontmanager), -1, -17);
+  mainView->Add(std::make_shared<GBMenuView>(*this, fontmanager), -1, -1);
 // #ifndef __EMSCRIPTEN__
 // 	windows.push_back(std::make_shared<GBSDLWindow>(new GBMenuView(*this), true, this, false, &fontmanager));
 // #endif

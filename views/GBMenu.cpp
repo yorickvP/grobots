@@ -144,7 +144,7 @@ void GBMenuView::AcceptClick(short x, short y, int /*clicks*/) {
     auto nx = std::next(it);
     if (x > it->x && (nx == topMenuItems.end() || x < nx->x)) {
       if (!it->children.empty()) {
-        app.OpenView(std::make_shared<GBMenuView>(app, fontmgr, &it->children), -1, 0);
+        app.OpenView(std::make_shared<GBMenuView>(app, fontmgr, &it->children), -1, PreferredHeight());
       } else {
         if (it->id != 0) {
           app.HandleMenuSelection(it->id);
