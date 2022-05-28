@@ -40,12 +40,6 @@ GBMenuView::GBMenuView(GBSDLApplication& app, GBFontManager& fontmgr, std::list<
     f->children.emplace_back("Show &Decorations", 13104); // CHECKED
     f->children.emplace_back("Show &Meters", 13105); // CHECKED
     f->children.emplace_back("");
-    f->children.emplace_back("Minimap Robots", 13107); // CHECKED
-    f->children.emplace_back("Minimap Food", 13108); // CHECKED
-    f->children.emplace_back("Minimap Sensors", 13109);
-    f->children.emplace_back("Minimap Decorations", 13110);
-    f->children.emplace_back("Minimap Trails", 13111);
-    f->children.emplace_back("");
     f->children.emplace_back("Report &Errors", 13113); // CHECKED
     f->children.emplace_back("Report &Prints", 13114);
     f->children.emplace_back("");
@@ -55,6 +49,13 @@ GBMenuView::GBMenuView(GBSDLApplication& app, GBFontManager& fontmgr, std::list<
     f->children.emplace_back("&Autofollow", 13119);
     f->children.emplace_back("");
     f->children.emplace_back("&Graph All Rounds", 13121);
+
+    f = &topMenuItems.emplace_back("Minimap");
+    f->children.emplace_back("Minimap Robots", 13107); // CHECKED
+    f->children.emplace_back("Minimap Food", 13108); // CHECKED
+    f->children.emplace_back("Minimap Sensors", 13109);
+    f->children.emplace_back("Minimap Decorations", 13110);
+    f->children.emplace_back("Minimap Trails", 13111);
 
     f = &topMenuItems.emplace_back("Simulation", 13200);
     f->children.emplace_back("&Run", 13201);
@@ -68,7 +69,8 @@ GBMenuView::GBMenuView(GBSDLApplication& app, GBFontManager& fontmgr, std::list<
     f->children.emplace_back("Fast (&60 fps)", 13209);
     f->children.emplace_back("Faster (300 fps)", 13210);
     f->children.emplace_back("&Unlimited", 13211);
-    f->children.emplace_back("");
+
+    f = &topMenuItems.emplace_back("Rounds");
     f->children.emplace_back("&New Round", 13213);
     f->children.emplace_back("R&estart", 13214);
     f->children.emplace_back("&Seed", 13215);
