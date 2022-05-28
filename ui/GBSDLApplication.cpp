@@ -29,8 +29,6 @@
 // todo: duplicated from GBApplication.h
 //Menu item IDs: these are 100*menuid + itemposition
 enum {
-	kAppleMenu = 128,
-		miAbout = 12801,
 	kFileMenu = 129,
 		miLoadSide = 12901, miDuplicateSide,
 		miReloadSide = 12903,
@@ -38,26 +36,26 @@ enum {
 		miClose = 12908,
 		miQuit = 12910,
 	kWindowMenu = 130,
-		miRosterView = 13001, miMainView, miMinimapView,
+		miAbout = 13001,
+		miRosterView, miMainView, miMinimapView,
 		miScoresView, miTypesView,
 		miDebuggerView,
 		miTournamentView, miSideDebuggerView,
 	kViewMenu = 131,
 		miSound = 13101,
-		miShowSensors = 13103, miShowDecorations, miShowMeters,
-		miMinimapRobots = 13107, miMinimapFood, miMinimapSensors, miMinimapDecorations,
+		miZoomIn = 13103, miZoomOut, miZoomStandard,
+		miShowSensors = 13107, miShowDecorations, miShowMeters,
 		miMinimapTrails,
-		miReportErrors = 13113, miReportPrints,
-		miRefollow = 13116, miFollowRandom, miRandomNear, miAutofollow,
-		miGraphAllRounds = 13121,
+		miReportErrors = 13112, miReportPrints,
+		miRefollow = 13115, miFollowRandom, miRandomNear, miAutofollow,
+		miNextPageMemory = 13120, miPreviousPageMemory, miFirstPageMemory,
 	kSimulationMenu = 132,
-		miRun = 13201, miSingleFrame, miStep, miPause,
-		miSlowerSpeed = 13206, miSlowSpeed, miNormalSpeed, miFastSpeed, miFasterSpeed, miUnlimitedSpeed,
-		miNewRound = 13213, miRestart,
-		miSeed = 13215, miReseed,
-		miRules = 13218,
-		miTournament = 13219, miSaveScores, miResetScores,
-		miStartStopBrain = 13223,
+		miRun = 13201, miSingleFrame, miStep, miPause, miStartStopBrain,
+		miSlowerSpeed = 13207, miSlowSpeed, miNormalSpeed, miFastSpeed, miFasterSpeed, miUnlimitedSpeed,
+		miNewRound = 13214, miRestart,
+		miSeed, miReseed,
+		miRules = 13219,
+	miTournament = 13220, miSaveScoresHtml, miSaveScoresWiki, miResetScores,
 	kToolsMenu = 133,
 		miScroll = 13301,
 		miAddManna = 13303, miAddRobot, miAddSeed,
@@ -435,7 +433,8 @@ void GBSDLApplication::HandleMenuSelection(int item) {
 #endif
 					world.tournament = true;
 				break;
-			case miSaveScores: world.DumpTournamentScores(); break;
+			case miSaveScoresHtml: world.DumpTournamentScores(true); break;
+			case miSaveScoresWiki: world.DumpTournamentScores(false); break;
 			case miResetScores: world.ResetTournamentScores(); break;
         //case miStartStopBrain: debugger->StartStopBrain(); break;
 		//Tools menu

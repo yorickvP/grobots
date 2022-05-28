@@ -2,6 +2,41 @@
 #include "GBMenu.h"
 #include "GBSDLApplication.h"
 
+//Menu item IDs: these are 100*menuid + itemposition
+enum {
+	kFileMenu = 129,
+		miLoadSide = 12901, miDuplicateSide,
+		miReloadSide = 12903,
+		miRemoveSide = 12905, miRemoveAllSides,
+		miClose = 12908,
+		miQuit = 12910,
+	kWindowMenu = 130,
+		miAbout = 13001,
+		miRosterView, miMainView, miMinimapView,
+		miScoresView, miTypesView,
+		miDebuggerView,
+		miTournamentView, miSideDebuggerView,
+	kViewMenu = 131,
+		miSound = 13101,
+		miZoomIn = 13103, miZoomOut, miZoomStandard,
+		miShowSensors = 13107, miShowDecorations, miShowMeters,
+		miMinimapTrails,
+		miReportErrors = 13112, miReportPrints,
+		miRefollow = 13115, miFollowRandom, miRandomNear, miAutofollow,
+		miNextPageMemory = 13120, miPreviousPageMemory, miFirstPageMemory,
+	kSimulationMenu = 132,
+		miRun = 13201, miSingleFrame, miStep, miPause, miStartStopBrain,
+		miSlowerSpeed = 13207, miSlowSpeed, miNormalSpeed, miFastSpeed, miFasterSpeed, miUnlimitedSpeed,
+		miNewRound = 13214, miRestart,
+		miSeed, miReseed,
+		miRules = 13219,
+	miTournament = 13220, miSaveScoresHtml, miSaveScoresWiki, miResetScores,
+	kToolsMenu = 133,
+		miScroll = 13301,
+		miAddManna = 13303, miAddRobot, miAddSeed,
+		miMove = 13307, miPull, miSmite, miBlasts, miErase, miEraseBig
+};
+
 GBMenuView::GBMenuView(GBSDLApplication& app, GBFontManager& fontmgr, std::list<MenuItem>* children)
 	: GBView()
 	, app(app)
@@ -14,90 +49,85 @@ GBMenuView::GBMenuView(GBSDLApplication& app, GBFontManager& fontmgr, std::list<
     topMenuItems = *children;
   } else {
     MenuItem* f;
-    f = &topMenuItems.emplace_back("File", 12900);
-    f->children.emplace_back("Load Side...", 12901);
-    f->children.emplace_back("Duplicate Side...", 12902);
-    f->children.emplace_back("Reload Side...", 12903);
+    f = &topMenuItems.emplace_back("File");
+    f->children.emplace_back("Open Side", miLoadSide);
+    f->children.emplace_back("Duplicate Side", miDuplicateSide);
+    f->children.emplace_back("Reload Side", miReloadSide);
     f->children.emplace_back("");
-    f->children.emplace_back("Remove Side", 12905);
-    f->children.emplace_back("Remove All Sides", 12906);
+    f->children.emplace_back("Remove Side", miRemoveSide);
+    f->children.emplace_back("Remove All Sides", miRemoveAllSides);
     f->children.emplace_back("");
-    f->children.emplace_back("Exit", 12910);
+    f->children.emplace_back("Exit", miQuit);
 
-    f = &topMenuItems.emplace_back("Window", 13000);
-    f->children.emplace_back("&Roster", 13001);
-    f->children.emplace_back("&Minimap", 13003);
-    f->children.emplace_back("&Statistics", 13004);
-    f->children.emplace_back("T&ypes", 13005);
-    f->children.emplace_back("&Debugger", 13006);
-    f->children.emplace_back("&Tournament", 13007);
-    f->children.emplace_back("S&ide Debugger", 13008);
+    f = &topMenuItems.emplace_back("Window");
+    f->children.emplace_back("&Roster", miRosterView);
+    f->children.emplace_back("&Minimap", miMinimapView);
+    f->children.emplace_back("&Statistics", miScoresView);
+    f->children.emplace_back("T&ypes", miTypesView);
+    f->children.emplace_back("&Debugger", miDebuggerView);
+    f->children.emplace_back("&Tournament", miTournamentView);
+    f->children.emplace_back("Shared Memory", miSideDebuggerView);
 
-    f = &topMenuItems.emplace_back("View", 13100);
-    f->children.emplace_back("Sound", 13101); // GRAYED
+    f = &topMenuItems.emplace_back("View");
+    f->children.emplace_back("Sound", miSound); // GRAYED
     f->children.emplace_back("");
-    f->children.emplace_back("Show &Sensors", 13103);
-    f->children.emplace_back("Show &Decorations", 13104); // CHECKED
-    f->children.emplace_back("Show &Meters", 13105); // CHECKED
+    f->children.emplace_back("Show &Sensors", miShowSensors);
+    f->children.emplace_back("Show &Decorations", miShowDecorations); // CHECKED
+    f->children.emplace_back("Show &Meters", miShowMeters); // CHECKED
+    f->children.emplace_back("Minimap Trails", miMinimapTrails);
     f->children.emplace_back("");
-    f->children.emplace_back("Report &Errors", 13113); // CHECKED
-    f->children.emplace_back("Report &Prints", 13114);
+    f->children.emplace_back("Report &Errors", miReportErrors); // CHECKED
+    f->children.emplace_back("Report &Prints", miReportPrints);
     f->children.emplace_back("");
-    f->children.emplace_back("Refollow", 13116);
-    f->children.emplace_back("Follow Random", 13117);
-    f->children.emplace_back("Follow Near", 13118);
-    f->children.emplace_back("&Autofollow", 13119);
+    f->children.emplace_back("Refollow", miRefollow);
+    f->children.emplace_back("Follow Random", miFollowRandom);
+    f->children.emplace_back("Follow Near", miRandomNear);
+    f->children.emplace_back("&Autofollow", miAutofollow);
     f->children.emplace_back("");
     f->children.emplace_back("&Graph All Rounds", 13121);
 
-    f = &topMenuItems.emplace_back("Minimap");
-    f->children.emplace_back("Minimap Robots", 13107); // CHECKED
-    f->children.emplace_back("Minimap Food", 13108); // CHECKED
-    f->children.emplace_back("Minimap Sensors", 13109);
-    f->children.emplace_back("Minimap Decorations", 13110);
-    f->children.emplace_back("Minimap Trails", 13111);
-
-    f = &topMenuItems.emplace_back("Simulation", 13200);
-    f->children.emplace_back("&Run", 13201);
-    f->children.emplace_back("Single &Frame", 13202);
-    f->children.emplace_back("Step", 13203); // GRAYED
-    f->children.emplace_back("&Pause", 13204);
+    f = &topMenuItems.emplace_back("Simulation");
+    f->children.emplace_back("&Run", miRun);
+    f->children.emplace_back("Single &Frame", miSingleFrame);
+    f->children.emplace_back("Step", miStep); // GRAYED
+    f->children.emplace_back("&Pause", miPause);
+    f->children.emplace_back("Start/Stop &Brain", miStartStopBrain);
     f->children.emplace_back("");
-    f->children.emplace_back("Slowest (2 fps)", 13206);
-    f->children.emplace_back("Slow (&10 fps)", 13207);
-    f->children.emplace_back("Normal (&30 fps)", 13208); // CHECKED
-    f->children.emplace_back("Fast (&60 fps)", 13209);
-    f->children.emplace_back("Faster (300 fps)", 13210);
-    f->children.emplace_back("&Unlimited", 13211);
+    f->children.emplace_back("Slowest (2 fps)", miSlowerSpeed);
+    f->children.emplace_back("Slow (&10 fps)", miSlowSpeed);
+    f->children.emplace_back("Normal (&30 fps)", miNormalSpeed); // CHECKED
+    f->children.emplace_back("Fast (&60 fps)", miFastSpeed);
+    f->children.emplace_back("Faster (300 fps)", miFasterSpeed);
+    f->children.emplace_back("&Unlimited", miUnlimitedSpeed);
 
     f = &topMenuItems.emplace_back("Rounds");
-    f->children.emplace_back("&New Round", 13213);
-    f->children.emplace_back("R&estart", 13214);
-    f->children.emplace_back("&Seed", 13215);
-    f->children.emplace_back("Resee&d", 13216);
+    f->children.emplace_back("&New Round", miNewRound);
+    f->children.emplace_back("Clear World", miRestart);
+    f->children.emplace_back("Add Seeds", miSeed);
+    f->children.emplace_back("Reseed Dead Sides", miReseed);
     f->children.emplace_back("");
-    f->children.emplace_back("Rules", 13218); // GRAYED
-    f->children.emplace_back("&Tournament", 13219);
-    f->children.emplace_back("Sa&ve Scores", 13220);
-    f->children.emplace_back("Reset Sc&ores", 13221);
-    f->children.emplace_back("Start/Stop &Brain", 13223);
+    f->children.emplace_back("Rules", miRules); // GRAYED
+    f->children.emplace_back("&Tournament", miTournament);
+    f->children.emplace_back("Sa&ve Scores (HTML)", miSaveScoresHtml);
+    f->children.emplace_back("Sa&ve Scores (wiki)", miSaveScoresWiki);
+    f->children.emplace_back("Reset Sc&ores", miResetScores);
 
     f = &topMenuItems.emplace_back("Tools", 13300);
-    f->children.emplace_back("Scroll", 13301);
+    f->children.emplace_back("Scroll", miScroll);
     f->children.emplace_back("");
-    f->children.emplace_back("Add Manna", 13303);
-    f->children.emplace_back("Add Robot", 13304);
-    f->children.emplace_back("Add Seed", 13305);
+    f->children.emplace_back("Add Manna", miAddManna);
+    f->children.emplace_back("Add Robot", miAddRobot);
+    f->children.emplace_back("Add Seed", miAddSeed);
     f->children.emplace_back("");
-    f->children.emplace_back("Move", 13307);
-    f->children.emplace_back("Pull", 13308);
-    f->children.emplace_back("Smite", 13309);
-    f->children.emplace_back("Blasts", 13310);
-    f->children.emplace_back("Erase", 13311);
-    f->children.emplace_back("Erase Area", 13312);
+    f->children.emplace_back("Move", miMove);
+    f->children.emplace_back("Pull", miPull);
+    f->children.emplace_back("Smite", miSmite);
+    f->children.emplace_back("Blasts", miBlasts);
+    f->children.emplace_back("Erase", miErase);
+    f->children.emplace_back("Erase Area", miEraseBig);
 
     f = &topMenuItems.emplace_back("Help", 12800);
-    f->children.emplace_back("&About Grobots", 12801);
+    f->children.emplace_back("&About Grobots", miAbout);
   }
 }
 
