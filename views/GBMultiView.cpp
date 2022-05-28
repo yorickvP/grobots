@@ -151,6 +151,10 @@ void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
   content->DoClick(x, y, clicksBefore);
 }
 void GBMultiView::AcceptUnclick(short x, short y, int clicksBefore) {
+  if (dragging && dragging->expired()) {
+    dragging = {};
+    return;
+  }
   dragging = {};
   if (auto childView = WindowFromXY(x, y)) {
     (*childView).DoUnclick(x, y, clicksBefore);
@@ -160,8 +164,9 @@ void GBMultiView::AcceptUnclick(short x, short y, int clicksBefore) {
 }
 void GBMultiView::AcceptDrag(short x, short y) {
   // todo: was dragging, but target disappeared
-  if (auto d = dragging.lock()) d->DoDrag(x, y);
-  else content->DoDrag(x, y);
+  if (auto dr = dragging) {
+    if (auto d = dr->lock()) d->DoDrag(x, y);
+  } else content->DoDrag(x, y);
   changed = true;
 }
 

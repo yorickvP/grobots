@@ -13,7 +13,7 @@ class GBCompositedWindow;
 class GBMultiView : public GBWrapperView {
  private:
   std::list<std::shared_ptr<GBCompositedWindow>> children;
-  std::weak_ptr<GBCompositedWindow> dragging;
+  std::optional<std::weak_ptr<GBCompositedWindow>> dragging;
   std::shared_ptr<GBCompositedWindow> WindowFromXY(short x, short y);
   bool changed;
  public:
