@@ -15,7 +15,9 @@ class GBMultiView : public GBWrapperView {
   std::list<std::shared_ptr<GBCompositedWindow>> children;
   std::optional<std::weak_ptr<GBCompositedWindow>> dragging;
   std::shared_ptr<GBCompositedWindow> WindowFromXY(short x, short y);
+  std::weak_ptr<GBCompositedWindow> focus;
   bool changed;
+  void Focus(std::shared_ptr<GBCompositedWindow> w);
  public:
 	GBMultiView(std::shared_ptr<GBView> bg);
 	~GBMultiView();
@@ -26,6 +28,8 @@ class GBMultiView : public GBWrapperView {
 	virtual void AcceptUnclick(short x, short y, int clicksBefore) override;
   void RightClick(short x, short y);
   virtual bool NeedsRedraw(bool running) const override;
+  virtual void SetFocus(bool) override;
+	void AcceptKeystroke(const char what) override;
 
   void CloseView(const GBView& v);
 };

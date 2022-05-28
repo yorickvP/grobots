@@ -19,9 +19,10 @@ class GBCompositedWindow {
   GBGraphics& parent;
   std::unique_ptr<GBBitmap> texture;
   short lastX, lastY;
+  bool focus;
 public:
   GBCompositedWindow(std::shared_ptr<GBView> v, GBGraphics& parent, short x, short y) :
-    v(v), parent(parent), texture(std::make_unique<GBBitmap>(v->PreferredWidth() + kFrameSize * 2, v->PreferredHeight() + kTitleBarHeight + 2 * kFrameSize, parent)), lastX(-1), lastY(-1) {
+    v(v), parent(parent), texture(std::make_unique<GBBitmap>(v->PreferredWidth() + kFrameSize * 2, v->PreferredHeight() + kTitleBarHeight + 2 * kFrameSize, parent)), lastX(-1), lastY(-1), focus(false) {
     texture->SetPosition(x, y);
     GBRect bounds = GBRect(kFrameSize,
                            kTitleBarHeight + kFrameSize,
@@ -49,14 +50,15 @@ public:
   void DrawFrame() {
     // TODO: frameless windows
     GBGraphicsWrapper g = texture->Graphics();
+    GBColor frameColor = focus ? GBColor::white : GBColor::gray;
     short width = texture->Bounds().Width();
     short height = texture->Bounds().Height();
     // frame
-    g->DrawOpenRect(GBRect(0, 0, width, height), GBColor::white);
+    g->DrawOpenRect(GBRect(0, 0, width, height), frameColor);
     GBRect titlebar = GBRect(0, 0, width, kTitleBarHeight+1);
     // titlebar bg // todo: alpha?
     g->DrawSolidRect(titlebar, GBColor::black);
-    g->DrawOpenRect(titlebar, GBColor::white);
+    g->DrawOpenRect(titlebar, frameColor);
     if (!v->Name().empty())
       g->DrawStringCentered(v->Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
   };
@@ -115,6 +117,16 @@ public:
   std::shared_ptr<GBView> View() const {
     return v;
   }
+  void SetFocus(bool focus) {
+    if (this->focus != focus) {
+      this->focus = focus;
+      DrawFrame();
+      v->SetFocus(focus);
+    }
+  }
+  void AcceptKeystroke(char what) {
+    v->AcceptKeystroke(what);
+  }
 };
 
 GBMultiView::GBMultiView(std::shared_ptr<GBView> bg)
@@ -150,10 +162,12 @@ std::shared_ptr<GBCompositedWindow> GBMultiView::WindowFromXY(short x, short y) 
 void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
   if (auto childView = WindowFromXY(x, y)) {
     dragging = childView;
-    (*childView).DoClick(x, y, clicksBefore);
-    return;
+    Focus(childView);
+    childView->DoClick(x, y, clicksBefore);
+  } else {
+    Focus({});
+    content->DoClick(x, y, clicksBefore);
   }
-  content->DoClick(x, y, clicksBefore);
 }
 void GBMultiView::AcceptUnclick(short x, short y, int clicksBefore) {
   if (dragging && dragging->expired()) {
@@ -185,13 +199,16 @@ void GBMultiView::Add(std::shared_ptr<GBView> v, short x, short y) {
       }
     }
   }
-  children.push_back(std::make_shared<GBCompositedWindow>(v, Graphics(), x, y));
+  auto f = std::make_shared<GBCompositedWindow>(v, Graphics(), x, y);
+  children.push_back(f);
+  Focus(f);
 }
 
 void GBMultiView::CloseView(const GBView& v) {
   for (auto win = children.begin(); win != children.end(); win++) {
     if ((*win)->View().get() == &v) {
       children.erase(win);
+      Focus({});
       changed = true;
       return;
     }
@@ -203,7 +220,41 @@ void GBMultiView::RightClick(short x, short y) {
     // prevent closing menu
     if (childView == children.front()) return;
     children.remove(childView);
+    Focus({});
     changed = true;
+  }
+}
+
+void GBMultiView::Focus(std::shared_ptr<GBCompositedWindow> newFocus) {
+  if (auto oldFocus = focus.lock()) {
+    if (oldFocus == newFocus) return;
+    oldFocus->SetFocus(false);
+  }
+  // todo: don't refocus on main? w == nil && focus == nil
+  if (newFocus) {
+    focus = newFocus;
+    newFocus->SetFocus(true);
+  } else {
+    focus.reset();
+    content->SetFocus(true);
+  }
+  changed = true;
+}
+
+void GBMultiView::SetFocus(bool /*hasFocus*/) {
+  // todo: should this really close menus?
+  // if (auto f = focus.lock()) {
+  //   f->SetFocus(hasFocus);
+  // } else {
+  //   content->SetFocus(hasFocus);
+  // }
+}
+
+void GBMultiView::AcceptKeystroke(const char what) {
+  if (auto f = focus.lock()) {
+    f->AcceptKeystroke(what);
+  } else {
+    content->AcceptKeystroke(what);
   }
 }
 

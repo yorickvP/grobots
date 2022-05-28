@@ -59,7 +59,7 @@ public:
 	void Quit();
 	void SetStepPeriod(int period);
 
-  bool HandleMenuSelection(int item);
+  void HandleMenuSelection(int item);
 	
   void OpenView(Ref<GBView> view, short x, short y);
 	void OpenMinimap();

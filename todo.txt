@@ -5,5 +5,5 @@
 - -fwasm-exceptions, improved speed
 - window for loading sides
 - wasm framerate management / multi-threaded rendering
-- keyboard focus for windows
 - drag windows using dead client area
+- better scroll to zoom

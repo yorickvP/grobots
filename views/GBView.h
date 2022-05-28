@@ -104,6 +104,7 @@ public:
 	virtual void AcceptDrag(short x, short y);
 	virtual void AcceptUnclick(short x, short y, int clicksBefore);
 	virtual void AcceptKeystroke(const char what);
+  virtual void SetFocus(bool) {};
 // other
 	virtual const string Name() const;
 	virtual GBCursor Cursor() const;

@@ -38,6 +38,7 @@ public:
 	void AcceptUnclick(int x, int y, short clicksBefore);
 	void AcceptKeystroke(char what);
 	bool GetFrontClicks() const;
+  void SetFocus(bool);
 //sizing
 	void ResizeSelf();
 	void SetSize(short width, short height);

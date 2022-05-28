@@ -7,6 +7,7 @@ GBMenuView::GBMenuView(GBSDLApplication& app, GBFontManager& fontmgr, std::list<
 	, app(app)
   , fontmgr(fontmgr)
   , width(0)
+  , isMain(children == nil)
 {
   if (children) {
     // todo: ugly copy
@@ -144,13 +145,15 @@ void GBMenuView::AcceptClick(short x, short y, int /*clicks*/) {
         app.OpenView(std::make_shared<GBMenuView>(app, fontmgr, &it->children), -1, 0);
       } else {
         if (it->id != 0) {
-          if (app.HandleMenuSelection(it->id)) {
-            app.CloseView(*this);
-          }
+          app.HandleMenuSelection(it->id);
         }
       }
       return;
     }
   }
+}
+
+void GBMenuView::SetFocus(bool focus) {
+  if (!isMain && !focus) app.CloseView(*this);
 }
 #endif

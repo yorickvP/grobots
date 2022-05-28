@@ -64,6 +64,8 @@ void GBSDLWindow::SetSize(short width, short height) {
 	this->Update(false);
 }
 
+void GBSDLWindow::SetFocus(bool focus) {view->SetFocus(focus);}
+
 Uint32 GBSDLWindow::WindowID() const { return windowid; }
 const GBRect & GBSDLWindow::Bounds() const { return bounds; };
 bool GBSDLWindow::GetFrontClicks() const { return view->GetFrontClicks(); }

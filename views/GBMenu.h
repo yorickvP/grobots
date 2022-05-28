@@ -22,6 +22,7 @@ class GBMenuView : public GBView {
   GBFontManager& fontmgr;
   unsigned int width;
   std::list<MenuItem> topMenuItems;
+  bool isMain;
 public:
 	GBMenuView(GBSDLApplication& app, GBFontManager&, std::list<MenuItem>* menuItems = nil);
 	~GBMenuView();
@@ -35,6 +36,7 @@ public:
 	const string Name() const;
 	
 	void AcceptClick(short x, short y, int /*clicks*/);
+  void SetFocus(bool) override;
 };
 
 #endif

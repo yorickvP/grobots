@@ -229,6 +229,7 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 				break;
     case SDL_MOUSEWHEEL: {
       Ref<GBSDLWindow> wnd = FindWndFromID(evt->wheel.windowID);
+      // todo: focus
       if (!wnd) break;
       if (evt->wheel.y > 0) {
         wnd->AcceptKeystroke('+');
@@ -273,6 +274,12 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 				    case SDL_WINDOWEVENT_CLOSE:
 				        this->CloseWindow(wnd);
 				        break;
+            case SDL_WINDOWEVENT_FOCUS_GAINED:
+                wnd->SetFocus(true);
+                break;
+            case SDL_WINDOWEVENT_FOCUS_LOST:
+                wnd->SetFocus(false);
+                break;
 				}
 				break; }
 			//case SDL_VIDEORESIZE:
@@ -333,7 +340,7 @@ void GBSDLApplication::OpenTournament() {
 	mainView->Add(std::make_shared<GBTournamentView>(world), 100, 100);
 }
 
-bool GBSDLApplication::HandleMenuSelection(int item) {
+void GBSDLApplication::HandleMenuSelection(int item) {
 	try {
 		switch ( item ) {
 		//Apple or Help menu
@@ -448,11 +455,9 @@ bool GBSDLApplication::HandleMenuSelection(int item) {
 				if (item / 100 == kAppleMenu)
 					OpenAppleMenuItem(item);
 #endif
-        return false;
 				break;
 		}
 	} catch ( GBAbort & ) {}
-  return true;
 }
 
 #endif
