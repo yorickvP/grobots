@@ -1,0 +1,10 @@
+- fix minimap clobbering its frame
+- pure nix wasm build
+- actual menu implementation
+- better robot rendering (arcs)
+- -fwasm-exceptions, improved speed
+- window for loading sides
+- wasm framerate management / multi-threaded rendering
+- keyboard focus for windows
+- drag windows using dead client area
+- background is missing some lines on some zoom levels
