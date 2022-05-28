@@ -29,8 +29,8 @@ class GBPortal : public GBView,
 				 public GBProjection {
 	GBWorld & world;
 	GBPosition viewpoint;
-	short defaultwidth, defaultheight;
 	short scale; //pixels per unit
+	short defaultwidth, defaultheight;
 	bool following;
 	GBPosition followPosition;
 	GBMilliseconds lastFollow;

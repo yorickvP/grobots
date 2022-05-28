@@ -14,6 +14,7 @@
 //Maps GBFinePoints to screen locations
 class GBProjection {
 public:
+  virtual ~GBProjection() = default;
 	virtual short ToScreenX(const GBCoordinate x) const = 0;
 	virtual short ToScreenY(const GBCoordinate y) const = 0;
 	virtual GBCoordinate FromScreenX(const short h) const = 0;

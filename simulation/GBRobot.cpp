@@ -350,6 +350,7 @@ void GBRobot::Draw(GBGraphics & g, const GBProjection & proj, const GBRect & whe
 		case rdNone: default:
 			if ( ! hardware.blaster.Cooldown() && ! hardware.grenades.Cooldown() )
 				break; //if we're flashing, fall through and draw a dot
+      [[fallthrough]];
 		case rdDot:
 			g.DrawSolidOval(GBRect(where.CenterX() - thickness, where.CenterY() - thickness,
 				where.CenterX() + thickness, where.CenterY() + thickness), color);

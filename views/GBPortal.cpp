@@ -141,7 +141,7 @@ void GBPortal::DrawObjectList(const GBObject * list, GBDrawingLayer layer) {
 				&& where.bottom > 0 && where.top < Height() ) {
 			bool selected = cur == world.Followed();
 			if ( layer == layerNormal )
-				cur->Draw(Graphics(), *this, CalcExternalRect(where), selected || showDetails && scale >= kMinDetailsScale);
+				cur->Draw(Graphics(), *this, CalcExternalRect(where), selected || (showDetails && scale >= kMinDetailsScale));
 			else if ( layer == layerUnderlay )
 				cur->DrawUnderlay(Graphics(), *this, CalcExternalRect(where), selected);
 			else if ( layer == layerOverlay )
@@ -317,7 +317,7 @@ void GBPortal::AcceptDrag(short x, short y) {
 		}
 		GBDistance dist = (spot - lastClick).Norm();
 		GBFrames frames = world.CurrentFrame() - lastFrame;
-		if ( dist >= kToolSpacings[tool] && kToolSpacings[tool]
+		if ( (dist >= kToolSpacings[tool] && kToolSpacings[tool])
          || (frames >= kToolIntervals[tool] && kToolIntervals[tool]) ) {
 			DoTool(spot);
 			lastx = x; lasty = y;
