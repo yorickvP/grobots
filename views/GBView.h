@@ -11,6 +11,8 @@
 #include "GBGraphics.h"
 #include "GBMilliseconds.h"
 
+#include <memory>
+
 typedef enum {
 	cuArrow = 0,
 	cuHand,
@@ -111,9 +113,9 @@ public:
 // WrapperView must forward all messages to content
 class GBWrapperView : public GBView {
 protected:
-	GBView * const content;
+  std::shared_ptr<GBView> const content;
 public:
-	explicit GBWrapperView(GBView * what);
+	explicit GBWrapperView(std::shared_ptr<GBView> what);
 	~GBWrapperView();
 // sizing
 	bool Resizable() const;
@@ -146,7 +148,7 @@ class GBDoubleBufferedView : public GBWrapperView {
 	GBBitmap * offscreen;
 	bool draw, flip;
 public:
-	explicit GBDoubleBufferedView(GBView * what);
+	explicit GBDoubleBufferedView(std::shared_ptr<GBView> what);
 	~GBDoubleBufferedView();
 // sizing
 	void SetSize(short width, short height);

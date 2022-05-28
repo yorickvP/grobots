@@ -258,13 +258,11 @@ GBCursor GBView::Cursor() const {
 
 // GBWrapperView //
 
-GBWrapperView::GBWrapperView(GBView * what)
+GBWrapperView::GBWrapperView(std::shared_ptr<GBView> what)
 	: content(what)
 {}
 
-GBWrapperView::~GBWrapperView() {
-	delete content;
-}
+GBWrapperView::~GBWrapperView() {}
 
 bool GBWrapperView::Resizable() const {
 	return content->Resizable();
@@ -350,7 +348,7 @@ GBCursor GBWrapperView::Cursor() const {
 
 // GBDoubleBufferedView //
 
-GBDoubleBufferedView::GBDoubleBufferedView(GBView * what)
+GBDoubleBufferedView::GBDoubleBufferedView(std::shared_ptr<GBView> what)
 	: GBWrapperView(what),
 	offscreen(nil),
 	draw(true), flip(true)
