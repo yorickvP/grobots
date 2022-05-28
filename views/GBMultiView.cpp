@@ -127,6 +127,9 @@ public:
   void AcceptKeystroke(char what) {
     v->AcceptKeystroke(what);
   }
+  bool GetFrontClicks() const {
+    return v->GetFrontClicks();
+  }
 };
 
 GBMultiView::GBMultiView(std::shared_ptr<GBView> bg)
@@ -161,9 +164,13 @@ std::shared_ptr<GBCompositedWindow> GBMultiView::WindowFromXY(short x, short y) 
 }
 void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
   if (auto childView = WindowFromXY(x, y)) {
-    dragging = childView;
+    bool shouldClick = true;
+    if (childView != focus.lock() && !childView->GetFrontClicks()) shouldClick = false;
     Focus(childView);
-    childView->DoClick(x, y, clicksBefore);
+    if (shouldClick) {
+      dragging = childView;
+      childView->DoClick(x, y, clicksBefore);
+    }
   } else {
     Focus({});
     content->DoClick(x, y, clicksBefore);
@@ -195,6 +202,7 @@ void GBMultiView::Add(std::shared_ptr<GBView> v, short x, short y) {
   if (!v->Name().empty()) {
     for (const auto &childView : children) {
       if (childView->Matches(v->Name())) {
+        Focus(childView);
         return;
       }
     }
@@ -234,6 +242,9 @@ void GBMultiView::Focus(std::shared_ptr<GBCompositedWindow> newFocus) {
   if (newFocus) {
     focus = newFocus;
     newFocus->SetFocus(true);
+    if (auto it = std::find(children.begin(), children.end(), newFocus); it != children.end()) {
+      children.splice(children.end(), children, it);
+    }
   } else {
     focus.reset();
     content->SetFocus(true);

@@ -158,4 +158,8 @@ void GBMenuView::AcceptClick(short x, short y, int /*clicks*/) {
 void GBMenuView::SetFocus(bool focus) {
   if (!isMain && !focus) app.CloseView(*this);
 }
+
+bool GBMenuView::GetFrontClicks() const {
+  return true;
+}
 #endif

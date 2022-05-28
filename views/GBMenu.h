@@ -32,6 +32,7 @@ public:
 	short PreferredWidth() const;
 	short PreferredHeight() const;
   short MinimumWidth() const override;
+  bool GetFrontClicks() const override;
 	
 	const string Name() const;
 	
