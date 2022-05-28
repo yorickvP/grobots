@@ -7,6 +7,7 @@
 #include <math.h>
 #if ! HEADLESS
 #include "SDL2_gfxPrimitives.h"
+#include "BBCSDL_gfx.h"
 #endif
 
 // GBRect //
@@ -64,6 +65,7 @@ void GBRect::ToRect(RECT & r) const {
 
 // GBGraphics //
 #ifdef WITH_SDL
+
 GBGraphics::GBGraphics(SDL_Renderer * renderer, GBFontManager* font_mgr) : renderer(renderer), font_mgr(font_mgr) {
 };
 GBGraphics::~GBGraphics() {}

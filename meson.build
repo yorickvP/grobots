@@ -1,4 +1,4 @@
-project('grobots', 'cpp',
+project('grobots', 'c', 'cpp',
   version : '0.1',
   default_options : ['warning_level=3', 'cpp_std=c++17'])
 
@@ -56,6 +56,7 @@ ui = [
   'ui/GBSDLWindow.cpp',
   'ui/GBViewsApplication.cpp',
   'ui/GBWindow.cpp',
+  'vendor/BBCSDL_gfx.c'
 ]
 
 sdl = dependency('sdl2', version : '>=2.0')
@@ -70,7 +71,7 @@ executable('grobots',
 
 executable('grobots_sdl',
            src + ui,
-           include_directories : ['brains', 'sides', 'simulation', 'support', 'ui', 'views'],
+           include_directories : ['brains', 'sides', 'simulation', 'support', 'ui', 'views', 'vendor'],
            cpp_args: ['-DWITH_SDL', '-Wno-sign-compare'],
            dependencies : [sdl, sdl_ttf, sdl_gfx],
            install : true)
