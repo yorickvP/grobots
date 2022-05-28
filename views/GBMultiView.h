@@ -26,6 +26,8 @@ class GBMultiView : public GBWrapperView {
 	virtual void AcceptUnclick(short x, short y, int clicksBefore) override;
   void RightClick(short x, short y);
   virtual bool NeedsRedraw(bool running) const override;
+
+  void CloseView(const GBView& v);
 };
 
 #endif

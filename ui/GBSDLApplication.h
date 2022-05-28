@@ -59,7 +59,9 @@ public:
 	void Quit();
 	void SetStepPeriod(int period);
 
+  bool HandleMenuSelection(int item);
 	
+  void OpenView(Ref<GBView> view, short x, short y);
 	void OpenMinimap();
 	void OpenDebugger();
 	void OpenAbout();
@@ -68,6 +70,7 @@ public:
 	void OpenScores();
 	void OpenTypeWindow();
 	void OpenTournament();
+  void CloseView(const GBView& v);
 
   static void mainloop(void* arg);
 };

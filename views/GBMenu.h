@@ -7,19 +7,30 @@
 
 #include "GBView.h"
 #include "GBWorld.h"
+#include <list>
+#include <string>
 
+struct MenuItem {
+  std::string name;
+  unsigned int id = 0;
+  std::list<MenuItem> children;
+  unsigned int x = 0;
+};
 class GBSDLApplication;
 class GBMenuView : public GBView {
-	GBWorld& world;
 	GBSDLApplication& app;
+  GBFontManager& fontmgr;
+  unsigned int width;
+  std::list<MenuItem> topMenuItems;
 public:
-	GBMenuView(GBWorld& world, GBSDLApplication& app);
+	GBMenuView(GBSDLApplication& app, GBFontManager&, std::list<MenuItem>* menuItems = nil);
 	~GBMenuView();
 
 	void Draw();
 	
 	short PreferredWidth() const;
 	short PreferredHeight() const;
+  short MinimumWidth() const override;
 	
 	const string Name() const;
 	

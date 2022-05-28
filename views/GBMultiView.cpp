@@ -47,6 +47,7 @@ public:
     Draw(true, false);
   }
   void DrawFrame() {
+    // TODO: frameless windows
     GBGraphicsWrapper g = texture->Graphics();
     short width = texture->Bounds().Width();
     short height = texture->Bounds().Height();
@@ -56,7 +57,8 @@ public:
     // titlebar bg // todo: alpha?
     g->DrawSolidRect(titlebar, GBColor::black);
     g->DrawOpenRect(titlebar, GBColor::white);
-    g->DrawStringCentered(v->Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
+    if (!v->Name().empty())
+      g->DrawStringCentered(v->Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
   };
   void Draw(bool force, bool running) {
     if (v->NeedsResize()) return Resize();
@@ -109,6 +111,9 @@ public:
   }
   bool NeedsResize() const {
     return v->NeedsResize();
+  }
+  std::shared_ptr<GBView> View() const {
+    return v;
   }
 };
 
@@ -173,12 +178,24 @@ void GBMultiView::AcceptDrag(short x, short y) {
 void GBMultiView::Add(std::shared_ptr<GBView> v, short x, short y) {
   changed = true;
   // hack to prevent duplicate windows
-  for (const auto &childView : children) {
-    if (childView->Matches(v->Name())) {
-      return;
+  if (!v->Name().empty()) {
+    for (const auto &childView : children) {
+      if (childView->Matches(v->Name())) {
+        return;
+      }
     }
   }
   children.push_back(std::make_shared<GBCompositedWindow>(v, Graphics(), x, y));
+}
+
+void GBMultiView::CloseView(const GBView& v) {
+  for (auto win = children.begin(); win != children.end(); win++) {
+    if ((*win)->View().get() == &v) {
+      children.erase(win);
+      changed = true;
+      return;
+    }
+  }
 }
 
 void GBMultiView::RightClick(short x, short y) {

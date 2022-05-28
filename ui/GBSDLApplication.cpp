@@ -26,6 +26,43 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
+// todo: duplicated from GBApplication.h
+//Menu item IDs: these are 100*menuid + itemposition
+enum {
+	kAppleMenu = 128,
+		miAbout = 12801,
+	kFileMenu = 129,
+		miLoadSide = 12901, miDuplicateSide,
+		miReloadSide = 12903,
+		miRemoveSide = 12905, miRemoveAllSides,
+		miClose = 12908,
+		miQuit = 12910,
+	kWindowMenu = 130,
+		miRosterView = 13001, miMainView, miMinimapView,
+		miScoresView, miTypesView,
+		miDebuggerView,
+		miTournamentView, miSideDebuggerView,
+	kViewMenu = 131,
+		miSound = 13101,
+		miShowSensors = 13103, miShowDecorations, miShowMeters,
+		miMinimapRobots = 13107, miMinimapFood, miMinimapSensors, miMinimapDecorations,
+		miMinimapTrails,
+		miReportErrors = 13113, miReportPrints,
+		miRefollow = 13116, miFollowRandom, miRandomNear, miAutofollow,
+		miGraphAllRounds = 13121,
+	kSimulationMenu = 132,
+		miRun = 13201, miSingleFrame, miStep, miPause,
+		miSlowerSpeed = 13206, miSlowSpeed, miNormalSpeed, miFastSpeed, miFasterSpeed, miUnlimitedSpeed,
+		miNewRound = 13213, miRestart,
+		miSeed = 13215, miReseed,
+		miRules = 13218,
+		miTournament = 13219, miSaveScores, miResetScores,
+		miStartStopBrain = 13223,
+	kToolsMenu = 133,
+		miScroll = 13301,
+		miAddManna = 13303, miAddRobot, miAddSeed,
+		miMove = 13307, miPull, miSmite, miBlasts, miErase, miEraseBig
+};
 
 const short kClickRange = 5;
 const GBMilliseconds kSlowerSpeedLimit = 500;
@@ -55,9 +92,9 @@ GBSDLApplication::GBSDLApplication()
 	mainView = std::make_shared<GBMultiView>(portal);
 
 	mainWnd = std::make_shared<GBSDLWindow>(mainView, true, true, fontmanager);
-  mainView->Add(std::make_shared<GBMenuView>(world, *this), 0, -17);
+  mainView->Add(std::make_shared<GBMenuView>(*this, fontmanager), -1, -17);
 // #ifndef __EMSCRIPTEN__
-// 	windows.push_back(std::make_shared<GBSDLWindow>(new GBMenuView(world, *this), true, this, false, &fontmanager));
+// 	windows.push_back(std::make_shared<GBSDLWindow>(new GBMenuView(*this), true, this, false, &fontmanager));
 // #endif
 	focus = mainWnd;
 	windows.push_back(mainWnd);
@@ -260,6 +297,14 @@ void GBSDLApplication::CloseWindow(Ref<GBSDLWindow> window) {
 	window->Hide();
 	windows.remove(window);
 }
+void GBSDLApplication::OpenView(Ref<GBView> view, short x, short y) {
+  mainView->Add(view, x, y);
+}
+
+void GBSDLApplication::CloseView(const GBView& v) {
+  // todo: multi window
+  mainView->CloseView(v);
+}
 void GBSDLApplication::OpenMinimap() {
   mainView->Add(std::make_shared<GBMiniMapView>(world, *portal), 7, mainView->Bounds().bottom - 200);
 }
@@ -286,6 +331,128 @@ void GBSDLApplication::OpenTypeWindow() {
 }
 void GBSDLApplication::OpenTournament() {
 	mainView->Add(std::make_shared<GBTournamentView>(world), 100, 100);
+}
+
+bool GBSDLApplication::HandleMenuSelection(int item) {
+	try {
+		switch ( item ) {
+		//Apple or Help menu
+			case miAbout: OpenAbout(); break;
+		//File menu
+        //case miLoadSide: DoLoadSide(); break;
+			case miDuplicateSide:
+				if ( world.SelectedSide() )
+					world.AddSide(world.SelectedSide()->Copy());
+				break;
+        //case miReloadSide: DoReloadSide(); break;
+			case miRemoveSide:
+				if ( world.SelectedSide() ) {
+					if ( world.SelectedSide()->Scores().Seeded() ) {
+						world.Reset();
+						world.running = false;
+					}
+					world.RemoveSide(world.SelectedSide());
+				} break;
+			case miRemoveAllSides:
+				world.Reset();
+				world.RemoveAllSides();
+				world.running = false;
+				break;
+			case miQuit:
+				Quit();
+				break;
+		//Window menu
+        //case miMainView: mainWindow->Show(); break;
+    case miRosterView: OpenRoster(); break;
+    case miMinimapView: OpenMinimap(); break;
+    case miScoresView: OpenScores(); break;
+    case miTypesView: OpenTypeWindow(); break;
+    case miTournamentView: OpenTournament(); break;
+    case miDebuggerView: OpenDebugger(); break;
+    case miSideDebuggerView: OpenSideDebugger(); break;
+		//View menu
+		//	case miSound: SetSoundActive(! SoundActive()); break;
+			case miShowSensors: portal->showSensors = ! portal->showSensors; break;
+			case miShowDecorations: portal->showDecorations = ! portal->showDecorations; break;
+			case miShowMeters: portal->showDetails = ! portal->showDetails; break;
+        //case miMinimapRobots: minimap->showRobots = ! minimap->showRobots; break;
+			// case miMinimapFood: minimap->showFood = ! minimap->showFood; break;
+			// case miMinimapSensors: minimap->showSensors = ! minimap->showSensors; break;
+			// case miMinimapDecorations: minimap->showDecorations = ! minimap->showDecorations; break;
+			// case miMinimapTrails: minimap->showTrails = ! minimap->showTrails; break;
+			case miReportErrors: world.reportErrors = ! world.reportErrors; break;
+			case miReportPrints: world.reportPrints = ! world.reportPrints; break;
+			case miRefollow: portal->Refollow(); break;
+			case miFollowRandom: portal->FollowRandom(); break;
+			case miRandomNear: portal->FollowRandomNear(); break;
+			case miAutofollow: portal->autofollow = ! portal->autofollow; break;
+        //case miGraphAllRounds: scores->graphAllRounds = ! scores->graphAllRounds; break;
+		//Simulation menu:
+			case miRun:
+				world.running = true;
+				lastStep = Milliseconds();
+				break;
+			case miSingleFrame:
+				world.AdvanceFrame();
+				world.running = false;
+				break;
+			// case miStep:
+			// 	if ( debugger->Active() && debugger->Step() )
+			// 		world.AdvanceFrame();
+			// 	world.running = false;
+			// 	break;
+			case miPause: world.running = false; break;
+			case miSlowerSpeed: SetStepPeriod(kSlowerSpeedLimit); break;
+			case miSlowSpeed: SetStepPeriod(kSlowSpeedLimit); break;
+			case miNormalSpeed: SetStepPeriod(kNormalSpeedLimit); break;
+			case miFastSpeed: SetStepPeriod(kFastSpeedLimit); break;
+			case miFasterSpeed: SetStepPeriod(kFasterSpeedLimit); break;
+			case miUnlimitedSpeed: SetStepPeriod(kNoSpeedLimit); break;
+			case miNewRound:
+				world.Reset();
+				world.AddSeeds();
+				world.running = true;
+				break;
+			case miRestart:
+				world.Reset();
+				world.running = false;
+				break;
+			case miSeed: world.AddSeeds(); break;
+			case miReseed: world.ReseedDeadSides(); break;
+        //case miRules: DoRulesDialog(); break;
+			case miTournament:
+				if ( world.tournament ) world.tournament = false;
+				else
+#if MAC
+					if ( DoNumberDialog("\pNumber of rounds:", world.tournamentLength, -1) )
+#endif
+					world.tournament = true;
+				break;
+			case miSaveScores: world.DumpTournamentScores(); break;
+			case miResetScores: world.ResetTournamentScores(); break;
+        //case miStartStopBrain: debugger->StartStopBrain(); break;
+		//Tools menu
+			case miScroll: portal->tool = ptScroll; break;
+			case miAddManna: portal->tool = ptAddManna; break;
+			case miAddRobot: portal->tool = ptAddRobot; break;
+			case miAddSeed: portal->tool = ptAddSeed; break;
+			case miMove: portal->tool = ptMove; break;
+			case miPull: portal->tool = ptPull; break;
+			case miSmite: portal->tool = ptSmite; break;
+			case miBlasts: portal->tool = ptBlasts; break;
+			case miErase: portal->tool = ptErase; break;
+			case miEraseBig: portal->tool = ptEraseBig; break;
+		//other
+			default:
+#if MAC && ! CARBON
+				if (item / 100 == kAppleMenu)
+					OpenAppleMenuItem(item);
+#endif
+        return false;
+				break;
+		}
+	} catch ( GBAbort & ) {}
+  return true;
 }
 
 #endif
