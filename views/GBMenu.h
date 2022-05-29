@@ -11,6 +11,7 @@
 #include <string>
 
 struct MenuItem {
+  MenuItem(std::string name, unsigned int id=0) : name(name), id(id) {};
   std::string name;
   unsigned int id = 0;
   std::list<MenuItem> children;

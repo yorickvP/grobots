@@ -96,12 +96,24 @@ if (target_machine.system() == 'windows' or has_wine)
   # todo: wine install .exe.so files
 
 elif target_machine.system() == 'emscripten'
-  # todo: -fwasm-exceptions
+  debug_args = []
+  if get_option('debug')
+    # run with python -m http.server on source root
+    debug_args = ['-gsource-map', '-sSAFE_HEAP=1', '-sSTACK_OVERFLOW_CHECK=1', '--source-map-base http://0.0.0.0:8000/build/']
+  endif
+  # todo: -fwasm-exceptions, not working on llvm14
+  shared_opts = ['-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-fexceptions']
   executable('grobots_wasm',
              src + src_ui,
              include_directories : include + include_ui,
-             cpp_args: ['-DWITH_SDL', '-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-fexceptions'],
-             link_args: ['-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-sEXIT_RUNTIME=1', '--embed-file=../Vera.ttf@Vera.ttf', '--embed-file=../commune-plus-2.gb@commune-plus-2.gb', '--embed-file=../the-lunacy.gb@the-lunacy.gb', '--embed-file=../VeraBd.ttf@VeraBd.ttf', '--embed-file=../the-horde.gb@the-horde.gb', '-fexceptions'],
+             cpp_args: ['-DWITH_SDL'] + shared_opts,
+             link_args: shared_opts + [
+               '--embed-file=../Vera.ttf@Vera.ttf',
+               '--embed-file=../commune-plus-2.gb@commune-plus-2.gb',
+               '--embed-file=../the-lunacy.gb@the-lunacy.gb',
+               '--embed-file=../VeraBd.ttf@VeraBd.ttf',
+               '--embed-file=../the-horde.gb@the-horde.gb'
+             ] + debug_args,
              name_suffix: 'html',
              install : true)
 else
