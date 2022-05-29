@@ -531,8 +531,8 @@ GBApplication::GBApplication()
 {
 	SetupSound();
 	GBView * roster = new GBRosterView(world);
-	portal = new GBPortal(world);
-	minimap = new GBMiniMapView(world, *portal);
+	portal = std::make_shared<GBPortal>(world);
+	minimap = std::make_shared<GBMiniMapView>(world, *portal);
 	scores = new GBScoresView(world);
 	debugger = new GBDebuggerView(world);
 	sideDebugger = new GBSideDebuggerView(world);

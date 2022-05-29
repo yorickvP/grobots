@@ -12,7 +12,7 @@
 #include "GBTypes.h"
 #include "GBWorld.h"
 #include "GBSide.h"
-
+#include <memory>
 
 class GBRobot;
 class GBPortal;
@@ -24,8 +24,8 @@ class GBSideDebuggerView;
 class GBApplication : public GBViewsApplication {
 	GBWorld world;
 // the views and windows
-	GBPortal * portal;
-	GBMiniMapView * minimap;
+  std::shared_ptr<GBPortal> portal;
+  std::shared_ptr<GBMiniMapView> minimap;
 	GBDebuggerView * debugger;
 	GBScoresView * scores;
 	GBSideDebuggerView * sideDebugger;

@@ -109,7 +109,7 @@ void GBWindow::Update(bool running) {
 	PAINTSTRUCT paint;
 	HDC dc = BeginPaint(win, &paint);
 	GBGraphics graphics(dc);
-	view->DoDraw(graphics);
+	view->DoDraw(graphics, running);
 	EndPaint(win, &paint);
 #endif
 }
@@ -127,7 +127,7 @@ void GBWindow::DrawChanges(bool running) {
 #elif WINDOWS
 		HDC dc = GetDC(win);
 		GBGraphics graphics(dc);
-		view->DoDraw(graphics);
+		view->DoDraw(graphics, running);
 		ReleaseDC(win, dc);
 #endif
 	}

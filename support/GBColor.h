@@ -76,6 +76,6 @@ namespace std {
       return t.hash();
     };
   };
-};
+}
 
 #endif

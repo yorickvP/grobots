@@ -8,7 +8,7 @@
 #define GBWindow_h
 
 #if WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #endif
 #include "GBView.h"
 

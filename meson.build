@@ -50,7 +50,7 @@ src = [
   'views/GBMenu.cpp',
   'views/GBMultiView.cpp',
 ]
-ui = [
+src_ui = [
   'ui/GBApplication.cpp',
   'ui/GBMain.cpp',
   'ui/GBSDLApplication.cpp',
@@ -59,36 +59,55 @@ ui = [
   'ui/GBWindow.cpp',
   'vendor/BBCSDL_gfx.c'
 ]
-
-sdl = dependency('sdl2', version : '>=2.0')
-sdl_ttf = dependency('SDL2_ttf', version : '>=2.0')
-sdl_gfx = dependency('SDL2_gfx', version : '>=1.0')
+include = ['brains', 'sides', 'simulation', 'support', 'views']
+include_ui = ['ui', 'views', 'vendor']
 
 if get_option('optimization') == '3'
    add_project_arguments('-flto', language: 'cpp')
 endif
 
-executable('grobots',
+# FIXME: fix these warnings
+add_project_arguments('-Wno-sign-compare', language: 'cpp')
+add_project_arguments('-Wno-shift-negative-value', language: 'cpp')
+add_project_arguments('-Wno-missing-field-initializers', language: 'cpp')
+
+executable('grobots_headless',
            src + ['GBHeadless.cpp'],
-           include_directories : ['brains', 'sides', 'simulation', 'support', 'views'],
-           cpp_args: ['-DHEADLESS', '-Wno-sign-compare'],
+           include_directories : include,
+           cpp_args: ['-DHEADLESS'],
            install : true)
 
-# todo: only on emscripten
-if meson.is_cross_build()
+if target_machine.system() == 'windows'
+  executable('grobots',
+             src + [
+               'ui/GBApplication.cpp',
+               'ui/GBMain.cpp',
+               'ui/GBViewsApplication.cpp',
+               'ui/GBWindow.cpp'
+             ],
+             include_directories : include + include_ui + ['win'],
+             install: true)
+
+elif target_machine.system() == 'emscripten'
   # todo: -fwasm-exceptions
   executable('grobots_wasm',
-             src + ui,
-             include_directories : ['brains', 'sides', 'simulation', 'support', 'ui', 'views', 'vendor'],
-             cpp_args: ['-DWITH_SDL', '-Wno-sign-compare', '-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-fexceptions'],
+             src + src_ui,
+             include_directories : include + include_ui,
+             cpp_args: ['-DWITH_SDL', '-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-fexceptions'],
              link_args: ['-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-sEXIT_RUNTIME=1', '--embed-file=../Vera.ttf@Vera.ttf', '--embed-file=../commune-plus-2.gb@commune-plus-2.gb', '--embed-file=../the-lunacy.gb@the-lunacy.gb', '--embed-file=../VeraBd.ttf@VeraBd.ttf', '--embed-file=../the-horde.gb@the-horde.gb', '-fexceptions'],
              name_suffix: 'html',
              install : true)
 else
+  # SDL
+  sdl = dependency('sdl2', version : '>=2.0')
+  sdl_ttf = dependency('SDL2_ttf', version : '>=2.0')
+  sdl_gfx = dependency('SDL2_gfx', version : '>=1.0')
+
   executable('grobots_sdl',
-             src + ui,
+             src + src_ui,
              include_directories : ['brains', 'sides', 'simulation', 'support', 'ui', 'views', 'vendor'],
-             cpp_args: ['-DWITH_SDL', '-Wno-sign-compare'],
+             cpp_args: ['-DWITH_SDL'],
              dependencies : [sdl, sdl_ttf, sdl_gfx],
              install : true)
+  install_data(['Vera.ttf', 'VeraBd.ttf'], install_dir: 'share/grobots/fonts')
 endif

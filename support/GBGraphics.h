@@ -17,7 +17,7 @@
 #elif MAC
 	#include <Carbon/Carbon.h>
 #elif WINDOWS
-	#include <Windows.h>
+	#include <windows.h>
 	#undef SendMessage
 	//this macro was clobbering GBSide::SendMessage
 #endif
@@ -45,7 +45,7 @@ public:
 #elif MAC && ! HEADLESS
 	void ToRect(Rect & r) const;
 	GBRect(Rect & r);
-#elif WINDOWS
+#elif WINDOWS && ! HEADLESS
 	void ToRect(RECT & r) const;
 #endif
 };
@@ -124,6 +124,7 @@ public:
 	BitMapPtr Bits() const;
 #elif WINDOWS
 	HBITMAP bits;
+public:
 	HDC hdc;
 #else
 	#warning "Need GBBitmap."

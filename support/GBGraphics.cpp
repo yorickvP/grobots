@@ -5,7 +5,7 @@
 #include "GBGraphics.h"
 #include "GBStringUtilities.h"
 #include <math.h>
-#if ! HEADLESS
+#ifdef WITH_SDL
 #include "SDL2_gfxPrimitives.h"
 #include "BBCSDL_gfx.h"
 #endif
@@ -65,7 +65,7 @@ void GBRect::ToRect(Rect & r) const {
 
 GBRect::GBRect(Rect & r)
 	: left(r.left), top(r.top), right(r.right), bottom(r.bottom) {}
-#elif WINDOWS
+#elif WINDOWS && ! HEADLESS
 void GBRect::ToRect(RECT & r) const {
 	r.left = left;
 	r.top = top;
@@ -292,7 +292,7 @@ void GBGraphics::DrawStringCentered(const string & str, short x, short y,
 	DrawString(s);
 }
 
-void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect) {
+void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char /*alpha*/) {
 	Rect r1, r2;
 	srcRect.ToRect(r1);
 	destRect.ToRect(r2);
@@ -399,11 +399,12 @@ void GBGraphics::DrawStringCentered(const string & str, short x, short y,
 	DrawString(str, x, y, size, color, useBold);
 }
 
-void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect) {
+void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char /*alpha*/) {
 	if (!BitBlt(hdc, destRect.left, destRect.top, destRect.Width(), destRect.Height(),
-			src.Graphics().hdc, srcRect.left, srcRect.top, SRCCOPY))
+			src.hdc, srcRect.left, srcRect.top, SRCCOPY))
 		DrawSolidRect(destRect, GBColor::black);
 }
+
 
 #else
 	#warning "Need implementation of GBGraphics."
@@ -536,6 +537,7 @@ GBBitmap::~GBBitmap() {
 
 void GBBitmap::StartDrawing() {}
 void GBBitmap::StopDrawing() {}
+void GBBitmap::SetClip(const GBRect* /*clip*/) {/*todo*/}
 
 #else
 	#warning "Need implementation of GBBitmap."
