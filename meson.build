@@ -77,7 +77,7 @@ executable('grobots_headless',
            src + ['GBHeadless.cpp'],
            include_directories : include,
            cpp_args: ['-DHEADLESS'],
-           name_suffix: has_wine ? 'exe' : '',
+           name_suffix: has_wine ? 'exe' : [],
            install : true)
 
 if (target_machine.system() == 'windows' or has_wine)
