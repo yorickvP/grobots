@@ -71,13 +71,16 @@ add_project_arguments('-Wno-sign-compare', language: 'cpp')
 add_project_arguments('-Wno-shift-negative-value', language: 'cpp')
 add_project_arguments('-Wno-missing-field-initializers', language: 'cpp')
 
+has_wine = meson.get_compiler('cpp').has_header('windows.h') and target_machine.system() != 'windows'
+
 executable('grobots_headless',
            src + ['GBHeadless.cpp'],
            include_directories : include,
            cpp_args: ['-DHEADLESS'],
+           name_suffix: has_wine ? 'exe' : '',
            install : true)
 
-if target_machine.system() == 'windows'
+if (target_machine.system() == 'windows' or has_wine)
   executable('grobots',
              src + [
                'ui/GBApplication.cpp',
@@ -86,7 +89,11 @@ if target_machine.system() == 'windows'
                'ui/GBWindow.cpp'
              ],
              include_directories : include + include_ui + ['win'],
+             cpp_args: has_wine ? ['-DWINDOWS=1', '-DNOMINMAX'] : [],
+             link_args: has_wine ? ['-mno-cygwin', '-mwindows'] : [],
+             name_suffix: 'exe',
              install: true)
+  # todo: wine install .exe.so files
 
 elif target_machine.system() == 'emscripten'
   # todo: -fwasm-exceptions

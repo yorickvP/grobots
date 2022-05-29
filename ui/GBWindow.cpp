@@ -57,7 +57,7 @@ GBWindow::GBWindow(GBView * v, int x, int y, bool vis,
 		(isMain ? 0 : app->MainWindow()->win), 0, hInstance, 0);
 	if (!win)
 		FatalError("Couldn't create window.");
-	SetWindowLong(win, GWL_USERDATA, reinterpret_cast<long>(this));
+	SetWindowLongPtr(win, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 	//TODO fix menubar from GBApplication?
 	//TODO examine window for menubar instead of isMain
 	//if (isMain) {

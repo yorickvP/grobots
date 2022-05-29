@@ -70,7 +70,7 @@ public:
 	static void SetCursor(GBCursor curs);
 #elif WINDOWS
 	GBWindow * MainWindow();
-	static HRESULT CALLBACK WindowProc(HWND hWin, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK WindowProc(HWND hWin, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
 	void SetStepPeriod(int period);
 //UI setup

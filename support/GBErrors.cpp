@@ -16,6 +16,9 @@
 	#include <windows.h>
 	#include "resource.h"
 	#include <string.h>
+  #ifdef UNIX
+    #include <iostream>
+  #endif
 #endif
 
 
@@ -141,7 +144,8 @@ bool Confirm(const string & message, const string & operation) {
 #elif WINDOWS
 
 //Handler for dialog that gets number of tournament rounds to run
-BOOL CALLBACK dlgNonfatalError(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK dlgNonfatalError(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  std::cout << "nonfatal error" << std::endl;
 	switch (uMsg) {
 		case WM_COMMAND: 
 			switch (LOWORD(wParam)) {
@@ -167,6 +171,9 @@ void FatalError(const string & message) {
 }
 
 void NonfatalError(const string & message) {
+#ifdef UNIX
+  std::cerr << message << std::endl;
+#endif
 	switch (DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(ID_NONFATALERROR), 
 						  NULL, dlgNonfatalError, (LPARAM)message.c_str())) {
 		case IDIGNORE: // continue, clicked ignore

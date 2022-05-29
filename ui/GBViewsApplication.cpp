@@ -215,9 +215,9 @@ GBWindow * GBViewsApplication::MainWindow() {
 WNDCLASS wclass = {CS_OWNDC | CS_VREDRAW | CS_HREDRAW, GBViewsApplication::WindowProc,
 	0, 0, 0, 0, 0, 0, 0, kWindowClassName};
 
-HRESULT CALLBACK GBViewsApplication::WindowProc(HWND hWin, UINT msg,
+LRESULT CALLBACK GBViewsApplication::WindowProc(HWND hWin, UINT msg,
 												WPARAM wParam, LPARAM lParam) {
-	GBWindow * self = reinterpret_cast<GBWindow *>(GetWindowLong(hWin, GWL_USERDATA));
+	GBWindow * self = reinterpret_cast<GBWindow *>(GetWindowLongPtr(hWin, GWLP_USERDATA));
 	int x = LOWORD(lParam), y = HIWORD(lParam);
 	switch (msg) {
 		case WM_CLOSE:

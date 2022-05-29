@@ -253,7 +253,16 @@ void GBApplication::DoLoadSide() {
 
 	if (GetOpenFileName(&ofn)) {
 		if (buff[ofn.nFileOffset - 1] != '\0') { //Only one file selected
+#ifdef UNIX // wine
+      WCHAR dosname[MAX_PATH];
+        MultiByteToWideChar(CP_ACP, 0, buff, -1, dosname, MAX_PATH);
+      char* unixname = wine_get_unix_file_name(dosname);
+      std::string s = unixname;
+      free(unixname);
+			GBSide * side = GBSideReader::Load(s);
+#else
 			GBSide * side = GBSideReader::Load(buff);
+#endif
 			if (side) world.AddSide(side);
 		} else { //There are multiple files selected.
 			//Buffer is formatted as "path\0file1\0file2\0...filelast\0\0"
@@ -261,7 +270,15 @@ void GBApplication::DoLoadSide() {
 			path += '\\';
 			for ( const char * filename = buff + path.size(); *filename;
 					filename += strlen(filename) + 1 ) {
-				GBSide * side = GBSideReader::Load(strchr(filename, '\\') ? filename : path + filename);
+        std::string file = strchr(filename, '\\') ? filename : path + filename;
+#ifdef UNIX // wine
+        WCHAR dosname[MAX_PATH];
+        MultiByteToWideChar(CP_ACP, 0, file.c_str(), -1, dosname, MAX_PATH);
+        char* unixname = wine_get_unix_file_name(dosname);
+        file = unixname;
+        free(unixname);
+#endif
+				GBSide * side = GBSideReader::Load(file);
 				if(side) world.AddSide(side);
 			 }
 		}
@@ -484,7 +501,7 @@ void GBApplication::DoRulesDialog() {
 
 #if WINDOWS
 //Handler for dialog that gets number of tournament rounds to run
-BOOL CALLBACK dlgTournamentProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK dlgTournamentProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	long rounds = -1;
 	char inputValue[10];
 	switch(uMsg) {
