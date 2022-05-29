@@ -7,3 +7,5 @@
 - wasm framerate management / multi-threaded rendering
 - drag windows using dead client area
 - better scroll to zoom
+- fix windows menus glitching
+- merge GBApplication and GBSDLApplication
