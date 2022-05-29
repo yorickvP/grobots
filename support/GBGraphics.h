@@ -125,7 +125,7 @@ public:
 #elif WINDOWS
 	HBITMAP bits;
 public:
-	HDC hdc;
+  HDC GetHDC() const;
 #else
 	#warning "Need GBBitmap."
 #endif

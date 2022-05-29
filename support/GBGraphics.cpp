@@ -401,8 +401,9 @@ void GBGraphics::DrawStringCentered(const string & str, short x, short y,
 
 void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char /*alpha*/) {
 	if (!BitBlt(hdc, destRect.left, destRect.top, destRect.Width(), destRect.Height(),
-			src.hdc, srcRect.left, srcRect.top, SRCCOPY))
+              src.GetHDC(), srcRect.left, srcRect.top, SRCCOPY))
 		DrawSolidRect(destRect, GBColor::black);
+  // todo: report error
 }
 
 
@@ -533,6 +534,10 @@ GBBitmap::GBBitmap(short width, short height, GBGraphics & parent)
 GBBitmap::~GBBitmap() {
 	DeleteDC(graphics.hdc);
 	DeleteObject(bits);
+}
+
+HDC GBBitmap::GetHDC() const {
+  return graphics.hdc;
 }
 
 void GBBitmap::StartDrawing() {}
