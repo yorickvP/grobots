@@ -113,8 +113,6 @@ GBSDLApplication::~GBSDLApplication() {}
 
 void GBSDLApplication::mainloop(void* arg) {
   GBSDLApplication *app = static_cast<GBSDLApplication*>(arg);
-  app->Process();
-  app->Redraw();
 	SDL_Event event;
   while (app->alive && SDL_PollEvent(&event)) {
     switch(event.type) {
@@ -126,6 +124,8 @@ void GBSDLApplication::mainloop(void* arg) {
       app->HandleEvent(&event);
     }
   }
+  app->Process();
+  app->Redraw();
 }
 
 void GBSDLApplication::Run() {
