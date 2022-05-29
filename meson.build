@@ -90,7 +90,7 @@ if (target_machine.system() == 'windows' or has_wine)
              ],
              include_directories : include + include_ui + ['win'],
              cpp_args: has_wine ? ['-DWINDOWS=1', '-DNOMINMAX'] : [],
-             link_args: has_wine ? ['-mno-cygwin', '-mwindows'] : [],
+             link_args: has_wine ? ['-mwindows'] : [],
              name_suffix: 'exe',
              install: true)
   # todo: wine install .exe.so files

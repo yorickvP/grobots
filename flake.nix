@@ -21,8 +21,15 @@
         let nixpkgs = inputs.nixpkgs.legacyPackages.${system};
         in {
           default = nixpkgs.callPackage grobotsPkg { withSDL = true; };
-          wine = (nixpkgs.callPackage grobotsPkg { withSDL = false; withWine = true; wine = inputs.nixpkgs.legacyPackages.x86_64-linux.wine; }).overrideAttrs (o: {
-            # WINELOADER = "wine64";
+          wine = let
+            wine = if system == "x86_64-linux" then nixpkgs.wine64 else inputs.nixpkgs.legacyPackages.x86_64-linux.wine;
+          in (nixpkgs.callPackage grobotsPkg {
+            withSDL = false;
+            withWine = true;
+            inherit wine;
+          }).overrideAttrs (o: {
+            buildInputs = o.buildInputs ++ [ nixpkgs.makeWrapper ];
+            WINELOADER = if nixpkgs.buildPlatform.is64bit then "${wine}/bin/wine64" else "${wine}/bin/wine";
             shellHook = ''
               export CC=winegcc
               export CXX=wineg++
@@ -32,6 +39,12 @@
               mkdir /tmp/.wine
               chown $UID /tmp/.wine
               $shellHook
+            '';
+            installPhase = ''
+              mkdir -p $out/bin
+              cp *.exe.so $out/bin
+              makeWrapper $WINELOADER $out/bin/grobots --add-flags $out/bin/grobots.exe.so
+              makeWrapper $WINELOADER $out/bin/grobots_headless --add-flags $out/bin/grobots_headless.exe.so
             '';
           });
           mingw32 = nixpkgs.pkgsCross.mingw32.callPackage grobotsPkg {
