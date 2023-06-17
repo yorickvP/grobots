@@ -68,9 +68,8 @@ public:
     // todo: clip
     if (force || v->NeedsRedraw(running)) {
       GBGraphicsWrapper g = texture->Graphics();
-      texture->SetClip(&v->Bounds());
+      GBClip clip = g->SetClip(&v->Bounds());
       v->DoDraw(**g, running);
-      texture->SetClip(nil);
     }
   };
   void Blit(GBGraphics& dest) {

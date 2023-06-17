@@ -26,8 +26,8 @@ const short kEdgeSpace = 2;
 class GBView {
 	GBRect bounds;
 	GBMilliseconds lastDrawn;
-	GBGraphics * graphics;
 protected:
+	GBGraphics * graphics;
 	GBRect CalcExternalRect(const GBRect & src) const;
 // portable graphics: lines
 	void DrawLine(short x1, short y1, short x2, short y2,

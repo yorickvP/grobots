@@ -51,14 +51,27 @@ public:
 };
 
 class GBBitmap;
+class GBGraphics;
+
+class GBClip {
+  GBRect oldclip;
+  GBGraphics* parent;
+public:
+  GBClip(GBRect& oldclip, GBGraphics* parent) : oldclip(oldclip), parent(parent) {};
+  ~GBClip();
+  GBClip(const GBClip&) = delete;
+  GBClip(GBClip&&) = delete;
+};
 
 class GBGraphics {
 #ifdef WITH_SDL
+protected:
   SDL_Renderer* renderer;
 	GBFontManager* font_mgr;
 public:
 	GBGraphics(SDL_Renderer * renderer, GBFontManager * font_mgr);
 	friend class GBBitmap;
+	friend class GBClip;
 #elif HEADLESS
 public:
 	GBGraphics();
@@ -105,6 +118,7 @@ public:
 
 // blitter
 	void Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char alpha=255);
+  [[nodiscard]] GBClip SetClip(const GBRect* clip);
 };
 class GBGraphicsWrapper;
 class GBBitmap {
@@ -144,14 +158,14 @@ public:
 	const GBRect & Bounds() const;
   GBGraphicsWrapper Graphics();
   void SetPosition(short x, short y);
-  void SetClip(const GBRect* clip);
 };
 
 class GBGraphicsWrapper {
   GBBitmap& b;
   GBGraphics& g;
+  GBClip c;
 public:
-  GBGraphicsWrapper(GBBitmap& b, GBGraphics& g) : b(b), g(g) {
+  GBGraphicsWrapper(GBBitmap& b, GBGraphics& g) : b(b), g(g), c(g.SetClip(nil)) {
     b.StartDrawing();
   }
   GBGraphicsWrapper(const GBGraphicsWrapper&) = delete;

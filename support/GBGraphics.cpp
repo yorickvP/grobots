@@ -467,13 +467,28 @@ void GBBitmap::StopDrawing() {
   SDL_SetRenderTarget(renderer, saveTexture);
   saveTexture = nil;
 }
-void GBBitmap::SetClip(const GBRect* clip) {
+
+GBClip GBGraphics::SetClip(const GBRect* clip) {
+  SDL_Rect old_rect;
+  SDL_RenderGetClipRect(renderer, &old_rect);
+  GBRect old_gbrect = old_rect;
   if (clip) {
     SDL_Rect t;
     clip->ToRect(t);
     SDL_RenderSetClipRect(renderer, &t);
   } else {
     SDL_RenderSetClipRect(renderer, nil);
+  }
+  return GBClip(old_gbrect, this);
+}
+
+GBClip::~GBClip() {
+  if (oldclip.Width() > 0) {
+    SDL_Rect t;
+    oldclip.ToRect(t);
+    SDL_RenderSetClipRect(parent->renderer, &t);
+  } else {
+    SDL_RenderSetClipRect(parent->renderer, nil);
   }
 }
 
@@ -486,7 +501,12 @@ GBBitmap::~GBBitmap() {}
 
 void GBBitmap::StartDrawing() {}
 void GBBitmap::StopDrawing() {}
-void GBBitmap::SetClip(const GBRect*) {}
+GBClip GBGraphics::SetClip(const GBRect*) {
+  GBRect r;
+  return GBClip(r, this);
+}
+
+GBClip::~GBClip() {}
 
 #elif MAC
 GBBitmap::GBBitmap(short width, short height, GBGraphics &)
@@ -542,7 +562,12 @@ HDC GBBitmap::GetHDC() const {
 
 void GBBitmap::StartDrawing() {}
 void GBBitmap::StopDrawing() {}
-void GBBitmap::SetClip(const GBRect* /*clip*/) {/*todo*/}
+GBClip GBGraphics::SetClip(const GBRect * /*clip*/) { /*todo*/
+  GBRect r;
+  return GBClip(r, this);
+}
+
+GBClip::~GBClip() {}
 
 #else
 	#warning "Need implementation of GBBitmap."
