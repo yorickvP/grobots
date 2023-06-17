@@ -11,10 +11,11 @@
 #include <string>
 
 struct MenuItem {
-  MenuItem(std::string name, unsigned int id=0) : name(name), id(id) {};
+  MenuItem(std::string name, unsigned int id=0) : name(name), id(id),
+                                                  children(std::make_shared<std::list<MenuItem>>()){};
   std::string name;
   unsigned int id = 0;
-  std::list<MenuItem> children;
+  std::shared_ptr<std::list<MenuItem>> children;
   unsigned int x = 0;
 };
 class GBSDLApplication;
@@ -22,10 +23,10 @@ class GBMenuView : public GBView {
 	GBSDLApplication& app;
   GBFontManager& fontmgr;
   unsigned int width;
-  std::list<MenuItem> topMenuItems;
+  std::shared_ptr<std::list<MenuItem>> topMenuItems;
   bool isMain;
 public:
-	GBMenuView(GBSDLApplication& app, GBFontManager&, std::list<MenuItem>* menuItems = nil);
+	GBMenuView(GBSDLApplication& app, GBFontManager&, std::shared_ptr<std::list<MenuItem>> menuItems = nil);
 	~GBMenuView();
 
 	void Draw();
