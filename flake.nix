@@ -60,8 +60,6 @@
               echo ${fetched.url} > $EM_PORTS/${name}/.emscripten_url
             '') ports);
             postInstall = ''
-              pwd
-              find
               cp grobots_wasm.{js,wasm} $out/bin/
             '';
           });
@@ -101,7 +99,10 @@
           nixpkgs = inputs.nixpkgs.legacyPackages.${system};
           pkgs = self.packages.${system};
         in {
-          inherit (pkgs) default;
+          default = pkgs.default.overrideAttrs (o: {
+            nativeBuildInputs = o.nativeBuildInputs ++ [ nixpkgs.clang-tools ];
+          });
+          #inherit (pkgs) default;
           emcc = nixpkgs.mkShell {
             shellHook = ''
               export EM_PORTS=$PWD/test

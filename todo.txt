@@ -1,5 +1,4 @@
 - fix minimap clobbering its frame
-- pure nix wasm build
 - actual menu implementation
 - better robot rendering (arcs)
 - -fwasm-exceptions, improved speed

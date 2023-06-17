@@ -13,12 +13,10 @@
 #elif MAC
 	#include <Carbon/Carbon.h>
 #elif WINDOWS
+	#include <iostream>
 	#include <windows.h>
 	#include "resource.h"
 	#include <string.h>
-  #ifdef UNIX
-    #include <iostream>
-  #endif
 #endif
 
 
