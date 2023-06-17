@@ -7,7 +7,7 @@
 
 #ifdef WITH_SDL
 	#include "SDL.h"
-#elif UNIX || WINDOWS
+#elif UNIX || WINDOWS || __EMSCRIPTEN__
   #include <time.h>
 #endif
 
@@ -19,7 +19,7 @@ GBMilliseconds Milliseconds() {
 GBMilliseconds Milliseconds() {
 	return (GBMilliseconds)(TickCount()) * 1000 / 60;
 }
-#elif UNIX || WINDOWS
+#elif UNIX || WINDOWS || __EMSCRIPTEN__
 GBMilliseconds Milliseconds() { return clock(); }
 //FIXME this is process time, not real time
 #else

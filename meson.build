@@ -103,6 +103,15 @@ elif target_machine.system() == 'emscripten'
   endif
   # todo: -fwasm-exceptions, not working on llvm14
   shared_opts = ['-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-fexceptions']
+  # hack: build emcc ports
+  ports = custom_target('emcc_ports',
+    input : 'empty.c',
+    output : 'dontcare',
+    command : ['emcc'] + shared_opts + ['@INPUT@', '-o', '@OUTPUT@'],
+    build_by_default : true
+  )
+
+  meson.override_dependency('SDL2', declare_dependency(sources : [ports]))
   executable('grobots_wasm',
              src + src_ui,
              include_directories : include + include_ui,
@@ -115,6 +124,7 @@ elif target_machine.system() == 'emscripten'
                '--embed-file=../the-horde.gb@the-horde.gb'
              ] + debug_args,
              name_suffix: 'html',
+             dependencies: dependency('SDL2'),
              install : true)
 else
   # SDL
