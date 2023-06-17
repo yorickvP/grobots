@@ -41,12 +41,16 @@ class GBStackBrainSpec;
 const size_t kBufferSize = 512;
 
 class GBSideReader {
+#ifdef __EMSCRIPTEN__
+  char* buffer;
+#else
 #if USE_MAC_IO
 	short refNum; // file reference number
 #else
 	std::ifstream fin;
 #endif
 	char buffer[kBufferSize];
+#endif
 	int bufpos, buflen;
 	GBSide * side; // the side being read
 	GBRobotType * type; // current type
@@ -78,6 +82,7 @@ class GBSideReader {
 	GBSide * Side();
 public:
 	static GBSide * Load(const GBFilename & filename);
+	static GBSide * Load(const GBFilename & filename, char* contents);
 };
 
 #endif

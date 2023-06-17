@@ -100,14 +100,14 @@ GBSDLApplication::GBSDLApplication()
   OpenRoster();
 	//windows.push_back(menuWnd);
 	
-	GBSide * side = GBSideReader::Load("the-lunacy.gb");
-	if (side) world.AddSide(side);
-	side = GBSideReader::Load("commune-plus-2.gb");
-	if (side) world.AddSide(side);
-	side = GBSideReader::Load("the-horde.gb");
-	if (side) world.AddSide(side);
-	world.AddSeeds();
-	world.running = true;
+	// GBSide * side = GBSideReader::Load("the-lunacy.gb");
+	// if (side) world.AddSide(side);
+	// side = GBSideReader::Load("commune-plus-2.gb");
+	// if (side) world.AddSide(side);
+	// side = GBSideReader::Load("the-horde.gb");
+	// if (side) world.AddSide(side);
+	//world.AddSeeds();
+	//world.running = true;
 }
 GBSDLApplication::~GBSDLApplication() {}
 
@@ -338,13 +338,33 @@ void GBSDLApplication::OpenTournament() {
 	mainView->Add(std::make_shared<GBTournamentView>(world), 100, 100);
 }
 
+void GBSDLApplication::DoLoadSide() {
+#ifdef __EMSCRIPTEN__
+  world.running = false;
+  EM_ASM({
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.multiple = true;
+  input.accept = '.gb';
+  input.onchange = _ => {
+    const files = Array.from(input.files);
+    files.forEach(file => {
+        file.text().then(txt =>
+                         Module.ccall('addSide', 'null', ['number', 'string', 'string'], [$0, file.name, txt]));
+    })
+  };
+  input.click();
+    }, &world);
+#endif
+}
+
 void GBSDLApplication::HandleMenuSelection(int item) {
 	try {
 		switch ( item ) {
 		//Apple or Help menu
 			case miAbout: OpenAbout(); break;
 		//File menu
-        //case miLoadSide: DoLoadSide(); break;
+      case miLoadSide: DoLoadSide(); break;
 			case miDuplicateSide:
 				if ( world.SelectedSide() )
 					world.AddSide(world.SelectedSide()->Copy());

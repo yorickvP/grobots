@@ -102,7 +102,7 @@ elif target_machine.system() == 'emscripten'
     debug_args = ['-gsource-map', '-sSAFE_HEAP=1', '-sSTACK_OVERFLOW_CHECK=1', '--source-map-base http://0.0.0.0:8000/build/']
   endif
   # todo: -fwasm-exceptions, not working on llvm14
-  shared_opts = ['-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-fexceptions']
+  shared_opts = ['-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-fexceptions', '-sEXPORTED_RUNTIME_METHODS=ccall,cwrap']
   # hack: build emcc ports
   ports = custom_target('emcc_ports',
     input : 'empty.c',
@@ -118,10 +118,7 @@ elif target_machine.system() == 'emscripten'
              cpp_args: ['-DWITH_SDL'] + shared_opts,
              link_args: shared_opts + [
                '--embed-file=../Vera.ttf@Vera.ttf',
-               '--embed-file=../commune-plus-2.gb@commune-plus-2.gb',
-               '--embed-file=../the-lunacy.gb@the-lunacy.gb',
                '--embed-file=../VeraBd.ttf@VeraBd.ttf',
-               '--embed-file=../the-horde.gb@the-horde.gb'
              ] + debug_args,
              name_suffix: 'html',
              dependencies: dependency('SDL2'),

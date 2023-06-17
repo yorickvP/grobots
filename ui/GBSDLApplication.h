@@ -71,6 +71,7 @@ public:
 	void OpenTypeWindow();
 	void OpenTournament();
   void CloseView(const GBView& v);
+  void DoLoadSide();
 
   static void mainloop(void* arg);
 };

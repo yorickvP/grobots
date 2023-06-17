@@ -15,6 +15,10 @@
 #else
 	using std::ifstream;
 #endif
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include "GBWorld.h"
+#endif
 
 const string tagNames[kNumElementTypes] = {
 	"none-illegal",
@@ -409,7 +413,9 @@ void GBSideReader::ProcessTag(GBElementType element) {
 }
 
 bool GBSideReader::GetNextBuffer() {
-#if USE_MAC_IO
+#ifdef __EMSCRIPTEN__
+  return false;
+#elif USE_MAC_IO
 	IOParam params;
 // set up params
 	params.ioCompletion = nil;
@@ -602,7 +608,9 @@ bool GBSideReader::SkipWhitespace() {
 }
 
 GBSideReader::GBSideReader(const GBFilename & filename)
-#if USE_MAC_IO
+#ifdef __EMSCRIPTEN__
+  :
+#elif USE_MAC_IO
 	: refNum(0),
 #else
 	: fin(filename.c_str()),
@@ -612,7 +620,8 @@ GBSideReader::GBSideReader(const GBFilename & filename)
 	state(etNone),
 	lineno(0), pos(0)
 {
-#if USE_MAC_IO
+#ifdef __EMSCRIPTEN__
+#elif USE_MAC_IO
 	if ( HOpen(filename.vRefNum, filename.parID, filename.name, fsRdPerm, &refNum) )
 		throw GBFileError();
 #else
@@ -627,7 +636,8 @@ GBSideReader::~GBSideReader() {
 	delete type;
 	if ( commonBrain != brain ) delete commonBrain;
 	delete brain;
-#if USE_MAC_IO
+#ifdef __EMSCRIPTEN__
+#elif USE_MAC_IO
 	if ( refNum && FSClose(refNum) )
 		throw GBFileError();
 #else
@@ -670,3 +680,27 @@ GBSide * GBSideReader::Load(const GBFilename & filename){
 	return nil;
 }
 
+GBSide * GBSideReader::Load(const GBFilename & filename, char * contents){
+	try {
+		GBSideReader reader(filename);
+    reader.buffer = contents;
+    reader.buflen = strlen(contents);
+		reader.LoadIt();
+		GBSide * side = reader.Side();
+		side->filename = filename;
+		return side;
+	} catch ( GBError & err ) {
+		NonfatalError("Error loading side: " + err.ToString());
+	} catch ( GBAbort & ) {}
+	return nil;
+}
+
+#ifdef __EMSCRIPTEN__
+extern "C" void EMSCRIPTEN_KEEPALIVE addSide(GBWorld* world, char* filename, char* contents) {
+
+  GBSide * side = GBSideReader::Load(filename, contents);
+  world->AddSide(side);
+  // world->running = true;
+}
+
+#endif
