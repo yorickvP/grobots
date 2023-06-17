@@ -23,12 +23,12 @@
           hash = "sha256-DN/XBFFyq/5EMobrx5X6lrzrrZRxzjSZww8bu1Rypt8=";
         };
         sdl2 = fetchurl {
-          url = "https://github.com/emscripten-ports/SDL2/archive/version_24.zip";
-          hash = "sha256-bNZ6Z2gRQirT7YMG7zTGjzUY90OfgeBXq9sz1cmuAmw=";
+          url = "https://github.com/libsdl-org/SDL/archive/release-2.24.0.zip";
+          hash = "sha256-AkCG2l0+JMN/Q9unBsM7r161+9zm8NNod9mPaweX9I8=";
         };
         harfbuzz = fetchurl {
-          url = "https://github.com/harfbuzz/harfbuzz/releases/download/2.8.1/harfbuzz-2.8.1.tar.xz";
-          hash = "sha256-QST2Y+xL9OKU2c8jBmg3C0JJpI/zTerw8G6PyC2JEwA=";
+          url = "https://storage.googleapis.com/webassembly/emscripten-ports/harfbuzz-3.2.0.tar.gz";
+          hash = "sha256-zleu2MfDtL459SKFWSjNqtgosFRubU/qjv98+Mp0dN4=";
         };
         sdl2_ttf = fetchurl {
           url = "https://github.com/libsdl-org/SDL_ttf/archive/38fcb695276ed794f879d5d9c5ef4e5286a5200d.zip";
@@ -105,7 +105,7 @@
           #inherit (pkgs) default;
           emcc = nixpkgs.mkShell {
             shellHook = ''
-              export EM_PORTS=$PWD/test
+              export EM_PORTS=$PWD/cache
               export EM_CACHE=$PWD/cache
             '';
             inputsFrom = [ pkgs.default ];
