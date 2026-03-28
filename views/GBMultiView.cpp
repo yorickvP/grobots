@@ -8,6 +8,7 @@
 #include "GBStringUtilities.h"
 #include "GBTypes.h"
 #include "GBMultiView.h"
+#include <algorithm>
 #include <memory>
 #include <optional>
 
