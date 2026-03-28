@@ -29,12 +29,16 @@ class GBSDLApplication {
 	void HandleEvent(SDL_Event* evt);
 	void ExpireClicks(int x, int y);
 	void Process(); // do periodic processing
-	void Redraw();
+	bool Redraw();
   Ref<GBSDLWindow> FindWndAtPos(short x, short y);
   Ref<GBSDLWindow> FindWndFromID(Uint32 id);
 	
-	GBMilliseconds stepPeriod;
-	GBMilliseconds lastStep;
+	double tickRate;
+	double dt;
+	double simTime;
+	double accumulator;
+	uint64_t lastFrameTime;
+	bool unlimitedSpeed;
 	
 	GBFontManager fontmanager;
 	
@@ -56,7 +60,8 @@ public:
 	~GBSDLApplication();
 	void Run();
 	void Quit();
-	void SetStepPeriod(int period);
+	void SetTickRate(double rate);
+	void SetUnlimitedSpeed();
 
   void HandleMenuSelection(int item);
 	

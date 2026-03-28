@@ -33,6 +33,7 @@ namespace SDL {
     SDL_Renderer* renderer;
     Renderer(Window& w, const char* driver) {
       renderer = SDL_CreateRenderer(w.sdlwindow, driver);
+      SDL_SetRenderVSync(renderer, 1);
     };
     Renderer(const Renderer&) = delete;
     ~Renderer() {

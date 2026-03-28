@@ -63,23 +63,22 @@ enum {
 };
 
 const short kClickRange = 5;
-const GBMilliseconds kSlowerSpeedLimit = 500;
-const GBMilliseconds kSlowSpeedLimit = 100;
-const GBMilliseconds kNormalSpeedLimit = 33;
-const GBMilliseconds kFastSpeedLimit = 17;
-const GBMilliseconds kFasterSpeedLimit = 10;
-const GBMilliseconds kNoSpeedLimit = 0;
+const double kSlowerTickRate = 2.0;
+const double kSlowTickRate = 10.0;
+const double kNormalTickRate = 30.0;
+const double kFastTickRate = 60.0;
+const double kFasterTickRate = 300.0;
 
-const int kMaxFasterSteps = 3;
 const GBMilliseconds kMaxEventInterval = 50;
 
 GBSDLApplication::GBSDLApplication()
-	: alive(true), clicks(0), clickx(0), clicky(0), stepPeriod(-1), lastStep(0), fontmanager(),
-    dragging(), world(), focus(), windows() {
+	: alive(true), clicks(0), clickx(0), clicky(0),
+    tickRate(kNormalTickRate), dt(1.0 / kNormalTickRate), simTime(0.0),
+    accumulator(0.0), lastFrameTime(0), unlimitedSpeed(false),
+    fontmanager(), dragging(), world(), focus(), windows() {
   // TODO: find out which parts to init
 	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) FatalError("Unable to init SDL");
 	atexit(SDL_Quit);
-	SetStepPeriod(kNormalSpeedLimit);
 	
 	portal = std::make_shared<GBPortal>(world);
 	mainView = std::make_shared<GBMultiView>(portal);
@@ -108,39 +107,78 @@ GBSDLApplication::~GBSDLApplication() {}
 
 void GBSDLApplication::mainloop(void* arg) {
   GBSDLApplication *app = static_cast<GBSDLApplication*>(arg);
-	SDL_Event event;
+
+  uint64_t now = SDL_GetPerformanceCounter();
+  double frameTime = (double)(now - app->lastFrameTime) / SDL_GetPerformanceFrequency();
+  app->lastFrameTime = now;
+
+  // clamp to avoid spiral of death
+  if (frameTime > 0.25) frameTime = 0.25;
+  app->accumulator += frameTime;
+
+  // poll events
+  SDL_Event event;
   while (app->alive && SDL_PollEvent(&event)) {
     switch(event.type) {
     case SDL_EVENT_QUIT:
       app->Quit();
       return;
-      break;
     default:
       app->HandleEvent(&event);
     }
   }
-  app->Process();
-  app->Redraw();
+
+  // simulation ticks
+  if (app->unlimitedSpeed) {
+    // run as many frames as possible within a time budget
+    GBMilliseconds start = Milliseconds();
+    while (app->world.running && Milliseconds() <= start + kMaxEventInterval) {
+      app->Process();
+    }
+    app->accumulator = 0.0;
+  } else {
+    while (app->accumulator >= app->dt) {
+      app->Process();
+      app->simTime += app->dt;
+      app->accumulator -= app->dt;
+    }
+  }
+
+  // render (vsync blocks in present when something is drawn)
+  if (!app->Redraw()) {
+    // nothing was drawn — wait for events or next tick to avoid busy spin
+    int waitMs = 1;
+    if (!app->unlimitedSpeed && app->world.running) {
+      double timeToNextTick = app->dt - app->accumulator;
+      if (timeToNextTick > 0)
+        waitMs = (int)(timeToNextTick * 1000);
+      if (waitMs < 1) waitMs = 1;
+    } else if (!app->world.running) {
+      waitMs = 16; // idle when paused
+    }
+    SDL_WaitEventTimeout(nullptr, waitMs);
+  }
 }
 
 void GBSDLApplication::Run() {
+  lastFrameTime = SDL_GetPerformanceCounter();
   #if __EMSCRIPTEN__
   emscripten_set_main_loop_arg(GBSDLApplication::mainloop, this, -1, 1);
   #else
   do {
-    Uint64 frameStart = SDL_GetTicks();
     GBSDLApplication::mainloop(this);
-    if (stepPeriod > 0) {
-      Uint64 elapsed = SDL_GetTicks() - frameStart;
-      if (elapsed < (Uint64)stepPeriod)
-        SDL_Delay((Uint32)(stepPeriod - elapsed));
-    }
   } while (alive);
   #endif
 }
 
-void GBSDLApplication::SetStepPeriod(int period) {
-	stepPeriod = period;
+void GBSDLApplication::SetTickRate(double rate) {
+  tickRate = rate;
+  dt = 1.0 / rate;
+  unlimitedSpeed = false;
+}
+
+void GBSDLApplication::SetUnlimitedSpeed() {
+  unlimitedSpeed = true;
 }
 
 void GBSDLApplication::Quit() {
@@ -148,29 +186,22 @@ void GBSDLApplication::Quit() {
 }
 
 void GBSDLApplication::Process() {
-	lastStep = Milliseconds();
-	if ( !world.running ) {
-		lastStep += 1000; //hack to prevent taking so much time when paused at Unlimited speed
-		return;
-	}
+	if ( !world.running ) return;
 	try {
-		int steps = 0;
-		do {
-			world.AdvanceFrame();
-			++steps;
-		} while ( world.running && (stepPeriod <= 0 || (stepPeriod <= 10 && steps < kMaxFasterSteps))
-			&& Milliseconds() <= lastStep + kMaxEventInterval );
+		world.AdvanceFrame();
 	} catch ( GBError & err ) {
 		NonfatalError("Error simulating: " + err.ToString());
 	} catch ( GBAbort & ) {
 		world.running = false;
 	}
 }
-void GBSDLApplication::Redraw() {
+bool GBSDLApplication::Redraw() {
+	bool any = false;
 	for (auto it = windows.begin(); it != windows.end(); ++it) {
 		if (!(*it)->Visible()) continue;
-		(*it)->DrawChanges(world.running);
+		if ((*it)->DrawChanges(world.running)) any = true;
 	}
+	return any;
 }
 
 Ref<GBSDLWindow> GBSDLApplication::FindWndAtPos(short x, short y) {
@@ -424,7 +455,6 @@ void GBSDLApplication::HandleMenuSelection(int item) {
 		//Simulation menu:
 			case miRun:
 				world.running = true;
-				lastStep = Milliseconds();
 				break;
 			case miSingleFrame:
 				world.AdvanceFrame();
@@ -436,12 +466,12 @@ void GBSDLApplication::HandleMenuSelection(int item) {
 			// 	world.running = false;
 			// 	break;
 			case miPause: world.running = false; break;
-			case miSlowerSpeed: SetStepPeriod(kSlowerSpeedLimit); break;
-			case miSlowSpeed: SetStepPeriod(kSlowSpeedLimit); break;
-			case miNormalSpeed: SetStepPeriod(kNormalSpeedLimit); break;
-			case miFastSpeed: SetStepPeriod(kFastSpeedLimit); break;
-			case miFasterSpeed: SetStepPeriod(kFasterSpeedLimit); break;
-			case miUnlimitedSpeed: SetStepPeriod(kNoSpeedLimit); break;
+			case miSlowerSpeed: SetTickRate(kSlowerTickRate); break;
+			case miSlowSpeed: SetTickRate(kSlowTickRate); break;
+			case miNormalSpeed: SetTickRate(kNormalTickRate); break;
+			case miFastSpeed: SetTickRate(kFastTickRate); break;
+			case miFasterSpeed: SetTickRate(kFasterTickRate); break;
+			case miUnlimitedSpeed: SetUnlimitedSpeed(); break;
 			case miNewRound:
 				world.Reset();
 				world.AddSeeds();
