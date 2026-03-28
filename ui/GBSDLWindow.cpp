@@ -16,7 +16,7 @@ GBSDLWindow::GBSDLWindow(std::shared_ptr<GBView> contents, bool vis, bool is_mai
 	, isMain(is_main)
 {
   #ifdef __EMSCRIPTEN__
-  SDL_Rect r = SDL::GetDisplayUsableBounds(0);
+  SDL_Rect r = SDL::GetDisplayUsableBounds(SDL_GetPrimaryDisplay());
 	view->SetSize(r.w - 1, r.h - 84);
   sdlwindow.SetSize(r.w - 1, r.h - 84);
   #else

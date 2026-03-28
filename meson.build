@@ -102,7 +102,10 @@ elif target_machine.system() == 'emscripten'
     debug_args = ['-gsource-map', '-sSAFE_HEAP=1', '-sSTACK_OVERFLOW_CHECK=1', '--source-map-base http://0.0.0.0:8000/build/']
   endif
   # todo: -fwasm-exceptions, not working on llvm14
-  shared_opts = ['-sUSE_SDL=2', '-sUSE_SDL_GFX=2', '-sUSE_SDL_TTF=2', '-fexceptions', '-sEXPORTED_RUNTIME_METHODS=ccall,cwrap']
+  # SDL3_gfx and SDL3_ttf have no emscripten ports in 4.0.12; use custom port scripts
+  sdl3_ttf_port = '--use-port=' + meson.source_root() / 'vendor/sdl3_ttf.py'
+  sdl3_gfx_port = '--use-port=' + meson.source_root() / 'vendor/sdl3_gfx.py'
+  shared_opts = ['-sUSE_SDL=3', sdl3_ttf_port, sdl3_gfx_port, '-fexceptions', '-sEXPORTED_RUNTIME_METHODS=ccall,cwrap']
   # hack: build emcc ports
   ports = custom_target('emcc_ports',
     input : 'empty.c',
@@ -111,17 +114,17 @@ elif target_machine.system() == 'emscripten'
     build_by_default : true
   )
 
-  meson.override_dependency('SDL2', declare_dependency(sources : [ports]))
+  meson.override_dependency('SDL3', declare_dependency(sources : [ports]))
   executable('grobots_wasm',
              src + src_ui,
-             include_directories : include + include_ui,
+             include_directories : include + include_ui + ['vendor'],
              cpp_args: ['-DWITH_SDL'] + shared_opts,
              link_args: shared_opts + [
                '--embed-file=../Vera.ttf@Vera.ttf',
                '--embed-file=../VeraBd.ttf@VeraBd.ttf',
              ] + debug_args,
              name_suffix: 'html',
-             dependencies: dependency('SDL2'),
+             dependencies: dependency('SDL3'),
              install : true)
 else
   # SDL

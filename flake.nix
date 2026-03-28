@@ -37,21 +37,21 @@
           url = "https://github.com/emscripten-ports/FreeType/archive/version_1.zip";
           hash = "sha256-DN/XBFFyq/5EMobrx5X6lrzrrZRxzjSZww8bu1Rypt8=";
         };
-        sdl2 = fetchurl {
-          url = "https://github.com/libsdl-org/SDL/archive/release-2.24.0.zip";
-          hash = "sha256-AkCG2l0+JMN/Q9unBsM7r161+9zm8NNod9mPaweX9I8=";
+        sdl3 = fetchurl {
+          url = "https://github.com/libsdl-org/SDL/archive/release-3.2.4.zip";
+          hash = "sha256-ijLJIC7U+z1VYDkVL1rR+IzdAKncD5Zx3fDN1gmUBZI=";
         };
         harfbuzz = fetchurl {
           url = "https://storage.googleapis.com/webassembly/emscripten-ports/harfbuzz-3.2.0.tar.gz";
           hash = "sha256-zleu2MfDtL459SKFWSjNqtgosFRubU/qjv98+Mp0dN4=";
         };
-        sdl2_ttf = fetchurl {
-          url = "https://github.com/libsdl-org/SDL_ttf/archive/38fcb695276ed794f879d5d9c5ef4e5286a5200d.zip";
-          hash = "sha256-31O0aMTje+VCSwjhEbS4JL2+MZ+B4Orstg6KHmaZzhE=";
+        sdl3_ttf = fetchurl {
+          url = "https://github.com/libsdl-org/SDL_ttf/archive/release-3.2.2.zip";
+          hash = "sha256-CjvBQm7hb8CWnpbxK675/z2YC+YbVMqlT6tnmDvOcYY=";
         };
-        sdl2_gfx = fetchurl {
-          url = "https://github.com/svn2github/sdl2_gfx/archive/2b147ffef10ec541d3eace326eafe11a54e635f8.zip";
-          hash = "sha256-wRGRoySzrOcDdCd7JjOwMqhVmwrxaKjN5D/9oGg3Ve0=";
+        sdl3_gfx = fetchurl {
+          url = "https://github.com/sabdul-khabir/SDL3_gfx/archive/0bbee988bb0caa3e98a9d78c7a2d106925c8275a.zip";
+          hash = "sha256-IqwxV/4edvmd/pITSVavLeRFFxCCWYhft4G01E8axJU=";
         };
 
       };

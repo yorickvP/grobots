@@ -6,7 +6,11 @@
 #include "GBStringUtilities.h"
 #include <math.h>
 #ifdef WITH_SDL
+#if __has_include(<SDL3_gfx/SDL3_gfxPrimitives.h>)
 #include <SDL3_gfx/SDL3_gfxPrimitives.h>
+#else
+#include "SDL3_gfxPrimitives.h"
+#endif
 #include "BBCSDL_gfx.h"
 #endif
 
