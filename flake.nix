@@ -34,16 +34,16 @@
       forEachSystem = lib.genAttrs [ "x86_64-linux" "i686-linux" ];
       portsF = fetchurl: {
         freetype = fetchurl {
-          url = "https://github.com/emscripten-ports/FreeType/archive/version_1.zip";
-          hash = "sha256-DN/XBFFyq/5EMobrx5X6lrzrrZRxzjSZww8bu1Rypt8=";
+          url = "https://github.com/freetype/freetype/archive/VER-2-13-3.zip";
+          hash = "sha256-pxZctAXfzjSa5k1vWe+yVnVlyo7brL7/Ko0OTPp3nPU=";
         };
         sdl3 = fetchurl {
           url = "https://github.com/libsdl-org/SDL/archive/release-3.2.4.zip";
           hash = "sha256-ijLJIC7U+z1VYDkVL1rR+IzdAKncD5Zx3fDN1gmUBZI=";
         };
         harfbuzz = fetchurl {
-          url = "https://storage.googleapis.com/webassembly/emscripten-ports/harfbuzz-3.2.0.tar.gz";
-          hash = "sha256-zleu2MfDtL459SKFWSjNqtgosFRubU/qjv98+Mp0dN4=";
+          url = "https://github.com/harfbuzz/harfbuzz/releases/download/3.2.0/harfbuzz-3.2.0.tar.xz";
+          hash = "sha256-CtpQocGZu29whDq4k8VYZ3Q6RDuE0IfVTfCK2IPrws0=";
         };
         sdl3_ttf = fetchurl {
           url = "https://github.com/libsdl-org/SDL_ttf/archive/release-3.2.2.zip";
@@ -52,6 +52,10 @@
         sdl3_gfx = fetchurl {
           url = "https://github.com/sabdul-khabir/SDL3_gfx/archive/0bbee988bb0caa3e98a9d78c7a2d106925c8275a.zip";
           hash = "sha256-IqwxV/4edvmd/pITSVavLeRFFxCCWYhft4G01E8axJU=";
+        };
+        zlib = fetchurl {
+          url = "https://github.com/madler/zlib/archive/refs/tags/v1.3.1.tar.gz";
+          hash = "sha256-F+iIY/NgBnKrSRgvIXKBtvxNPHYr3jYZNeQ2qVIU0Fw=";
         };
 
       };
@@ -68,10 +72,14 @@
             nativeBuildInputs = o.nativeBuildInputs ++ [ nixpkgs.emscripten nixpkgs.libarchive ];
             EM_CACHE = "/tmp/emcc-cache";
             EM_PORTS = "/tmp/ports";
-            postUnpack = lib.concatStringsSep "\n" (lib.mapAttrsToList (name: fetched: ''
+            postUnpack = lib.concatStringsSep "\n" (lib.mapAttrsToList (name: fetched:
+              let
+                urlFilename = lib.last (lib.splitString "/" fetched.url);
+                ext = lib.concatStringsSep "." (lib.tail (lib.splitString "." urlFilename));
+              in ''
               mkdir -p $EM_PORTS/${name}/
-              ln -s ${fetched} $EM_PORTS/${name}.zip
-              bsdtar -x -f $EM_PORTS/${name}.zip -C $EM_PORTS/${name}/
+              ln -s ${fetched} $EM_PORTS/${name}.${ext}
+              bsdtar -x -f $EM_PORTS/${name}.${ext} -C $EM_PORTS/${name}/
               echo ${fetched.url} > $EM_PORTS/${name}/.emscripten_url
             '') ports);
             postInstall = ''
