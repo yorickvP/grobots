@@ -6,7 +6,7 @@
 #include "GBStringUtilities.h"
 #include <math.h>
 #ifdef WITH_SDL
-#include "SDL2_gfxPrimitives.h"
+#include <SDL3_gfx/SDL3_gfxPrimitives.h>
 #include "BBCSDL_gfx.h"
 #endif
 
@@ -52,6 +52,12 @@ void GBRect::ToRect(SDL_Rect & r) const {
 	r.w = right-left;
 	r.h = bottom-top;
 }
+void GBRect::ToFRect(SDL_FRect & r) const {
+	r.x = left;
+	r.y = top;
+	r.w = right-left;
+	r.h = bottom-top;
+}
 GBRect::GBRect(SDL_Rect & r)
 	: left(r.x), top(r.y), right(r.x + r.w), bottom(r.y + r.h) {}
 
@@ -87,28 +93,28 @@ void GBGraphics::DrawLine(short x1, short y1, short x2, short y2,
 }
 void GBGraphics::DrawSolidRect(const GBRect & where, const GBColor & color) {
 	if (renderer == nil) return;
-  SDL_Rect r1;
-  where.ToRect(r1);
+  SDL_FRect r1;
+  where.ToFRect(r1);
   SDL_SetRenderDrawColor(renderer, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
   SDL_RenderFillRect(renderer, &r1);
 }
 void GBGraphics::DrawOpenRect(const GBRect & where, const GBColor & color, short thickness) {
 	if (renderer == nil) return;
-  SDL_Rect r1;
-  where.ToRect(r1);
+  SDL_FRect r1;
+  where.ToFRect(r1);
   SDL_SetRenderDrawColor(renderer, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
-  SDL_RenderDrawRect(renderer, &r1);
+  SDL_RenderRect(renderer, &r1);
 }
 void GBGraphics::DrawSolidOval(const GBRect & r, const GBColor & color) {
 	if (renderer == nil) return;
-	SDL_Rect r1;
-	r.ToRect(r1);
+	SDL_FRect r1;
+	r.ToFRect(r1);
 	filledEllipseRGBA(renderer, r1.x + (r1.w/2), r1.y + (r1.h/2), r1.w/2, r1.h/2, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 void GBGraphics::DrawOpenOval(const GBRect & r, const GBColor & color, short thickness) {
 	if (renderer == nil) return;
-	SDL_Rect r1;
-	r.ToRect(r1);
+	SDL_FRect r1;
+	r.ToFRect(r1);
 	thickEllipseRGBA(renderer, r1.x + (r1.w/2), r1.y + (r1.h/2), r1.w/2, r1.h/2, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255, thickness);
 }
 //startAngle: degrees clockwise from up
@@ -120,37 +126,23 @@ void GBGraphics::DrawArc(const GBRect & where, short startAngle, short length,
 void GBGraphics::DrawStringLeft(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
-	SDL_Rect destrect = {x, y, 0, 0};
   GBFontManager::Text text = font_mgr->renderText_Blended(renderer, size, useBold, str, color);
-	destrect.w = text->w;
-	destrect.h = text->h;
-	destrect.y -= text->h;
+	SDL_FRect destrect = {(float)x, (float)(y - text->h), (float)text->w, (float)text->h};
   text->draw(renderer, nil, &destrect);
-	//stringRGBA(renderer, x, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 void GBGraphics::DrawStringCentered(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
-	SDL_Rect destrect = {x, y, 0, 0};
   GBFontManager::Text text = font_mgr->renderText_Blended(renderer, size, useBold, str, color);
-	destrect.w = text->w;
-	destrect.h = text->h;
-	destrect.x -= text->w / 2;
-	destrect.y -= text->h;
+	SDL_FRect destrect = {(float)(x - text->w / 2), (float)(y - text->h), (float)text->w, (float)text->h};
   text->draw(renderer, nil, &destrect);
-	//stringRGBA(renderer, x - (str.length() * 4), y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 void GBGraphics::DrawStringRight(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
 	if (renderer == nil) return;
-	SDL_Rect destrect = {x, y, 0, 0};
   GBFontManager::Text text = font_mgr->renderText_Blended(renderer, size, useBold, str, color);
-	destrect.w = text->w;
-	destrect.h = text->h;
-	destrect.x -= text->w;
-	destrect.y -= text->h;
+	SDL_FRect destrect = {(float)(x - text->w), (float)(y - text->h), (float)text->w, (float)text->h};
   text->draw(renderer, nil, &destrect);
-	//stringRGBA(renderer, x - str.length() * 8, y, str.c_str(), color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 
 GBRect GBGraphics::MeasureText(const string & str, short size, const GBColor & color, bool useBold) {
@@ -158,18 +150,17 @@ GBRect GBGraphics::MeasureText(const string & str, short size, const GBColor & c
   return GBRect(0, 0, text->w, text->h);
 }
 void GBGraphics::Blit(const GBBitmap & src, const GBRect & srcRect, const GBRect & destRect, unsigned char alpha) {
-	SDL_Rect r1, r2;
-	srcRect.ToRect(r1);
-	destRect.ToRect(r2);
+	SDL_FRect r1, r2;
+	srcRect.ToFRect(r1);
+	destRect.ToFRect(r2);
 
   if (alpha != 255) {
     SDL_SetTextureBlendMode(src.texture, SDL_BLENDMODE_BLEND);
     SDL_SetTextureAlphaMod(src.texture, alpha);
-    SDL_RenderCopy(renderer, src.texture, &r1, &r2);
+    SDL_RenderTexture(renderer, src.texture, &r1, &r2);
     SDL_SetTextureBlendMode(src.texture, SDL_BLENDMODE_NONE);
-    //SDL_SetTextureAlphaMod(src.texture, 255);
   } else {
-    SDL_RenderCopy(renderer, src.texture, &r1, &r2);
+    SDL_RenderTexture(renderer, src.texture, &r1, &r2);
   }
 }
 #elif HEADLESS
@@ -432,24 +423,6 @@ void GBBitmap::SetPosition(short x, short y) {
 }
 	
 #ifdef WITH_SDL
-SDL_Surface* CreateCompatibleRGBSurface(Uint32 flags, short width, short height) {
-    Uint32 rmask, gmask, bmask, amask;
-    /* SDL interprets each pixel as a 32-bit number, so our masks must depend
-       on the endianness (byte order) of the machine */
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    rmask = 0xff000000;
-    gmask = 0x00ff0000;
-    bmask = 0x0000ff00;
-    amask = 0x000000ff;
-#else
-    rmask = 0x000000ff;
-    gmask = 0x0000ff00;
-    bmask = 0x00ff0000;
-    amask = 0xff000000;
-#endif
-    //const SDL_PixelFormat& fmt = *(source->format);
-	return SDL_CreateRGBSurface(flags, width, height, 32, rmask, gmask, bmask, amask);
-}
 GBBitmap::GBBitmap(short width, short height, GBGraphics &g)
 	: // todo: getwindowpixelformat
   texture(SDL_CreateTexture(g.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height)),
@@ -470,14 +443,14 @@ void GBBitmap::StopDrawing() {
 
 GBClip GBGraphics::SetClip(const GBRect* clip) {
   SDL_Rect old_rect;
-  SDL_RenderGetClipRect(renderer, &old_rect);
+  SDL_GetRenderClipRect(renderer, &old_rect);
   GBRect old_gbrect = old_rect;
   if (clip) {
     SDL_Rect t;
     clip->ToRect(t);
-    SDL_RenderSetClipRect(renderer, &t);
+    SDL_SetRenderClipRect(renderer, &t);
   } else {
-    SDL_RenderSetClipRect(renderer, nil);
+    SDL_SetRenderClipRect(renderer, nil);
   }
   return GBClip(old_gbrect, this);
 }
@@ -486,9 +459,9 @@ GBClip::~GBClip() {
   if (oldclip.Width() > 0) {
     SDL_Rect t;
     oldclip.ToRect(t);
-    SDL_RenderSetClipRect(parent->renderer, &t);
+    SDL_SetRenderClipRect(parent->renderer, &t);
   } else {
-    SDL_RenderSetClipRect(parent->renderer, nil);
+    SDL_SetRenderClipRect(parent->renderer, nil);
   }
 }
 

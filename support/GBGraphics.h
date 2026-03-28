@@ -9,8 +9,7 @@
 #include "GBPlatform.h"
 
 #ifdef WITH_SDL
-  #include <SDL.h>
-  #include <SDL2_gfxPrimitives.h>
+  #include <SDL3/SDL.h>
   #include "GBFontManager.h"
 #elif HEADLESS
 	//nothing
@@ -41,6 +40,7 @@ public:
   void SetXY(const short x, const short y);
 #ifdef WITH_SDL
 	void ToRect(SDL_Rect & r) const;
+	void ToFRect(SDL_FRect & r) const;
 	GBRect(SDL_Rect & r);
 #elif MAC && ! HEADLESS
 	void ToRect(Rect & r) const;

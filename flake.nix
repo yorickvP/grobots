@@ -1,16 +1,31 @@
 {
+  inputs = {
+    nixpkgs = {};
+  };
   outputs = inputs@{ self, nixpkgs }:
     let
       inherit (nixpkgs) lib;
+      sdl3-gfx = nixpkgs: nixpkgs.stdenv.mkDerivation {
+        pname = "sdl3-gfx";
+        version = "1.0.0-unstable-2025";
+        src = nixpkgs.fetchFromGitHub {
+          owner = "sabdul-khabir";
+          repo = "SDL3_gfx";
+          rev = "0bbee988bb0caa3e98a9d78c7a2d106925c8275a";
+          hash = "sha256-uHyCXYTv8D2DzuLSyIsgYfWgtrCdC5UiZEYhUdFzNOk=";
+        };
+        nativeBuildInputs = [ nixpkgs.cmake nixpkgs.pkg-config ];
+        buildInputs = [ nixpkgs.sdl3 ];
+      };
       grobotsPkg = { stdenv, lib, meson, ninja, pkg-config, withSDL ? true
-        , SDL2 ? null, SDL2_ttf ? null, SDL2_gfx ? null, windows ? null, withWine ? false, wine }:
+        , sdl3 ? null, sdl3-ttf ? null, sdl3-gfx ? null, windows ? null, withWine ? false, wine }:
         stdenv.mkDerivation {
           pname = "grobots";
           version = builtins.substring 0 8 self.lastModifiedDate;
           src = ./.;
           nativeBuildInputs = [ meson ninja ]
                               ++ (lib.optionals (withSDL || withWine) [ pkg-config ]);
-          buildInputs = (lib.optionals withSDL [ SDL2 SDL2_ttf SDL2_gfx ]) ++ (lib.optionals withWine [ wine ]);
+          buildInputs = (lib.optionals withSDL [ sdl3 sdl3-ttf sdl3-gfx ]) ++ (lib.optionals withWine [ wine ]);
           postInstall = lib.optionalString (stdenv.system == "i686-windows") ''
             cp ${windows.mcfgthreads}/bin/*.dll $out/bin
             cp ${stdenv.cc.cc.out}/i686-w64-mingw32/lib/*.dll $out/bin
@@ -45,7 +60,7 @@
         let nixpkgs = inputs.nixpkgs.legacyPackages.${system};
             ports = portsF nixpkgs.fetchurl;
         in {
-          default = nixpkgs.callPackage grobotsPkg { withSDL = true; };
+          default = nixpkgs.callPackage grobotsPkg { withSDL = true; sdl3-gfx = sdl3-gfx nixpkgs; };
           emcc = (nixpkgs.callPackage grobotsPkg {
             withSDL = false;
           }).overrideAttrs (o: {

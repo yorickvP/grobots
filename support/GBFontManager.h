@@ -7,8 +7,8 @@
 #include "GBColor.h"
 #include "GBCache.h"
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <string>
 #include <list>
 #include <memory>
@@ -58,7 +58,7 @@ class GBRenderedText {
 public:
   uint16_t w, h;
   SDL_Texture *t;
-  void draw(SDL_Renderer* r, const SDL_Rect*, const SDL_Rect*);
+  void draw(SDL_Renderer* r, const SDL_FRect*, const SDL_FRect*);
   GBRenderedText(uint16_t w, uint16_t h, SDL_Texture *t) : w(w), h(h), t(t) {};
   GBRenderedText(GBRenderedText&) = delete;
   ~GBRenderedText() {

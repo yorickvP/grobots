@@ -13,7 +13,7 @@
 #include "GBPortal.h"
 #include "GBFontManager.h"
 #include "GBMultiView.h"
-#include "SDL2_framerate.h"
+#include <SDL3/SDL.h>
 #include <list>
 #include <memory>
 
@@ -23,7 +23,6 @@ class GBSDLWindow;
 
 class GBSDLApplication {
 	bool alive;
-	FPSmanager stepManager;
 	int clicks; // how many mousedowns recently
 	GBMilliseconds clickTime;
 	short clickx, clicky;

@@ -125,9 +125,9 @@ elif target_machine.system() == 'emscripten'
              install : true)
 else
   # SDL
-  sdl = dependency('sdl2', version : '>=2.0')
-  sdl_ttf = dependency('SDL2_ttf', version : '>=2.0')
-  sdl_gfx = dependency('SDL2_gfx', version : '>=1.0')
+  sdl = dependency('sdl3', version : '>=3.0')
+  sdl_ttf = dependency('sdl3-ttf', version : '>=3.0')
+  sdl_gfx = dependency('sdl3-gfx', version : '>=1.0')
 
   executable('grobots_sdl',
              src + src_ui,

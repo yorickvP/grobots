@@ -1,10 +1,11 @@
-/* 
+/*
 
-SDL2_gfxPrimitives.h: graphics primitives for SDL - extracted
+SDL3_gfxPrimitives.h: thick graphics primitives for SDL3 renderers
 
 Copyright (C) 2012-2014  Andreas Schiffler
 Additions for BBC BASIC (C) 2016-2020 Richard Russell
 Extracted the thick functions - 2022 Yorick van Pelt
+Updated for SDL3 - 2025
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -31,12 +32,17 @@ Richard Russell -- richard at rtrussell dot co dot uk
 */
 #ifndef BBC_SDL_H
 #define BBC_SDL_H
+#ifdef __cplusplus
 extern "C" {
-#include "SDL2_gfxPrimitives.h"
+#endif
+#include <SDL3_gfx/SDL3_gfxPrimitives.h>
 
-	SDL2_GFXPRIMITIVES_SCOPE int thickEllipseColor(SDL_Renderer * renderer, Sint16 x, Sint16 y, Sint16 rx, Sint16 ry, Uint32 color, Uint8 thick);
-	SDL2_GFXPRIMITIVES_SCOPE int thickEllipseRGBA(SDL_Renderer * renderer, Sint16 xc, Sint16 yc, Sint16 xr, Sint16 yr, Uint8 r, Uint8 g, Uint8 b, Uint8 a, Uint8 thick);
-	SDL2_GFXPRIMITIVES_SCOPE int thickArcColor(SDL_Renderer * renderer, Sint16 x, Sint16 y, Sint16 rad, Sint16 start, Sint16 end, Uint32 color, Uint8 thick);
-	SDL2_GFXPRIMITIVES_SCOPE int thickArcRGBA(SDL_Renderer * renderer, Sint16 xc, Sint16 yc, Sint16 rad, Sint16 start, Sint16 end, Uint8 r, Uint8 g, Uint8 b, Uint8 a, Uint8 thick);
+	int thickEllipseColor(SDL_Renderer * renderer, Sint16 x, Sint16 y, Sint16 rx, Sint16 ry, Uint32 color, Uint8 thick);
+	int thickEllipseRGBA(SDL_Renderer * renderer, Sint16 xc, Sint16 yc, Sint16 xr, Sint16 yr, Uint8 r, Uint8 g, Uint8 b, Uint8 a, Uint8 thick);
+	int thickArcColor(SDL_Renderer * renderer, Sint16 x, Sint16 y, Sint16 rad, Sint16 start, Sint16 end, Uint32 color, Uint8 thick);
+	int thickArcRGBA(SDL_Renderer * renderer, Sint16 xc, Sint16 yc, Sint16 rad, Sint16 start, Sint16 end, Uint8 r, Uint8 g, Uint8 b, Uint8 a, Uint8 thick);
+
+#ifdef __cplusplus
 }
+#endif
 #endif

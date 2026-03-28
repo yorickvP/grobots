@@ -73,17 +73,12 @@ const GBMilliseconds kNoSpeedLimit = 0;
 const int kMaxFasterSteps = 3;
 const GBMilliseconds kMaxEventInterval = 50;
 
-GBSDLApplication::GBSDLApplication() 
+GBSDLApplication::GBSDLApplication()
 	: alive(true), clicks(0), clickx(0), clicky(0), stepPeriod(-1), lastStep(0), fontmanager(),
     dragging(), world(), focus(), windows() {
   // TODO: find out which parts to init
-#ifndef __EMSCRIPTEN__
-	if (SDL_Init(SDL_INIT_EVERYTHING) == -1) FatalError("Unable to init SDL");
-#else
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) == -1) FatalError("Unable to init SDL");
-#endif
+	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) FatalError("Unable to init SDL");
 	atexit(SDL_Quit);
-	SDL_initFramerate(&stepManager);
 	SetStepPeriod(kNormalSpeedLimit);
 	
 	portal = std::make_shared<GBPortal>(world);
@@ -116,7 +111,7 @@ void GBSDLApplication::mainloop(void* arg) {
 	SDL_Event event;
   while (app->alive && SDL_PollEvent(&event)) {
     switch(event.type) {
-    case SDL_QUIT:
+    case SDL_EVENT_QUIT:
       app->Quit();
       return;
       break;
@@ -132,16 +127,20 @@ void GBSDLApplication::Run() {
   #if __EMSCRIPTEN__
   emscripten_set_main_loop_arg(GBSDLApplication::mainloop, this, -1, 1);
   #else
-	do {
+  do {
+    Uint64 frameStart = SDL_GetTicks();
     GBSDLApplication::mainloop(this);
-		SDL_framerateDelay(&stepManager);
-	} while (alive);
+    if (stepPeriod > 0) {
+      Uint64 elapsed = SDL_GetTicks() - frameStart;
+      if (elapsed < (Uint64)stepPeriod)
+        SDL_Delay((Uint32)(stepPeriod - elapsed));
+    }
+  } while (alive);
   #endif
 }
 
 void GBSDLApplication::SetStepPeriod(int period) {
 	stepPeriod = period;
-	SDL_setFramerate(&stepManager, 1000/period);
 }
 
 void GBSDLApplication::Quit() {
@@ -193,7 +192,7 @@ Ref<GBSDLWindow> GBSDLApplication::FindWndFromID(Uint32 id) {
 void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 	try {
 		switch ( evt->type ) {
-			case SDL_MOUSEBUTTONDOWN:
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 				if (evt->button.button == SDL_BUTTON_LEFT) {
 					ExpireClicks(evt->button.x, evt->button.y);
 					clickTime = Milliseconds();
@@ -225,7 +224,7 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 					if (focus.lock() == wnd) focus = {};
 				}
 				break;
-    case SDL_MOUSEWHEEL: {
+    case SDL_EVENT_MOUSE_WHEEL: {
       Ref<GBSDLWindow> wnd = FindWndFromID(evt->wheel.windowID);
       // todo: focus
       if (!wnd) break;
@@ -236,7 +235,7 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
       }
       // todo: smooth zooming using preciseY
     } break;
-			case SDL_MOUSEBUTTONUP:
+			case SDL_EVENT_MOUSE_BUTTON_UP:
 				if (evt->button.button == SDL_BUTTON_LEFT) {
 					if ( auto d = dragging.lock() ) {
 						ExpireClicks(evt->button.x, evt->button.y);
@@ -245,45 +244,40 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
 					}
 				}
 				break;
-			case SDL_MOUSEMOTION:
-				if (evt->motion.state & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+			case SDL_EVENT_MOUSE_MOTION:
+				if (evt->motion.state & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) {
 					if (auto d = dragging.lock() ) {
 						d->AcceptDrag(evt->motion.x, evt->motion.y);
 					}
 				}
 				break;
-			case SDL_KEYDOWN:
+			case SDL_EVENT_KEY_DOWN:
 				if (auto f = focus.lock()) {
           // FIXME: deal with modifiers
-          f->AcceptKeystroke(evt->key.keysym.sym);
+          f->AcceptKeystroke(evt->key.key);
 				}
 				break;
-    case SDL_WINDOWEVENT: {
-		        Ref<GBSDLWindow> wnd = FindWndFromID(evt->window.windowID);
-				if (!wnd) break;
-				switch (evt->window.event) {
-				    case SDL_WINDOWEVENT_SHOWN:
-				    case SDL_WINDOWEVENT_EXPOSED:
-				        wnd->Update(false);
-				        break;
-				    case SDL_WINDOWEVENT_RESIZED:
-				        wnd->SetSize(evt->window.data1, evt->window.data2);
-				        break;
-				    case SDL_WINDOWEVENT_CLOSE:
-				        this->CloseWindow(wnd);
-				        break;
-            case SDL_WINDOWEVENT_FOCUS_GAINED:
-                wnd->SetFocus(true);
-                break;
-            case SDL_WINDOWEVENT_FOCUS_LOST:
-                wnd->SetFocus(false);
-                break;
-				}
-				break; }
-			//case SDL_VIDEORESIZE:
-			//	main_screen = SDL_SetVideoMode(evt->resize.w, evt->resize.h, 32, SDL_SWSURFACE | SDL_RESIZABLE);
-			//	mainGrf->setSurface(main_screen);
-			//	mainWnd->SetSize(evt->resize.w, evt->resize.h);
+    case SDL_EVENT_WINDOW_SHOWN:
+    case SDL_EVENT_WINDOW_EXPOSED: {
+        Ref<GBSDLWindow> wnd = FindWndFromID(evt->window.windowID);
+        if (wnd) wnd->Update(false);
+        break; }
+    case SDL_EVENT_WINDOW_RESIZED: {
+        Ref<GBSDLWindow> wnd = FindWndFromID(evt->window.windowID);
+        if (wnd) wnd->SetSize(evt->window.data1, evt->window.data2);
+        break; }
+    case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
+        Ref<GBSDLWindow> wnd = FindWndFromID(evt->window.windowID);
+        if (wnd) this->CloseWindow(wnd);
+        break; }
+    case SDL_EVENT_WINDOW_FOCUS_GAINED: {
+        Ref<GBSDLWindow> wnd = FindWndFromID(evt->window.windowID);
+        if (wnd) wnd->SetFocus(true);
+        break; }
+    case SDL_EVENT_WINDOW_FOCUS_LOST: {
+        Ref<GBSDLWindow> wnd = FindWndFromID(evt->window.windowID);
+        if (wnd) wnd->SetFocus(false);
+        break; }
 			default:
 				break;
 		}

@@ -1,10 +1,11 @@
-/* 
+/*
 https://github.com/rtrussell/BBCSDL/blob/master/src/SDL2_gfxPrimitives.c
 SDL2_gfxPrimitives.c: graphics primitives for SDL2 renderers
 
 Copyright (C) 2012-2014  Andreas Schiffler
 Modifications and additions for BBC BASIC (C) 2016-2020 Richard Russell
 Extracted the thick functions - 2022 Yorick van Pelt
+Updated for SDL3 - 2025
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -34,47 +35,42 @@ Richard Russell -- richard at rtrussell dot co dot uk
 #include <math.h>
 #include <string.h>
 
-#include "SDL2/SDL2_gfxPrimitives.h"
+#include <SDL3_gfx/SDL3_gfxPrimitives.h>
 
-// SDL_RenderDrawLine() is documented as including both end points, but this isn't
-// reliable in Linux so use SDL_RenderDrawPoints() instead, despite being slower.
+// SDL_RenderLine() is documented as including both end points, but this isn't
+// reliable in Linux so use SDL_RenderPoints() instead, despite being slower.
 static int renderdrawline(SDL_Renderer *renderer, int x1, int y1, int x2, int y2)
 {
 	int result ;
 #ifndef __EMSCRIPTEN__
-	if ((x1 == x2) && (y1 == y2))
-		result = SDL_RenderDrawPoint (renderer, x1, y1) ;
-	else if (y1 == y2)
-	    {
+	if ((x1 == x2) && (y1 == y2)) {
+		SDL_FPoint p = { (float)x1, (float)y1 };
+		result = SDL_RenderPoints(renderer, &p, 1) ? 0 : -1 ;
+	} else if (y1 == y2) {
 		int x ;
 		if (x1 > x2) { x = x1 ; x1 = x2 ; x2 = x ; }
-		SDL_Point *points = (SDL_Point*) malloc ((x2 - x1 + 1) * sizeof(SDL_Point)) ;
+		SDL_FPoint *points = (SDL_FPoint*) malloc ((x2 - x1 + 1) * sizeof(SDL_FPoint)) ;
 		if (points == NULL) return -1 ;
-		for (x = x1; x <= x2; x++)
-		    {
-			points[x - x1].x = x ;
-			points[x - x1].y = y1 ;
-		    }
-		result = SDL_RenderDrawPoints (renderer, points, x2 - x1 + 1) ;
+		for (x = x1; x <= x2; x++) {
+			points[x - x1].x = (float)x ;
+			points[x - x1].y = (float)y1 ;
+		}
+		result = SDL_RenderPoints(renderer, points, x2 - x1 + 1) ? 0 : -1 ;
 		free (points) ;
-	    }
-	else if (x1 == x2)
-	    {
+	} else if (x1 == x2) {
 		int y ;
 		if (y1 > y2) { y = y1 ; y1 = y2 ; y2 = y ; }
-		SDL_Point *points = (SDL_Point*) malloc ((y2 - y1 + 1) * sizeof(SDL_Point)) ;
+		SDL_FPoint *points = (SDL_FPoint*) malloc ((y2 - y1 + 1) * sizeof(SDL_FPoint)) ;
 		if (points == NULL) return -1 ;
-		for (y = y1; y <= y2; y++)
-		    {
-			points[y - y1].x = x1 ;
-			points[y - y1].y = y ;
-		    }
-		result = SDL_RenderDrawPoints (renderer, points, y2 - y1 + 1) ;
+		for (y = y1; y <= y2; y++) {
+			points[y - y1].x = (float)x1 ;
+			points[y - y1].y = (float)y ;
+		}
+		result = SDL_RenderPoints(renderer, points, y2 - y1 + 1) ? 0 : -1 ;
 		free (points) ;
-	    }
-	else
+	} else
 #endif
-		result = SDL_RenderDrawLine (renderer, x1, y1, x2, y2) ;
+		result = SDL_RenderLine(renderer, (float)x1, (float)y1, (float)x2, (float)y2) ? 0 : -1 ;
 	return result ;
 }
 static int hlinecliparc(SDL_Renderer *renderer, int x1, int x2, int y, int xc, int yc, double s, double f)
@@ -117,9 +113,9 @@ static int hlinecliparc(SDL_Renderer *renderer, int x1, int x2, int y, int xc, i
 \param rad Radius in pixels of the arc.
 \param start Starting radius in degrees of the arc. 0 degrees is right, increasing clockwise.
 \param end Ending radius in degrees of the arc. 0 degrees is right, increasing clockwise.
-\param r The red value of the arc to draw. 
-\param g The green value of the arc to draw. 
-\param b The blue value of the arc to draw. 
+\param r The red value of the arc to draw.
+\param g The green value of the arc to draw.
+\param b The blue value of the arc to draw.
 \param a The alpha value of the arc to draw.
 \param thick The line thickness in pixels.
 \returns Returns 0 on success, -1 on failure.
@@ -149,7 +145,7 @@ int thickArcRGBA(SDL_Renderer * renderer, Sint16 xc, Sint16 yc, Sint16 rad, Sint
 	ro2 = ro * ro ;
 
 	if (a != 255) result |= SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-	result |= SDL_SetRenderDrawColor(renderer, r, g, b, a);
+	result |= SDL_SetRenderDrawColor(renderer, r, g, b, a) ? 0 : -1;
 
 	for (y = -ro; y <= -ri; y++)
 	    {
@@ -176,9 +172,9 @@ int thickArcRGBA(SDL_Renderer * renderer, Sint16 xc, Sint16 yc, Sint16 rad, Sint
 \param yc Y coordinate of the center of the ellipse.
 \param xr Horizontal radius in pixels of the ellipse.
 \param yr Vertical radius in pixels of the ellipse.
-\param r The red value of the ellipse to draw. 
-\param g The green value of the ellipse to draw. 
-\param b The blue value of the ellipse to draw. 
+\param r The red value of the ellipse to draw.
+\param g The green value of the ellipse to draw.
+\param b The blue value of the ellipse to draw.
 \param a The alpha value of the ellipse to draw.
 \param thick The line thickness in pixels
 \returns Returns 0 on success, -1 on failure.
@@ -206,7 +202,7 @@ int thickEllipseRGBA(SDL_Renderer * renderer, Sint16 xc, Sint16 yc, Sint16 xr, S
 	yo2 = yo * yo ;
 
 	if (a != 255) result |= SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-	result |= SDL_SetRenderDrawColor(renderer, r, g, b, a);
+	result |= SDL_SetRenderDrawColor(renderer, r, g, b, a) ? 0 : -1;
 
 	if (xr < yr)
 	    {

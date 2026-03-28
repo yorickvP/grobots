@@ -6,7 +6,7 @@
 #include "GBMilliseconds.h"
 
 #ifdef WITH_SDL
-	#include "SDL.h"
+	#include <SDL3/SDL.h>
 #elif UNIX || WINDOWS || __EMSCRIPTEN__
   #include <time.h>
 #endif

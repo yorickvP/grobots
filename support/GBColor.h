@@ -7,7 +7,7 @@
 #define GBColor_h
 
 #ifdef WITH_SDL
-#include "SDL2/SDL_pixels.h"
+#include <SDL3/SDL_pixels.h>
 #endif
 #include <functional>
 
