@@ -8,6 +8,7 @@
 #include "GBRobotType.h"
 #include "GBSide.h"
 #include "GBStackBrainSpec.h"
+#include <cstring>
 #include <ctype.h>
 
 #if USE_MAC_IO
@@ -625,7 +626,7 @@ GBSideReader::GBSideReader(const GBFilename & filename)
 	if ( HOpen(filename.vRefNum, filename.parID, filename.name, fsRdPerm, &refNum) )
 		throw GBFileError();
 #else
-	//fin.open(filename.c_str(), ifstream::in);
+	fin.open(filename.c_str(), ifstream::in);
 	if ( fin.fail() || ! fin.is_open() || fin.eof() ) throw GBFileError();
 #endif
 }
@@ -683,8 +684,10 @@ GBSide * GBSideReader::Load(const GBFilename & filename){
 GBSide * GBSideReader::Load(const GBFilename & filename, char * contents){
 	try {
 		GBSideReader reader(filename);
+#ifdef __EMSCRIPTEN__
     reader.buffer = contents;
     reader.buflen = strlen(contents);
+#endif
 		reader.LoadIt();
 		GBSide * side = reader.Side();
 		side->filename = filename;
