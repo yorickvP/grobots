@@ -122,6 +122,7 @@ elif target_machine.system() == 'emscripten'
              link_args: shared_opts + [
                '--embed-file=../Vera.ttf@Vera.ttf',
                '--embed-file=../VeraBd.ttf@VeraBd.ttf',
+               '--shell-file=../shell.html',
              ] + debug_args,
              name_suffix: 'html',
              dependencies: dependency('SDL3'),
