@@ -9,11 +9,15 @@
 #include "GBTypes.h"
 #include "GBMultiView.h"
 #include <algorithm>
+#include <cstdlib>
 #include <memory>
 #include <optional>
 
 const short kTitleBarHeight = 16;
 const short kFrameSize = 1;
+const short kCloseButtonSize = 12;
+const short kCloseButtonMargin = 2;
+const short kSnapDistance = 8;
 
 class GBCompositedWindow {
   std::shared_ptr<GBView> v;
@@ -22,9 +26,10 @@ class GBCompositedWindow {
   std::unique_ptr<GBBitmap> texture;
   short lastX, lastY;
   bool focus;
+  bool draggingTitlebar;
 public:
   GBCompositedWindow(std::shared_ptr<GBView> v, GBGraphics& parent, short x, short y) :
-    v(v), parent(parent), hasTitlebar(!v->Name().empty()), texture(std::make_unique<GBBitmap>(v->PreferredWidth() + kFrameSize * 2, v->PreferredHeight() + (hasTitlebar ? kTitleBarHeight : 0) + 2 * kFrameSize, parent)), lastX(-1), lastY(-1), focus(false) {
+    v(v), parent(parent), hasTitlebar(!v->Name().empty()), texture(std::make_unique<GBBitmap>(v->PreferredWidth() + kFrameSize * 2, v->PreferredHeight() + (hasTitlebar ? kTitleBarHeight : 0) + 2 * kFrameSize, parent)), lastX(-1), lastY(-1), focus(false), draggingTitlebar(false) {
     texture->SetPosition(x, y);
     GBRect bounds = GBRect(kFrameSize,
                            (hasTitlebar ? kTitleBarHeight : 0) + kFrameSize,
@@ -62,6 +67,13 @@ public:
       g->DrawSolidRect(titlebar, GBColor::black);
       g->DrawOpenRect(titlebar, frameColor);
       g->DrawStringCentered(v->Name(), width / 2, kTitleBarHeight + 1, 14, GBColor::white, true);
+      // close button
+      short cbLeft = width - kCloseButtonSize - kCloseButtonMargin - kFrameSize;
+      short cbTop = kFrameSize + kCloseButtonMargin;
+      short cbRight = cbLeft + kCloseButtonSize;
+      short cbBottom = cbTop + kCloseButtonSize;
+      g->DrawLine(cbLeft, cbTop, cbRight, cbBottom, GBColor::white);
+      g->DrawLine(cbRight, cbTop, cbLeft, cbBottom, GBColor::white);
     }
   };
   void Draw(bool force, bool running) {
@@ -86,27 +98,30 @@ public:
     if (y - dst.top < v->Bounds().top) {
       lastX = x;
       lastY = y;
+      draggingTitlebar = true;
       return;
       // todo: move by drag on unused client space
       // possibly by returning bool from DoClick
     }
+    draggingTitlebar = false;
     v->DoClick(x - dst.left, y - dst.top, clicksBefore);
   };
   void DoUnclick(short x, short y, int clicksBefore) {
     const GBRect& dst = texture->Bounds();
-    v->DoUnclick(x - dst.left, y - dst.top, clicksBefore);
+    if (!draggingTitlebar)
+      v->DoUnclick(x - dst.left, y - dst.top, clicksBefore);
     lastX = -1;
     lastY = -1;
+    draggingTitlebar = false;
   };
   void DoDrag(short x, short y) {
     const GBRect& dst = texture->Bounds();
-    if (y - dst.top > v->Bounds().top) {
-      v->DoDrag(x - dst.left, y - dst.top);
-    }
-    if (lastX != -1 && lastY != -1) {
+    if (draggingTitlebar) {
       texture->SetPosition(dst.left + (x - lastX), dst.top + (y - lastY));
       lastX = x;
       lastY = y;
+    } else {
+      v->DoDrag(x - dst.left, y - dst.top);
     }
   };
   bool NeedsRedraw(bool running) const {
@@ -134,6 +149,58 @@ public:
   }
   bool GetFrontClicks() const {
     return v->GetFrontClicks();
+  }
+  bool HitCloseButton(short x, short y) const {
+    if (!hasTitlebar) return false;
+    const GBRect& dst = texture->Bounds();
+    short lx = x - dst.left;
+    short ly = y - dst.top;
+    short width = dst.Width();
+    short cbLeft = width - kCloseButtonSize - kCloseButtonMargin - kFrameSize;
+    short cbTop = kFrameSize + kCloseButtonMargin;
+    return lx >= cbLeft && lx <= cbLeft + kCloseButtonSize
+        && ly >= cbTop && ly <= cbTop + kCloseButtonSize;
+  }
+  const GBRect& GetBounds() const {
+    return texture->Bounds();
+  }
+  bool IsDragging() const {
+    return draggingTitlebar;
+  }
+  void SnapPosition(const GBRect& screen, const std::list<std::shared_ptr<GBCompositedWindow>>& others) {
+    if (!IsDragging()) return;
+    const GBRect& b = texture->Bounds();
+    short snapX = 0, snapY = 0;
+    // snap to screen edges
+    if (std::abs(b.left - screen.left) < kSnapDistance) snapX = screen.left - b.left;
+    else if (std::abs(b.right - screen.right) < kSnapDistance) snapX = screen.right - b.right;
+    if (std::abs(b.top - screen.top) < kSnapDistance) snapY = screen.top - b.top;
+    else if (std::abs(b.bottom - screen.bottom) < kSnapDistance) snapY = screen.bottom - b.bottom;
+    // snap to other windows
+    for (const auto& other : others) {
+      if (other.get() == this) continue;
+      const GBRect& o = other->GetBounds();
+      // only snap if there's vertical overlap
+      bool vOverlap = b.bottom > o.top && b.top < o.bottom;
+      bool hOverlap = b.right > o.left && b.left < o.right;
+      if (vOverlap && snapX == 0) {
+        if (std::abs(b.right - o.left) < kSnapDistance) snapX = o.left - b.right;
+        else if (std::abs(b.left - o.right) < kSnapDistance) snapX = o.right - b.left;
+        else if (std::abs(b.left - o.left) < kSnapDistance) snapX = o.left - b.left;
+        else if (std::abs(b.right - o.right) < kSnapDistance) snapX = o.right - b.right;
+      }
+      if (hOverlap && snapY == 0) {
+        if (std::abs(b.bottom - o.top) < kSnapDistance) snapY = o.top - b.bottom;
+        else if (std::abs(b.top - o.bottom) < kSnapDistance) snapY = o.bottom - b.top;
+        else if (std::abs(b.top - o.top) < kSnapDistance) snapY = o.top - b.top;
+        else if (std::abs(b.bottom - o.bottom) < kSnapDistance) snapY = o.bottom - b.bottom;
+      }
+    }
+    if (snapX != 0 || snapY != 0) {
+      texture->SetPosition(b.left + snapX, b.top + snapY);
+      lastX += snapX;
+      lastY += snapY;
+    }
   }
 };
 
@@ -169,6 +236,12 @@ std::shared_ptr<GBCompositedWindow> GBMultiView::WindowFromXY(short x, short y) 
 }
 void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
   if (auto childView = WindowFromXY(x, y)) {
+    if (childView->HitCloseButton(x, y)) {
+      children.remove(childView);
+      Focus({});
+      changed = true;
+      return;
+    }
     bool shouldClick = true;
     if (childView != focus.lock() && !childView->GetFrontClicks()) shouldClick = false;
     Focus(childView);
@@ -196,7 +269,10 @@ void GBMultiView::AcceptUnclick(short x, short y, int clicksBefore) {
 void GBMultiView::AcceptDrag(short x, short y) {
   // todo: was dragging, but target disappeared
   if (auto dr = dragging) {
-    if (auto d = dr->lock()) d->DoDrag(x, y);
+    if (auto d = dr->lock()) {
+      d->DoDrag(x, y);
+      d->SnapPosition(Bounds(), children);
+    }
   } else content->DoDrag(x, y);
   changed = true;
 }
