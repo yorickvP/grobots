@@ -37,6 +37,7 @@ public:
 	void AcceptDrag(int x, int y);
 	void AcceptUnclick(int x, int y, short clicksBefore);
 	void AcceptKeystroke(char what);
+	void DoZoom(short x, short y, short direction);
 	bool GetFrontClicks() const;
   void SetFocus(bool);
 //sizing

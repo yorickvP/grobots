@@ -233,6 +233,9 @@ void GBView::DoUnclick(short x, short y, int clicksBefore) {
 	AcceptUnclick(x - bounds.left, y - bounds.top, clicksBefore);
 }
 
+void GBView::DoZoom(short x, short y, short direction) {
+	AcceptZoom(x - bounds.left, y - bounds.top, direction);
+}
 
 bool GBView::GetFrontClicks() const {
 	return false;
@@ -246,6 +249,7 @@ void GBView::AcceptUnclick(short /*x*/, short /*y*/, int /*clicksBefore*/) {}
 
 void GBView::AcceptKeystroke(const char) {}
 
+void GBView::AcceptZoom(short /*x*/, short /*y*/, short /*direction*/) {}
 
 const string GBView::Name() const {
 	return "a view";
@@ -336,6 +340,10 @@ void GBWrapperView::AcceptUnclick(short x, short y, int clicksBefore) {
 
 void GBWrapperView::AcceptKeystroke(const char what) {
 	content->AcceptKeystroke(what);
+}
+
+void GBWrapperView::AcceptZoom(short x, short y, short direction) {
+	content->DoZoom(x, y, direction);
 }
 
 const string GBWrapperView::Name() const {

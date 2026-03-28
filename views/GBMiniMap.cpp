@@ -242,11 +242,14 @@ void GBMiniMapView::AcceptKeystroke(const char what) {
 		case '\n': case '\r': portal.FollowRandom(); break;
 		case '\t': portal.FollowRandomNear(); break;
 		case '`': portal.Refollow(); break;
-		case '-': portal.Zoom(-1); break;
-		case '+': case '=': portal.Zoom(1); break;
 		case '0': portal.ResetZoom(); break;
 		default: break;
 	}
+	worldChanges = -1;
+}
+
+void GBMiniMapView::AcceptZoom(short x, short y, short direction) {
+	portal.ZoomAt(direction, FromScreen(x, y));
 	worldChanges = -1;
 }
 

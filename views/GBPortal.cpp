@@ -352,11 +352,13 @@ void GBPortal::AcceptKeystroke(const char what) {
 		case '\n': case '\r': FollowRandom(); break;
 		case '\t': FollowRandomNear(); break;
 		case '`': Refollow(); break;
-		case '-': Zoom(-1); break;
-		case '+': case '=': Zoom(1); break;
 		case '0': ResetZoom(); break;
 		default: break;
 	}
+}
+
+void GBPortal::AcceptZoom(short x, short y, short direction) {
+	ZoomAt(direction, FromScreen(x, y));
 }
 
 const string GBPortal::Name() const {
@@ -451,6 +453,16 @@ void GBPortal::Zoom(short direction) {
 	scale += direction * max(1, scale/9);
 	InitBackground();
 	Changed();
+}
+
+void GBPortal::ZoomAt(short direction, const GBFinePoint & center) {
+	short oldScale = scale;
+	Zoom(direction);
+	if (scale != oldScale) {
+		// shift viewpoint toward center by the fraction the scale changed
+		viewpoint += (center - viewpoint) * (GBNumber(1) - GBNumber(oldScale) / scale);
+		RestrictScrolling();
+	}
 }
 
 bool GBPortal::Following() const {

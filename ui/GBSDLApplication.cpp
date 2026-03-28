@@ -229,9 +229,9 @@ void GBSDLApplication::HandleEvent(SDL_Event* evt) {
       // todo: focus
       if (!wnd) break;
       if (evt->wheel.y > 0) {
-        wnd->AcceptKeystroke('+');
+        wnd->DoZoom((short)evt->wheel.mouse_x, (short)evt->wheel.mouse_y, 1);
       } else if (evt->wheel.y < 0) {
-        wnd->AcceptKeystroke('-');
+        wnd->DoZoom((short)evt->wheel.mouse_x, (short)evt->wheel.mouse_y, -1);
       }
       // todo: smooth zooming using preciseY
     } break;

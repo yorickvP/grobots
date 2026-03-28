@@ -128,6 +128,10 @@ public:
   void AcceptKeystroke(char what) {
     v->AcceptKeystroke(what);
   }
+  void DoZoom(short x, short y, short direction) {
+    const GBRect& dst = texture->Bounds();
+    v->DoZoom(x - dst.left, y - dst.top, direction);
+  }
   bool GetFrontClicks() const {
     return v->GetFrontClicks();
   }
@@ -267,6 +271,14 @@ void GBMultiView::AcceptKeystroke(const char what) {
     f->AcceptKeystroke(what);
   } else {
     content->AcceptKeystroke(what);
+  }
+}
+
+void GBMultiView::AcceptZoom(short x, short y, short direction) {
+  if (auto childView = WindowFromXY(x, y)) {
+    childView->DoZoom(x, y, direction);
+  } else {
+    content->DoZoom(x, y, direction);
   }
 }
 

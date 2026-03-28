@@ -54,6 +54,7 @@ public:
 	void AcceptClick(short x, short y, int clicks);
 	void AcceptDrag(short x, short y);
 	void AcceptKeystroke(const char what);
+	void AcceptZoom(short x, short y, short direction);
 	const string Name() const;
 	GBCursor Cursor() const;
 };

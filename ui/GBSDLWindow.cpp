@@ -72,5 +72,6 @@ bool GBSDLWindow::GetFrontClicks() const { return view->GetFrontClicks(); }
 void GBSDLWindow::AcceptClick(int x, int y, short clicksBefore) { view->DoClick(x - bounds.left, y - bounds.top, clicksBefore); }
 void GBSDLWindow::AcceptDrag(int x, int y) { view->DoDrag(x - bounds.left, y - bounds.top); }
 void GBSDLWindow::AcceptKeystroke(char what) { view->AcceptKeystroke(what); }
+void GBSDLWindow::DoZoom(short x, short y, short direction) { view->DoZoom(x - bounds.left, y - bounds.top, direction); }
 void GBSDLWindow::AcceptUnclick(int x, int y, short clicksBefore) { view->DoUnclick(x - bounds.left, y - bounds.top, clicksBefore); }
 #endif

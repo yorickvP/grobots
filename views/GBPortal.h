@@ -80,6 +80,7 @@ public:
 	void AcceptDrag(short x, short y);
 	void AcceptUnclick(short x, short y, int clicks);
 	void AcceptKeystroke(const char what);
+	void AcceptZoom(short x, short y, short direction);
 	void ReportDeletion(const GBDeletionReporter * deletee);
 	const string Name() const;
 	GBCursor Cursor() const;
@@ -100,6 +101,7 @@ public:
 	void ScrollBy(const GBFinePoint delta);
 	void ResetZoom();
 	void Zoom(short direction);
+	void ZoomAt(short direction, const GBFinePoint & center);
 // following
 	void Follow(GBObject * ob);
 	bool Following() const;

@@ -98,12 +98,14 @@ public:
 	void DoClick(short x, short y, int clicksBefore);
 	void DoDrag(short x, short y);
 	void DoUnclick(short x, short y, int clicksBefore);
+	void DoZoom(short x, short y, short direction);
 // to override
 	virtual bool GetFrontClicks() const; // accept clicks that brought window to front?
 	virtual void AcceptClick(short x, short y, int clicksBefore);
 	virtual void AcceptDrag(short x, short y);
 	virtual void AcceptUnclick(short x, short y, int clicksBefore);
 	virtual void AcceptKeystroke(const char what);
+	virtual void AcceptZoom(short x, short y, short direction);
   virtual void SetFocus(bool) {};
 // other
 	virtual const string Name() const;
@@ -139,6 +141,7 @@ public:
 	void AcceptDrag(short x, short y);
 	void AcceptUnclick(short x, short y, int clicksBefore);
 	void AcceptKeystroke(const char what);
+	void AcceptZoom(short x, short y, short direction);
 // other
 	const string Name() const;
 	GBCursor Cursor() const;

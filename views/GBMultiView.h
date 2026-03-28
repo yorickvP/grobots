@@ -30,6 +30,7 @@ class GBMultiView : public GBWrapperView {
   virtual bool NeedsRedraw(bool running) const override;
   virtual void SetFocus(bool) override;
 	void AcceptKeystroke(const char what) override;
+	void AcceptZoom(short x, short y, short direction) override;
 
   void CloseView(const GBView& v);
 };
