@@ -332,6 +332,15 @@ void GBSDLApplication::OpenTournament() {
 	mainView->Add(std::make_shared<GBTournamentView>(world), 100, 100);
 }
 
+static void LoadSideCallback(void *userdata, const char * const *filelist, int /*filter*/) {
+  GBWorld *world = static_cast<GBWorld *>(userdata);
+  if (!filelist) return;
+  for (const char * const *f = filelist; *f; ++f) {
+    GBSide *side = GBSideReader::Load(*f);
+    if (side) world->AddSide(side);
+  }
+}
+
 void GBSDLApplication::DoLoadSide() {
 #ifdef __EMSCRIPTEN__
   world.running = false;
@@ -349,6 +358,12 @@ void GBSDLApplication::DoLoadSide() {
   };
   input.click();
     }, &world);
+#else
+  static const SDL_DialogFileFilter filters[] = {
+    { "Grobots sides", "gb" },
+    { "All files", "*" },
+  };
+  SDL_ShowOpenFileDialog(LoadSideCallback, &world, nullptr, filters, 2, nullptr, true);
 #endif
 }
 

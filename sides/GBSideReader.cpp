@@ -626,7 +626,6 @@ GBSideReader::GBSideReader(const GBFilename & filename)
 	if ( HOpen(filename.vRefNum, filename.parID, filename.name, fsRdPerm, &refNum) )
 		throw GBFileError();
 #else
-	fin.open(filename.c_str(), ifstream::in);
 	if ( fin.fail() || ! fin.is_open() || fin.eof() ) throw GBFileError();
 #endif
 }
