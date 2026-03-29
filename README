@@ -74,36 +74,38 @@ Troubleshooting:
 3) If it complains about finding "windows.h" you are probably using version 6.1 of the Microsoft SDK, which does not appear to include windows.h. Use the 6.0a SDK instead. On my computer Visual Studio 2008 defaults to 6.1 and VS 2005 defaults to 6.0a, so if your computer is similar then switching to VS 2005 should solve this problem.
 
 ----- Building on Linux -----
-* Updated for GNU Autotools on February 23, 2013
 
-To build a headless (no graphics, console-only interface) Grobots executable on
-Linux or other Unix-like systems, you will require the GNU build system, known
-as Autotools. In the source directory, there are two vital files, Makefile.am
-and configure.ac, that provide all the information needed to build a version
-customized for your system/architecture.
-
-If you do not have Autotools, see the following web resources:
-<http://en.wikipedia.org/wiki/GNU_build_system>
-<http://www.gnu.org/software/automake>
-<http://airs.com/ian/configure>
-
-When ready, follow these steps:
+To build Grobots on Linux or other Unix-like systems, you will need Meson and
+Ninja. See <https://mesonbuild.com/Getting-meson.html> for installation
+instructions.
 
 1) Enter the top-level source directory.
 $ cd ./source
 
-2) Generate new configure and Makefile.in.
-$ autoreconf --install
+2) Configure the build directory.
+$ meson setup build
 
-3) Configure the actual Makefile for the system.
-$ ./configure
+3) Build the executable.
+$ ninja -C build
 
-4) Build the executable.
-$ make
+The headless executable will be at build/grobots_headless. If SDL3 and its
+dependencies are available, the graphical build (grobots_sdl) will also be
+built.
 
-And there you have it. Questions or concerns about the build system should be
-directed to Hector <ninjahector.escobedo@gmail.com>. Future support and
-inclusion of pre-generated configure files is expected.
+----- Building with Nix -----
+
+If you have Nix with flakes enabled, you can build directly:
+
+$ nix build              # graphical (SDL3) build
+$ nix build .#emcc       # Emscripten/WebAssembly build
+$ nix build .#wine       # Wine build
+$ nix build .#mingw32    # MinGW cross-compile
+
+Or enter a development shell with all dependencies available:
+
+$ nix develop
+$ meson setup build
+$ ninja -C build
 
 ----- Building under other environments -----
 
