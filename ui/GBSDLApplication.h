@@ -20,6 +20,10 @@
 template <class T> using Ref = std::shared_ptr<T>;
 union SDL_Event;
 class GBSDLWindow;
+class GBMenuView;
+class GBDebuggerView;
+class GBMiniMapView;
+class GBSideDebuggerView;
 
 class GBSDLApplication {
 	bool alive;
@@ -32,28 +36,37 @@ class GBSDLApplication {
 	bool Redraw();
   Ref<GBSDLWindow> FindWndAtPos(short x, short y);
   Ref<GBSDLWindow> FindWndFromID(Uint32 id);
-	
+
 	double tickRate;
 	double dt;
 	double simTime;
 	double accumulator;
 	uint64_t lastFrameTime;
 	bool unlimitedSpeed;
-	
+
 	GBFontManager fontmanager;
-	
+
   std::weak_ptr<GBSDLWindow> dragging;
 
 	GBWorld world;
-	
+
 	Ref<GBPortal> portal;
   Ref<GBSDLWindow> mainWnd;
 	Ref<GBSDLWindow> menuWnd;
   std::weak_ptr<GBSDLWindow> focus;
 	std::list<Ref<GBSDLWindow>> windows;
-	
+
 	void CloseWindow(Ref<GBSDLWindow> window);
   Ref<GBMultiView> mainView;
+
+  // Stored view references for menu state and actions
+  Ref<GBMenuView> menuView;
+  Ref<GBDebuggerView> debugger;
+  Ref<GBMiniMapView> minimap;
+  Ref<GBSideDebuggerView> sideDebugger;
+
+  void DoReloadSide();
+  void UpdateCursor();
 public:
 	GBSDLApplication();
   GBSDLApplication(const GBSDLApplication&) = delete;
@@ -64,7 +77,8 @@ public:
 	void SetUnlimitedSpeed();
 
   void HandleMenuSelection(int item);
-	
+  void AdjustMenus();
+
   void OpenView(Ref<GBView> view, short x, short y);
 	void OpenMinimap();
 	void OpenDebugger();
