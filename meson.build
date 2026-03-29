@@ -105,7 +105,7 @@ elif target_machine.system() == 'emscripten'
   # SDL3_gfx and SDL3_ttf have no emscripten ports in 4.0.12; use custom port scripts
   sdl3_ttf_port = '--use-port=' + meson.source_root() / 'vendor/sdl3_ttf.py'
   sdl3_gfx_port = '--use-port=' + meson.source_root() / 'vendor/sdl3_gfx.py'
-  shared_opts = ['-sUSE_SDL=3', sdl3_ttf_port, sdl3_gfx_port, '-fexceptions', '-sEXPORTED_RUNTIME_METHODS=ccall,cwrap']
+  shared_opts = ['-sUSE_SDL=3', sdl3_ttf_port, sdl3_gfx_port, '-fexceptions', '-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,FS']
   # hack: build emcc ports
   ports = custom_target('emcc_ports',
     input : 'empty.c',
@@ -122,6 +122,7 @@ elif target_machine.system() == 'emscripten'
              link_args: shared_opts + [
                '--embed-file=../Vera.ttf@Vera.ttf',
                '--embed-file=../VeraBd.ttf@VeraBd.ttf',
+               '--embed-file=../top9@top9',
                '--shell-file=../shell.html',
              ] + debug_args,
              name_suffix: 'html',
