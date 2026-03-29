@@ -67,12 +67,16 @@ GBMenuView::GBMenuView(GBSDLApplication& app, GBFontManager& fontmgr, std::share
     f = &topMenuItems->emplace_back("File");
     f->children->emplace_back("Open Side", miLoadSide);
     f->children->emplace_back("Duplicate Side", miDuplicateSide);
+    #ifndef __EMSCRIPTEN__
     f->children->emplace_back("Reload Side", miReloadSide);
+    #endif
     f->children->emplace_back("");
     f->children->emplace_back("Remove Side", miRemoveSide);
     f->children->emplace_back("Remove All Sides", miRemoveAllSides);
+    #ifndef __EMSCRIPTEN__
     f->children->emplace_back("");
     f->children->emplace_back("Exit", miQuit);
+    #endif
 
     f = &topMenuItems->emplace_back("Window");
     f->children->emplace_back("&Roster", miRosterView);
