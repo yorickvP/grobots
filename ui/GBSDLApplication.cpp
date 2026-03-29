@@ -144,7 +144,13 @@ void GBSDLApplication::mainloop(void* arg) {
     }
   }
 
-  // render (vsync blocks in present when something is drawn)
+  // render
+#ifdef __EMSCRIPTEN__
+  // emscripten main loop is already paced by requestAnimationFrame,
+  // so always redraw — no need to idle-wait (which busy-spins on web)
+  app->Redraw();
+#else
+  // vsync blocks in present when something is drawn
   if (!app->Redraw()) {
     // nothing was drawn — wait for events or next tick to avoid busy spin
     int waitMs = 1;
@@ -158,6 +164,7 @@ void GBSDLApplication::mainloop(void* arg) {
     }
     SDL_WaitEventTimeout(nullptr, waitMs);
   }
+#endif
 }
 
 void GBSDLApplication::Run() {
