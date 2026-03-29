@@ -33,6 +33,7 @@ class GBMultiView : public GBWrapperView {
 	void AcceptZoom(short x, short y, short direction) override;
 
   void CloseView(const GBView& v);
+  const string Name() const override;
 };
 
 #endif

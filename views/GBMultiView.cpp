@@ -363,7 +363,7 @@ void GBMultiView::AcceptZoom(short x, short y, short direction) {
   }
 }
 
-// const string GBMultiView::Name() const {
-// 	return "Grobots";
-// }
+const string GBMultiView::Name() const {
+	return "Grobots";
+}
 
