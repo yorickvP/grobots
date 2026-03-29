@@ -6,6 +6,11 @@
 #include "GBSide.h"
 #include "GBWorld.h"
 #include "GBStringUtilities.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
+#include <SDL3/SDL.h>
+#endif
 
 const short kFramecounterHeight = 15;
 const short kSideBoxHeight = 17;
@@ -115,6 +120,32 @@ void GBRosterView::DrawFooter(const GBRect & box) {
 					   box.left, box.top + 22, 10, GBColor::black);
 	DrawStringLeft("http://grobots.sf.net/sides/",
 				   box.left, box.top + 34, 10, GBColor::blue);
+}
+
+static void OpenURL(const char * url) {
+#ifdef __EMSCRIPTEN__
+	EM_ASM({ window.open(UTF8ToString($0), '_blank'); }, url);
+#else
+	SDL_OpenURL(url);
+#endif
+}
+
+void GBRosterView::AcceptClick(short x, short y, int clicks) {
+	// Check if click is in footer area (where the URL is)
+	if (Items() == 0) {
+		short hh = HeaderHeight();
+		short top = kEdgeSpace + (hh ? hh + kEdgeSpace : 0);
+		short footerTop = top + kEdgeSpace;
+		if (y >= footerTop && y < footerTop + FooterHeight()) {
+			// Click in footer - check if on the URL line (third line, around y=34 within footer)
+			short footerLineY = footerTop + 24; // approximate start of URL line
+			if (y >= footerLineY) {
+				OpenURL("http://grobots.sf.net/sides/");
+				return;
+			}
+		}
+	}
+	GBListView::AcceptClick(x, y, clicks);
 }
 
 void GBRosterView::ItemClicked(long index) {

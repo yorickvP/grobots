@@ -16,7 +16,8 @@ public:
 	
 	short PreferredWidth() const;
 	short PreferredHeight() const;
-	
+	void AcceptClick(short x, short y, int clicks);
+
 	const string Name() const;
 };
 

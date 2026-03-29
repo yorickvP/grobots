@@ -39,6 +39,7 @@ public:
 	void DrawHeader(const GBRect & box);
 	void DrawItem(long index, const GBRect & box);
 	void DrawFooter(const GBRect & box);
+	void AcceptClick(short x, short y, int clicks);
 	void ItemClicked(long index);
 };
 

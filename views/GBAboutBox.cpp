@@ -4,6 +4,11 @@
 
 #include "GBAboutBox.h"
 #include "GBColor.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
+#include <SDL3/SDL.h>
+#endif
 
 
 GBAboutBox::GBAboutBox()
@@ -47,6 +52,17 @@ short GBAboutBox::PreferredWidth() const {
 
 short GBAboutBox::PreferredHeight() const {
 	return 265;
+}
+
+void GBAboutBox::AcceptClick(short /*x*/, short y, int /*clicks*/) {
+	// URL is drawn at y=205, font size 10 - clickable region around it
+	if (y >= 195 && y <= 210) {
+#ifdef __EMSCRIPTEN__
+		EM_ASM({ window.open(UTF8ToString($0), '_blank'); }, "http://grobots.sourceforge.net/");
+#else
+		SDL_OpenURL("http://grobots.sourceforge.net/");
+#endif
+	}
 }
 
 const string GBAboutBox::Name() const {
