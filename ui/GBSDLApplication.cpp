@@ -397,6 +397,18 @@ void GBSDLApplication::DoReloadSide() {
 	}
 }
 
+struct SaveScoresRequest {
+  GBWorld *world;
+  bool html;
+};
+
+static void SaveScoresCallback(void *userdata, const char * const *filelist, int /*filter*/) {
+  auto *req = static_cast<SaveScoresRequest *>(userdata);
+  if (filelist && *filelist)
+    req->world->DumpTournamentScores(req->html, *filelist);
+  delete req;
+}
+
 static void LoadSideCallback(void *userdata, const char * const *filelist, int /*filter*/) {
   GBWorld *world = static_cast<GBWorld *>(userdata);
   if (!filelist) return;
@@ -429,6 +441,51 @@ void GBSDLApplication::DoLoadSide() {
     { "All files", "*" },
   };
   SDL_ShowOpenFileDialog(LoadSideCallback, &world, nullptr, filters, 2, nullptr, true);
+#endif
+}
+
+void GBSDLApplication::DoSaveScores(bool html) {
+#ifdef __EMSCRIPTEN__
+  std::ostringstream ss;
+  world.DumpTournamentScores(html, ss);
+  std::string content = ss.str();
+  const char *defaultName = html ? "tournament-scores.html" : "tournament-scores.txt";
+  const char *mimeType = html ? "text/html" : "text/plain";
+  EM_ASM({
+    var content = UTF8ToString($0);
+    var filename = UTF8ToString($1);
+    var mime = UTF8ToString($2);
+    if (window.showSaveFilePicker) {
+      window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{accept: {[mime]: ['.' + filename.split('.').pop()]}}]
+      }).then(function(handle) {
+        return handle.createWritable().then(function(writable) {
+          return writable.write(content).then(function() { return writable.close(); });
+        });
+      }).catch(function(e) { if (e.name !== 'AbortError') console.error(e); });
+    } else {
+      var blob = new Blob([content], {type: mime});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+  }, content.c_str(), defaultName, mimeType);
+#else
+  static const SDL_DialogFileFilter htmlFilters[] = {
+    { "HTML files", "html;htm" },
+    { "All files", "*" },
+  };
+  static const SDL_DialogFileFilter wikiFilters[] = {
+    { "Text files", "txt" },
+    { "All files", "*" },
+  };
+  auto *req = new SaveScoresRequest{&world, html};
+  SDL_ShowSaveFileDialog(SaveScoresCallback, req, nullptr,
+    html ? htmlFilters : wikiFilters, 2,
+    html ? "tournament-scores.html" : "tournament-scores.txt");
 #endif
 }
 
@@ -583,8 +640,8 @@ void GBSDLApplication::HandleMenuSelection(int item) {
 				if ( world.tournament ) world.tournament = false;
 				else world.tournament = true;
 				break;
-			case miSaveScoresHtml: world.DumpTournamentScores(true); break;
-			case miSaveScoresWiki: world.DumpTournamentScores(false); break;
+			case miSaveScoresHtml: DoSaveScores(true); break;
+			case miSaveScoresWiki: DoSaveScores(false); break;
 			case miResetScores: world.ResetTournamentScores(); break;
 		//Tools menu
 			case miScroll: portal->tool = ptScroll; break;

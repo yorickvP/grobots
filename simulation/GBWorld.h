@@ -107,7 +107,8 @@ public:
 	void ReportRobot(GBEnergy amount);
 	void ReportRound();
 	void ResetTournamentScores();
-	void DumpTournamentScores(bool html);
+	void DumpTournamentScores(bool html, std::ostream & out);
+	void DumpTournamentScores(bool html, const std::string & filename = "tournament-scores.html");
 	const GBScores & RoundScores() const;
 	const GBScores & TournamentScores() const;
 // selected object

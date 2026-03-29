@@ -495,7 +495,7 @@ void GBWorld::ResetTournamentScores() {
 	Changed();
 }
 
-static void PutPercentCell(std::ofstream &f, bool html, const GBNumber &percent, int digits, bool enoughData,
+static void PutPercentCell(std::ostream &f, bool html, const GBNumber &percent, int digits, bool enoughData,
 						   const GBNumber &low, const GBNumber &high, const char *lowclass, const char *highclass) {
 	const char *label = !enoughData ? "uncertain" :
 		percent < low ? lowclass : percent > high ? highclass : NULL;
@@ -515,9 +515,13 @@ static void PutPercentCell(std::ofstream &f, bool html, const GBNumber &percent,
 const long kMinColorRounds = 10;
 
 //The low/high classification logic is duplicated from GBTournamentView::DrawItem.
-void GBWorld::DumpTournamentScores(bool html) {
-	std::ofstream f("tournament-scores.html", std::ios::app);
+void GBWorld::DumpTournamentScores(bool html, const std::string & filename) {
+	std::ofstream f(filename, std::ios::app);
 	if ( !f.good() ) return;
+	DumpTournamentScores(html, f);
+}
+
+void GBWorld::DumpTournamentScores(bool html, std::ostream & f) {
 	char date[32];
 	time_t now = time(NULL);
 	strftime(date, 32, "%d %b %Y %H:%M:%S", localtime(&now));

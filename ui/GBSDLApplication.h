@@ -66,6 +66,7 @@ class GBSDLApplication {
   Ref<GBSideDebuggerView> sideDebugger;
 
   void DoReloadSide();
+  void DoSaveScores(bool html);
   void UpdateCursor();
 public:
 	GBSDLApplication();
