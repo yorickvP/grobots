@@ -8,7 +8,7 @@
 #include "GBStringUtilities.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#else
+#elif defined(WITH_SDL)
 #include <SDL3/SDL.h>
 #endif
 
@@ -125,7 +125,7 @@ void GBRosterView::DrawFooter(const GBRect & box) {
 static void OpenURL(const char * url) {
 #ifdef __EMSCRIPTEN__
 	EM_ASM({ window.open(UTF8ToString($0), '_blank'); }, url);
-#else
+#elif defined(WITH_SDL)
 	SDL_OpenURL(url);
 #endif
 }

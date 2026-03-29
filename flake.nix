@@ -28,7 +28,6 @@
           buildInputs = (lib.optionals withSDL [ sdl3 sdl3-ttf sdl3-gfx ]) ++ (lib.optionals withWine [ wine ]);
           postInstall = lib.optionalString (stdenv.system == "i686-windows") ''
             cp ${windows.mcfgthreads}/bin/*.dll $out/bin
-            cp ${stdenv.cc.cc.out}/i686-w64-mingw32/lib/*.dll $out/bin
           '';
         };
       forEachSystem = lib.genAttrs [ "x86_64-linux" "i686-linux" ];

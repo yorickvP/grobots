@@ -6,7 +6,7 @@
 #include "GBColor.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#else
+#elif defined(WITH_SDL)
 #include <SDL3/SDL.h>
 #endif
 
@@ -59,7 +59,7 @@ void GBAboutBox::AcceptClick(short /*x*/, short y, int /*clicks*/) {
 	if (y >= 195 && y <= 210) {
 #ifdef __EMSCRIPTEN__
 		EM_ASM({ window.open(UTF8ToString($0), '_blank'); }, "http://grobots.sourceforge.net/");
-#else
+#elif defined(WITH_SDL)
 		SDL_OpenURL("http://grobots.sourceforge.net/");
 #endif
 	}
