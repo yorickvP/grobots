@@ -113,19 +113,25 @@ void GBGraphics::DrawSolidOval(const GBRect & r, const GBColor & color) {
 	if (renderer == nil) return;
 	SDL_FRect r1;
 	r.ToFRect(r1);
-	filledEllipseRGBA(renderer, r1.x + (r1.w/2), r1.y + (r1.h/2), r1.w/2, r1.h/2, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
+	// Inset by 1 so the fill sits inside the border drawn by DrawOpenOval (matching Mac QuickDraw)
+	filledEllipseRGBA(renderer, r1.x + (r1.w/2), r1.y + (r1.h/2), r1.w/2 - 1, r1.h/2 - 1, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255);
 }
 void GBGraphics::DrawOpenOval(const GBRect & r, const GBColor & color, short thickness) {
 	if (renderer == nil) return;
 	SDL_FRect r1;
 	r.ToFRect(r1);
-	thickEllipseRGBA(renderer, r1.x + (r1.w/2), r1.y + (r1.h/2), r1.w/2, r1.h/2, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255, thickness);
+	// Inset radius by half thickness to stroke inward (matching Mac QuickDraw behavior)
+	float inset = thickness / 2.0f;
+	thickEllipseRGBA(renderer, r1.x + (r1.w/2), r1.y + (r1.h/2), r1.w/2 - inset, r1.h/2 - inset, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255, thickness);
 }
 //startAngle: degrees clockwise from up
 //length: degrees
 void GBGraphics::DrawArc(const GBRect & where, short startAngle, short length,
 		const GBColor & color, short thickness) {
-  thickArcRGBA(renderer, where.CenterX(), where.CenterY(), where.Width()/2, startAngle, startAngle + length, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255, thickness);
+  short sdlStart = startAngle - 90; // convert from clockwise-from-up to clockwise-from-right
+  // Inset radius by half thickness to stroke inward (matching Mac QuickDraw behavior)
+  short rad = where.Width()/2 - thickness/2;
+  thickArcRGBA(renderer, where.CenterX(), where.CenterY(), rad, sdlStart, sdlStart + length, color.Red()*0xFF, color.Green()*0xFF, color.Blue()*0xFF, 255, thickness);
 }
 void GBGraphics::DrawStringLeft(const string & str, short x, short y,
 		short size, const GBColor & color, bool useBold) {
