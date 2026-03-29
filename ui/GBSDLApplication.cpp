@@ -25,6 +25,7 @@
 #include <vector>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+extern "C" void setWorld(GBWorld* world);
 #endif
 // todo: duplicated from GBApplication.h
 //Menu item IDs: these are 100*menuid + itemposition
@@ -90,6 +91,9 @@ GBSDLApplication::GBSDLApplication()
 	windows.push_back(mainWnd);
   OpenMinimap();
   OpenRoster();
+#ifdef __EMSCRIPTEN__
+  setWorld(&world);
+#endif
 }
 GBSDLApplication::~GBSDLApplication() {}
 

@@ -18,11 +18,124 @@
         width: 100vw;
         height: 100vh;
       }
+      #welcome-popover {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #000;
+        color: #fff;
+        border: 1px solid #444;
+        border-radius: 0;
+        padding: 32px;
+        max-width: 480px;
+        width: 90vw;
+        z-index: 100;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      #welcome-popover h1 {
+        margin: 0 0 12px;
+        font-size: 24px;
+        color: #4ade80;
+      }
+      #welcome-popover p {
+        margin: 0 0 16px;
+        line-height: 1.5;
+        font-size: 14px;
+        color: #fff;
+      }
+      #welcome-popover .buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+      #welcome-popover button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 0;
+        font-size: 14px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      #welcome-popover .btn-demo {
+        background: #4ade80;
+        color: #000;
+      }
+      #welcome-popover .btn-demo:hover {
+        background: #22c55e;
+      }
+      #welcome-popover .btn-close {
+        background: #333;
+        color: #e0e0e0;
+      }
+      #welcome-popover .btn-close:hover {
+        background: #444;
+      }
+      #welcome-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 99;
+      }
     </style>
   </head>
   <body>
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
 
+    <div id="welcome-backdrop"></div>
+    <div id="welcome-popover">
+      <h1>Grobots</h1>
+      <p>
+        Grobots is a real-time strategy programming game. Write programs in a
+        simple dialect of Forth to control teams of robots as they forage,
+        reproduce, and fight.
+      </p>
+      <p>
+        Load sides from the File menu, or try the demo to jump right in.
+      </p>
+      <div class="buttons">
+        <button class="btn-close" onclick="closeWelcome()">Close</button>
+        <button class="btn-close" onclick="dismissWelcome()">Don't show again</button>
+        <button class="btn-demo" onclick="loadDemo()">Load Demo Sides</button>
+      </div>
+    </div>
+
+    <script type='text/javascript'>
+      function closeWelcome() {
+        document.getElementById('welcome-popover').remove();
+        document.getElementById('welcome-backdrop').remove();
+      }
+      function dismissWelcome() {
+        closeWelcome();
+        localStorage.setItem('grobots-welcome-dismissed', '1');
+      }
+      function loadDemo() {
+        closeWelcome();
+        var sides = [
+          'top9/active-9.gb',
+          'top9/faithless-1.gb',
+          'top9/isi-33.gb',
+          'top9/mice.gb',
+          'top9/move-zig-3.gb',
+          'top9/rk-bertha.gb',
+          'top9/segregated-eaters-3.gb',
+          'top9/the-lunacy.gb',
+          'top9/weird-men-d.gb',
+        ];
+        var world = Module.ccall('getWorld', 'number', [], []);
+        sides.forEach(function(path) {
+          var data = FS.readFile(path, { encoding: 'utf8' });
+          var filename = path.split('/').pop();
+          Module.ccall('addSide', null, ['number', 'string', 'string'], [world, filename, data]);
+        });
+        Module.ccall('newRound', null, ['number'], [world]);
+      }
+      if (localStorage.getItem('grobots-welcome-dismissed')) {
+        document.getElementById('welcome-popover').remove();
+        document.getElementById('welcome-backdrop').remove();
+      }
+    </script>
     <script type='text/javascript'>
       var canvasElement = document.getElementById('canvas');
 

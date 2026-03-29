@@ -698,6 +698,22 @@ GBSide * GBSideReader::Load(const GBFilename & filename, char * contents){
 }
 
 #ifdef __EMSCRIPTEN__
+GBWorld* gTheWorld = nullptr;
+
+extern "C" void EMSCRIPTEN_KEEPALIVE setWorld(GBWorld* world) {
+  gTheWorld = world;
+}
+
+extern "C" GBWorld* EMSCRIPTEN_KEEPALIVE getWorld() {
+  return gTheWorld;
+}
+
+extern "C" void EMSCRIPTEN_KEEPALIVE newRound(GBWorld* world) {
+  world->Reset();
+  world->AddSeeds();
+  world->running = true;
+}
+
 extern "C" void EMSCRIPTEN_KEEPALIVE addSide(GBWorld* world, char* filename, char* contents) {
 
   GBSide * side = GBSideReader::Load(filename, contents);
