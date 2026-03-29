@@ -164,6 +164,11 @@ public:
   const GBRect& GetBounds() const {
     return texture->Bounds();
   }
+  bool HitTitlebar(short x, short y) const {
+    if (!hasTitlebar) return false;
+    const GBRect& dst = texture->Bounds();
+    return y - dst.top < v->Bounds().top;
+  }
   bool IsDragging() const {
     return draggingTitlebar;
   }
@@ -242,10 +247,10 @@ void GBMultiView::AcceptClick(short x, short y, int clicksBefore) {
       changed = true;
       return;
     }
-    bool shouldClick = true;
-    if (childView != focus.lock() && !childView->GetFrontClicks()) shouldClick = false;
+    bool wasFocused = (childView == focus.lock());
     Focus(childView);
-    if (shouldClick) {
+    // Always allow titlebar clicks (for dragging); gate content clicks on GetFrontClicks
+    if (wasFocused || childView->GetFrontClicks() || childView->HitTitlebar(x, y)) {
       dragging = childView;
       childView->DoClick(x, y, clicksBefore);
     }

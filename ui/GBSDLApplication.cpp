@@ -134,24 +134,10 @@ void GBSDLApplication::mainloop(void* arg) {
 
   // render
 #ifdef __EMSCRIPTEN__
-  // emscripten main loop is already paced by requestAnimationFrame,
-  // so always redraw — no need to idle-wait (which busy-spins on web)
   app->Redraw();
 #else
-  // vsync blocks in present when something is drawn
-  if (!app->Redraw()) {
-    // nothing was drawn — wait for events or next tick to avoid busy spin
-    int waitMs = 1;
-    if (!app->unlimitedSpeed && app->world.running) {
-      double timeToNextTick = app->dt - app->accumulator;
-      if (timeToNextTick > 0)
-        waitMs = (int)(timeToNextTick * 1000);
-      if (waitMs < 1) waitMs = 1;
-    } else if (!app->world.running) {
-      waitMs = 16; // idle when paused
-    }
-    SDL_WaitEventTimeout(nullptr, waitMs);
-  }
+  if (!app->Redraw())
+    SDL_WaitEventTimeout(nullptr, 1);
 #endif
 }
 
@@ -207,10 +193,9 @@ void GBSDLApplication::Process() {
 }
 bool GBSDLApplication::Redraw() {
 	bool any = false;
-	bool isDragging = !dragging.expired();
 	for (auto it = windows.begin(); it != windows.end(); ++it) {
 		if (!(*it)->Visible()) continue;
-		if ((*it)->DrawChanges(world.running || isDragging)) any = true;
+		if ((*it)->DrawChanges(world.running)) any = true;
 	}
 	return any;
 }

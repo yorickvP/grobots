@@ -38,7 +38,7 @@ bool GBSDLWindow::DrawChanges(bool running) {
 	bool redrawn = visible && view->NeedsRedraw(running);
 	if (redrawn) {
 		view->DoDraw(graphics, running);
-    renderer.Present();
+		renderer.Present();
 	}
 	if ( !isMain && visible && view->NeedsResize() ) {
 		redrawn = true;
